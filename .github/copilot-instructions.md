@@ -9,8 +9,8 @@
 
 - [x] Compile the Project
 
-- [ ] Create and Run Task
+- [x] Create and Run Task
 
-- [ ] Launch the Project
+- [x] Launch the Project
 
-- [ ] Ensure Documentation is Complete
+- [x] Ensure Documentation is Complete
