@@ -1,0 +1,137 @@
+.financial-card {
+  background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #444;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.financial-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-color);
+}
+
+.financial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent-color);
+}
+
+.financial-card.positive {
+  --accent-color: #28a745;
+}
+
+.financial-card.negative {
+  --accent-color: #dc3545;
+}
+
+.financial-card.neutral {
+  --accent-color: #FFD700;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 215, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.card-icon img {
+  width: 32px;
+  height: 32px;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%) hue-rotate(5deg) brightness(104%) contrast(101%);
+}
+
+.card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  color: #ccc;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-value {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  word-break: break-all;
+}
+
+.financial-card.positive .card-value {
+  color: #28a745;
+}
+
+.financial-card.negative .card-value {
+  color: #dc3545;
+}
+
+.financial-card.neutral .card-value {
+  color: #FFD700;
+}
+
+@media (max-width: 768px) {
+  .financial-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .card-icon img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .card-title {
+    font-size: 0.75rem;
+  }
+
+  .card-value {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .financial-card {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .card-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .card-icon img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .card-value {
+    font-size: 1.1rem;
+  }
+}

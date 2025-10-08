@@ -1,0 +1,364 @@
+.dashboard {
+  padding: 2rem;
+  background: #0f0f0f;
+  min-height: calc(100vh - 100px);
+  color: white;
+}
+
+.financial-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 1.5rem;
+}
+
+.dashboard-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: #FFD700;
+}
+
+.card-header {
+  color: #FFD700;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #333;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.transactions-table,
+.bills-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.transactions-table th,
+.bills-table th {
+  color: #ccc;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #444;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.transactions-table td,
+.bills-table td {
+  padding: 0.75rem 0.5rem;
+  border-bottom: 1px solid #2a2a2a;
+  color: white;
+}
+
+.category {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.category.income {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+  border: 1px solid #28a745;
+}
+
+.category.expense {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.value.income {
+  color: #28a745;
+  font-weight: 700;
+}
+
+.value.expense {
+  color: #dc3545;
+  font-weight: 700;
+}
+
+.chart-container {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.chart-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #FF6B6B 0deg 144deg,
+    #4ECDC4 144deg 252deg,
+    #45B7D1 252deg 324deg,
+    #96CEB4 324deg 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.chart-placeholder::before {
+  content: '';
+  width: 120px;
+  height: 120px;
+  background: #1a1a1a;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.chart-center {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.total-label {
+  color: #ccc;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.total-value {
+  color: #FFD700;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.chart-legend {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  color: #ccc;
+  font-size: 0.875rem;
+}
+
+.bills-container {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.bills-icon {
+  width: 80px;
+  height: 80px;
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bills-icon img {
+  width: 48px;
+  height: 48px;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%) hue-rotate(5deg) brightness(104%) contrast(101%);
+}
+
+.category-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.category-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-name {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.category-amount {
+  color: #ccc;
+  font-size: 0.75rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Responsivo */
+@media (max-width: 1200px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 1rem;
+  }
+
+  .financial-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .dashboard-grid {
+    gap: 1rem;
+  }
+
+  .dashboard-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+  }
+
+  .chart-placeholder {
+    width: 150px;
+    height: 150px;
+  }
+
+  .chart-placeholder::before {
+    width: 90px;
+    height: 90px;
+  }
+
+  .total-value {
+    font-size: 0.875rem;
+  }
+
+  .bills-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .bills-icon {
+    width: 60px;
+    height: 60px;
+    align-self: center;
+  }
+
+  .bills-icon img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: 0.75rem;
+  }
+
+  .dashboard-card {
+    padding: 0.75rem;
+  }
+
+  .card-header {
+    font-size: 1rem;
+  }
+
+  .transactions-table th,
+  .bills-table th,
+  .transactions-table td,
+  .bills-table td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+
+  .category {
+    padding: 0.125rem 0.5rem;
+    font-size: 0.625rem;
+  }
+
+  .chart-placeholder {
+    width: 120px;
+    height: 120px;
+  }
+
+  .chart-placeholder::before {
+    width: 80px;
+    height: 80px;
+  }
+
+  .total-label {
+    font-size: 0.625rem;
+  }
+
+  .total-value {
+    font-size: 0.75rem;
+  }
+
+  .legend-label {
+    font-size: 0.75rem;
+  }
+}
