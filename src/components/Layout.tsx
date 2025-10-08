@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import './Layout.css';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import Dashboard from './Dashboard';
+import Dashboard from '../pages/Dashboard';
+import Receitas from '../pages/Receitas';
+import Despesas from '../pages/Despesas';
 
 const Layout: React.FC = () => {
   const [activeItem, setActiveItem] = useState('dashboard');
@@ -30,26 +32,9 @@ const Layout: React.FC = () => {
       case 'dashboard':
         return <Dashboard />;
       case 'receitas':
-        return (
-          <div className="page-placeholder">
-            <h2>Receitas</h2>
-            <p>Página em desenvolvimento...</p>
-          </div>
-        );
+        return <Receitas />;
       case 'despesas':
-        return (
-          <div className="page-placeholder">
-            <h2>Despesas</h2>
-            <p>Página em desenvolvimento...</p>
-          </div>
-        );
-      case 'contas':
-        return (
-          <div className="page-placeholder">
-            <h2>Contas a Pagar</h2>
-            <p>Página em desenvolvimento...</p>
-          </div>
-        );
+        return <Despesas />;
       default:
         return <Dashboard />;
     }

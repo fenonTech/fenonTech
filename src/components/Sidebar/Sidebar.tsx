@@ -4,7 +4,6 @@ import logo from '../../assets/logo.png';
 import simboloDashboard from '../../assets/simboloDashboardAmarelo.png';
 import simboloReceita from '../../assets/simboloMenuReceita.png';
 import simboloDespesas from '../../assets/simboloMenuDespesas.png';
-import simboloContasAPagar from '../../assets/simboloMenuBolsoContasAPagar.png';
 import simboloConfiguracao from '../../assets/simboloConfiguracao.png';
 import simboloSaida from '../../assets/simboloSaida.png';
 import simboloMenuBurguer from '../../assets/simboloMenuBurguer.png';
@@ -21,7 +20,6 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
     { id: 'dashboard', label: 'DashBoard', icon: simboloDashboard },
     { id: 'receitas', label: 'Receitas', icon: simboloReceita },
     { id: 'despesas', label: 'Despesas', icon: simboloDespesas },
-    { id: 'contas', label: 'Contas a Pagar', icon: simboloContasAPagar },
   ];
 
   const systemItems = [
