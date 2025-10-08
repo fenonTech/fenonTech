@@ -314,10 +314,12 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .dashboard {
     padding: 1rem;
     background: #0f0f0f;
+    width: 100%;
+    min-height: calc(100vh - 2rem);
   }
 
   /* Cards financeiros em layout mobile */
@@ -525,29 +527,108 @@
     font-size: 0.75rem;
   }
 
-  /* Contas a pagar mobile */
+  /* Contas a pagar mobile - layout da imagem */
   .bills-container {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 1rem;
+    align-items: flex-start;
+    padding: 0;
   }
 
   .bills-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 215, 0, 0.1);
-    border-radius: 8px;
+    width: 80px;
+    height: 80px;
+    background: transparent;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    align-self: flex-start;
+    margin-top: 0.5rem;
   }
 
   .bills-icon img {
-    width: 28px;
-    height: 28px;
+    width: 70px;
+    height: 70px;
     filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%) hue-rotate(7deg) brightness(118%) contrast(109%);
+  }
+
+  /* Tabela de contas mobile - layout específico da imagem */
+  .bills-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.75rem;
+    background: transparent;
+    flex: 1;
+  }
+
+  .bills-table thead {
+    display: none; /* Esconder cabeçalho na versão mobile */
+  }
+
+  .bills-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    background: rgba(26, 26, 26, 0.8);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid #333;
+    position: relative;
+  }
+
+  .bills-table tbody td {
+    display: block;
+    padding: 0.4rem 0;
+    border: none;
+    text-align: left;
+    color: white;
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .bills-table tbody td:before {
+    content: attr(data-label);
+    color: #999;
+    font-weight: 600;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: inline-block;
+    width: 80px;
+    margin-right: 0.5rem;
+  }
+
+  /* Categoria laranja */
+  .bills-table .category.expense {
+    background: transparent;
+    color: #FF8C00;
+    border: none;
+    padding: 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: none;
+    display: inline;
+  }
+
+  /* Valores em vermelho */
+  .bills-table .value.expense {
+    color: #FF6B6B;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  /* Destacar linha amarela à direita de cada item */
+  .bills-table tbody tr::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 4px;
+    height: 100%;
+    background: #FFD700;
+    border-radius: 0 12px 12px 0;
   }
 
   /* Botão "Ver todas as transações" mobile */

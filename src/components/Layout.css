@@ -40,7 +40,7 @@
 }
 
 /* Responsivo */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-width: 601px) {
   .layout {
     flex-direction: column;
   }
@@ -63,7 +63,26 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 600px) {
+  /* Layout permanece em flexbox para mobile com sidebar lateral */
+  .layout {
+    display: flex;
+    flex-direction: row; /* Mantém lado a lado no mobile */
+  }
+
+  /* Conteúdo principal ajustado para sidebar mobile */
+  .main-content {
+    margin-left: 50px; /* Espaço para sidebar fechada (apenas menu burger) */
+    transition: margin-left 0.3s ease;
+    width: calc(100% - 50px);
+  }
+
+  /* Quando sidebar está aberta no mobile */
+  .sidebar:not(.collapsed) ~ .main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+  }
+
   .page-placeholder {
     padding: 1rem;
     min-height: 250px;

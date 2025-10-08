@@ -154,14 +154,14 @@ const Dashboard: React.FC = () => {
                 <tbody>
                   {bills.map((bill, index) => (
                     <tr key={index}>
-                      <td>{bill.date}</td>
-                      <td>{bill.description}</td>
-                      <td>
+                      <td data-label="Data">{bill.date}</td>
+                      <td data-label="Descrição">{bill.description}</td>
+                      <td data-label="Categoria">
                         <span className="category expense">
                           {bill.category}
                         </span>
                       </td>
-                      <td className="value expense">{bill.value}</td>
+                      <td data-label="Valor" className="value expense">{bill.value}</td>
                     </tr>
                   ))}
                 </tbody>

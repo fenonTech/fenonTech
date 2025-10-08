@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Sidebar.css';
 import logo from '../../assets/logo.png';
 import simboloDashboard from '../../assets/simboloDashboardAmarelo.png';
@@ -15,6 +15,22 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar se está em mobile e inicializar como fechado
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 600;
+      setIsMobile(mobile);
+      if (mobile) {
+        setIsCollapsed(true); // Inicia fechado no mobile
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const menuItems = [
     { id: 'dashboard', label: 'DashBoard', icon: simboloDashboard },
@@ -28,9 +44,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
   ];
 
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobile ? 'mobile' : ''}`}>
       <div className="sidebar-header">
-        <img src={logo} alt="Meu Bolso" className="logo" />
+        {(!isCollapsed || !isMobile) && <img src={logo} alt="Meu Bolso" className="logo" />}
         {!isCollapsed && <span className="app-name">Meu Bolso</span>}
         <button 
           className="menu-toggle"
@@ -41,39 +57,44 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
       </div>
 
       <nav className="sidebar-nav">
-        <div className="nav-section">
-          {!isCollapsed && <span className="nav-title">Navegação</span>}
-          <ul className="nav-list">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
-                  onClick={() => onItemClick(item.id)}
-                >
-                  <img src={item.icon} alt={item.label} className="nav-icon" />
-                  {!isCollapsed && <span>{item.label}</span>}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {/* Esconder navegação completamente quando fechado no mobile */}
+        {!(isMobile && isCollapsed) && (
+          <>
+            <div className="nav-section">
+              {!isCollapsed && <span className="nav-title">Navegação</span>}
+              <ul className="nav-list">
+                {menuItems.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
+                      onClick={() => onItemClick(item.id)}
+                    >
+                      <img src={item.icon} alt={item.label} className="nav-icon" />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-        <div className="nav-section">
-          {!isCollapsed && <span className="nav-title">Sistema</span>}
-          <ul className="nav-list">
-            {systemItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
-                  onClick={() => onItemClick(item.id)}
-                >
-                  <img src={item.icon} alt={item.label} className="nav-icon" />
-                  {!isCollapsed && <span>{item.label}</span>}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+            <div className="nav-section">
+              {!isCollapsed && <span className="nav-title">Sistema</span>}
+              <ul className="nav-list">
+                {systemItems.map((item) => (
+                  <li key={item.id}>
+                    <button
+                      className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
+                      onClick={() => onItemClick(item.id)}
+                    >
+                      <img src={item.icon} alt={item.label} className="nav-icon" />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
       </nav>
     </div>
   );
