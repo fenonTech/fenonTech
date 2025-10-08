@@ -4,6 +4,7 @@ import FinancialCard from '../../components/Cards/FinancialCard';
 import dinheiroSaldo from '../../assets/dinheiroSaldo.png';
 import sacoDeDinheiro from '../../assets/sacoDeDinheiro.png';
 import setaParaBaixo from '../../assets/setaParaBaixo.png';
+import simboloMenuBolsoContasAPagar from '../../assets/simboloMenuBolsoContasAPagar.png';
 
 interface Transaction {
   date: string;
@@ -101,6 +102,9 @@ const Dashboard: React.FC = () => {
               </tbody>
             </table>
           </div>
+          <button className="view-all-btn">
+            📊 Ver todas as transações
+          </button>
         </div>
 
         {/* Despesas por categoria (simulando gráfico de pizza) */}
@@ -114,15 +118,18 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="chart-legend">
-              {categoryData.map((item, index) => (
-                <div key={index} className="legend-item">
-                  <div 
-                    className="legend-color" 
-                    style={{ backgroundColor: item.color }}
-                  ></div>
-                  <span className="legend-label">{item.name} ({item.percentage}%)</span>
-                </div>
-              ))}
+              <div className="legend-item">
+                <div className="legend-bar alimentacao"></div>
+                <span className="legend-label">Básicos</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-bar transporte"></div>
+                <span className="legend-label">Transporte</span>
+              </div>
+              <div className="legend-item">
+                <div className="legend-bar despesas"></div>
+                <span className="legend-label">Despesas</span>
+              </div>
             </div>
           </div>
         </div>
@@ -132,7 +139,7 @@ const Dashboard: React.FC = () => {
           <h3 className="card-header">Contas a pagar</h3>
           <div className="bills-container">
             <div className="bills-icon">
-              <img src={sacoDeDinheiro} alt="Contas" />
+              <img src={simboloMenuBolsoContasAPagar} alt="Contas" />
             </div>
             <div className="table-container">
               <table className="bills-table">
