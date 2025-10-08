@@ -3,6 +3,10 @@ import './Configuracoes.css';
 import simboloMeuBolsoUsadoNoCardDePerfilDoUsuario from '../../assets/simboloMeuBolsoUsadoNoCardDePerfilDoUsuario.png';
 import simboloMeuBolsoUtilizadoNoCardDeNotificacoes from '../../assets/simboloMeuBolsoUtilizadoNoCardDeNotificacoes.png';
 import SimboloMeuBolsoUtilizadoNoCardDeBancosConectados from '../../assets/SimboloMeuBolsoUtilizadoNoCardDeBancosConectados.png';
+import nubankLogo from '../../assets/nubankLogoBancoRoxaBancosConectados.png';
+import itauLogo from '../../assets/itauLogoBancoLaranjaBancosConectados.png';
+import picpayLogo from '../../assets/picpayLogoBancoVerdeBancosConectados.png';
+import simboloMaisBancosConectados from '../../assets/simboloMaisBancosConectados.png';
 
 interface NotificationSetting {
   id: string;
@@ -49,20 +53,23 @@ const Configuracoes: React.FC = () => {
     {
       id: 'nubank',
       name: 'Nubank',
-      logo: '🟣', // Placeholder, você pode substituir por ícones reais
-      color: '#8A05BE'
+      logo: nubankLogo,
+      color: '#8A05BE',
+      bgColor: 'transparent'
     },
     {
       id: 'itau',
       name: 'Itaú',
-      logo: '🟠',
-      color: '#EC7000'
+      logo: itauLogo,
+      color: '#EC7000',
+      bgColor: 'transparent'
     },
     {
       id: 'pix',
       name: 'PIX',
-      logo: '🟢',
-      color: '#32BCAD'
+      logo: picpayLogo,
+      color: '#32BCAD',
+      bgColor: 'transparent'
     }
   ];
 
@@ -175,14 +182,14 @@ const Configuracoes: React.FC = () => {
           <div className="bancos-grid">
             {bancos.map((banco) => (
               <div key={banco.id} className="banco-item" style={{ borderColor: banco.color }}>
-                <div className="banco-logo" style={{ backgroundColor: banco.color }}>
-                  {banco.logo}
+                <div className="banco-logo" style={{ backgroundColor: banco.bgColor }}>
+                  <img src={banco.logo} alt={banco.name} className="banco-image" />
                 </div>
               </div>
             ))}
             <div className="banco-item add-banco">
               <div className="banco-logo add-logo">
-                <span>+</span>
+                <img src={simboloMaisBancosConectados} alt="Adicionar banco" className="plus-icon" />
               </div>
             </div>
           </div>

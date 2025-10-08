@@ -209,21 +209,22 @@
 /* Bancos Conectados */
 .bancos-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  max-width: 500px;
+  max-width: 400px;
 }
 
 .banco-item {
   aspect-ratio: 1;
-  border: 2px solid #444;
+  border: 2px solid;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 .banco-item:hover {
@@ -238,14 +239,23 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 700;
   color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.banco-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .add-banco {
   border-color: #FFD700;
   border-style: dashed;
+  border-width: 2px;
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .add-banco:hover {
@@ -255,12 +265,17 @@
 
 .add-logo {
   background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #1a1a1a;
+  color: #000;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.add-logo span {
-  font-size: 2rem;
-  font-weight: 300;
+.plus-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) saturate(100%) invert(0%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%);
 }
 
 /* Responsivo */
@@ -321,10 +336,25 @@
     gap: 0.75rem;
   }
 
+  .bancos-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    max-width: 320px;
+  }
+
   .banco-logo {
     width: 36px;
     height: 36px;
-    font-size: 1.25rem;
+  }
+
+  .banco-image {
+    width: 100%;
+    height: 100%;
+  }
+
+  .plus-icon {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -374,17 +404,23 @@
   }
 
   .bancos-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.5rem;
+    max-width: 280px;
   }
 
   .banco-logo {
     width: 32px;
     height: 32px;
-    font-size: 1rem;
   }
 
-  .add-logo span {
-    font-size: 1.5rem;
+  .banco-image {
+    width: 100%;
+    height: 100%;
+  }
+
+  .plus-icon {
+    width: 16px;
+    height: 16px;
   }
 }
