@@ -5,6 +5,7 @@ import Header from './Header';
 import Dashboard from '../pages/Dashboard';
 import Receitas from '../pages/Receitas';
 import Despesas from '../pages/Despesas';
+import Configuracoes from '../pages/Configuracoes';
 
 const Layout: React.FC = () => {
   const [activeItem, setActiveItem] = useState('dashboard');
@@ -35,6 +36,8 @@ const Layout: React.FC = () => {
         return <Receitas />;
       case 'despesas':
         return <Despesas />;
+      case 'configuracao':
+        return <Configuracoes />;
       default:
         return <Dashboard />;
     }

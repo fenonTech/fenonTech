@@ -1,0 +1,390 @@
+.configuracoes-page {
+  padding: 2rem;
+  background: #0f0f0f;
+  min-height: calc(100vh - 100px);
+  color: white;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  color: #FFD700;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-header p {
+  color: #ccc;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.brand-name {
+  color: #FFD700;
+  font-weight: 600;
+}
+
+.configuracoes-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.config-card {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+}
+
+.config-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: #FFD700;
+}
+
+.bancos-card {
+  grid-column: 1 / -1;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #333;
+}
+
+.card-icon {
+  width: 32px;
+  height: 32px;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%) hue-rotate(5deg) brightness(104%) contrast(101%);
+}
+
+.card-header h3 {
+  color: #FFD700;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Perfil do Usuário */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: #FFD700;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #FFD700;
+  background: #3a3a3a;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
+}
+
+.save-button {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border: none;
+  border-radius: 8px;
+  padding: 0.875rem 2rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.save-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.save-button:active {
+  transform: translateY(0);
+}
+
+/* Notificações */
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid #444;
+  transition: all 0.3s ease;
+}
+
+.notification-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #555;
+}
+
+.notification-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.notification-label {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.notification-description {
+  color: #ccc;
+  font-size: 0.75rem;
+}
+
+.toggle-switch {
+  width: 48px;
+  height: 24px;
+  background: #444;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 1px solid #555;
+}
+
+.toggle-switch.enabled {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-color: #FFD700;
+}
+
+.toggle-circle {
+  width: 18px;
+  height: 18px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.enabled .toggle-circle {
+  transform: translateX(24px);
+}
+
+/* Bancos Conectados */
+.bancos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+  max-width: 500px;
+}
+
+.banco-item {
+  aspect-ratio: 1;
+  border: 2px solid #444;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.banco-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.banco-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+
+.add-banco {
+  border-color: #FFD700;
+  border-style: dashed;
+}
+
+.add-banco:hover {
+  background: rgba(255, 215, 0, 0.1);
+  border-color: #FFA500;
+}
+
+.add-logo {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #1a1a1a;
+}
+
+.add-logo span {
+  font-size: 2rem;
+  font-weight: 300;
+}
+
+/* Responsivo */
+@media (max-width: 1200px) {
+  .configuracoes-content {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .configuracoes-page {
+    padding: 1rem;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .page-header p {
+    font-size: 1rem;
+  }
+
+  .configuracoes-content {
+    gap: 1rem;
+  }
+
+  .config-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    margin-bottom: 1rem;
+  }
+
+  .card-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .profile-form {
+    gap: 1rem;
+  }
+
+  .form-input {
+    padding: 0.625rem 0.875rem;
+  }
+
+  .save-button {
+    padding: 0.75rem 1.5rem;
+  }
+
+  .notification-item {
+    padding: 0.75rem;
+  }
+
+  .bancos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .banco-logo {
+    width: 36px;
+    height: 36px;
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .configuracoes-page {
+    padding: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .config-card {
+    padding: 0.75rem;
+  }
+
+  .card-header {
+    gap: 0.75rem;
+  }
+
+  .card-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .card-header h3 {
+    font-size: 1rem;
+  }
+
+  .notification-item {
+    padding: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .notification-info {
+    width: 100%;
+  }
+
+  .toggle-switch {
+    align-self: flex-end;
+  }
+
+  .bancos-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .banco-logo {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .add-logo span {
+    font-size: 1.5rem;
+  }
+}
