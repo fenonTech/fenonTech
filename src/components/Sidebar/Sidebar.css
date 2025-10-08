@@ -57,7 +57,7 @@
 .menu-toggle img {
   width: 20px;
   height: 20px;
-  filter: invert(1);
+  filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%) hue-rotate(7deg) brightness(118%) contrast(109%);
 }
 
 .sidebar-nav {
