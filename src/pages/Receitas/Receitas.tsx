@@ -1,8 +1,8 @@
-import React from 'react';
-import './Receitas.css';
-import FinancialCard from '../../components/Cards/FinancialCard';
-import sacoDeDinheiro from '../../assets/sacoDeDinheiro.png';
-import simboloMeuBolsoContasAReceberCard from '../../assets/simboloMeuBolsoContasAReceberCard.png';
+import React from "react";
+import "./Receitas.css";
+import FinancialCard from "../../components/Cards/FinancialCard";
+import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
+import simboloMeuBolsoContasAReceberCard from "../../assets/simboloMeuBolsoContasAReceberCard.png";
 
 interface ReceitaEntry {
   date: string;
@@ -13,35 +13,35 @@ interface ReceitaEntry {
 
 const Receitas: React.FC = () => {
   const receitasData: ReceitaEntry[] = [
-    { date: '06/10', category: 'Salário', type: 'Fixa', value: 'R$ 5.000,00' },
-    { date: '10/10', category: 'Freelancer', type: 'Variável', value: 'R$ 550,00' },
+    { date: "06/10", category: "Salário", type: "Fixa", value: "R$ 5.000,00" },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
   ];
 
   // Dados para o gráfico de barras (simulando os valores mensais)
   const monthlyData = [
-    { month: 'Jan', value: 85 },
-    { month: 'Fev', value: 75 },
-    { month: 'Mar', value: 95 },
-    { month: 'Abr', value: 80 },
-    { month: 'Mai', value: 85 },
-    { month: 'Jun', value: 100 },
-    { month: 'Jul', value: 90 },
-    { month: 'Ago', value: 95 },
-    { month: 'Set', value: 85 },
-    { month: 'Out', value: 100 },
-    { month: 'Nov', value: 0 },
-    { month: 'Dez', value: 0 },
+    { month: "Jan", value: 85 },
+    { month: "Fev", value: 75 },
+    { month: "Mar", value: 95 },
+    { month: "Abr", value: 80 },
+    { month: "Mai", value: 85 },
+    { month: "Jun", value: 100 },
+    { month: "Jul", value: 90 },
+    { month: "Ago", value: 95 },
+    { month: "Set", value: 85 },
+    { month: "Out", value: 100 },
+    { month: "Nov", value: 0 },
+    { month: "Dez", value: 0 },
   ];
 
-  const maxValue = Math.max(...monthlyData.map(item => item.value));
+  const maxValue = Math.max(...monthlyData.map((item) => item.value));
 
   return (
     <div className="receitas-page">
-      <div className="page-header">
-        <h1>Receita</h1>
-        <p>Controle os valores que entram em sua conta</p>
-      </div>
-
       {/* Cards principais */}
       <div className="receitas-cards">
         <FinancialCard
@@ -96,11 +96,11 @@ const Receitas: React.FC = () => {
             <div className="bar-chart">
               {monthlyData.map((item, index) => (
                 <div key={index} className="bar-item">
-                  <div 
+                  <div
                     className="bar"
-                    style={{ 
+                    style={{
                       height: `${(item.value / maxValue) * 100}%`,
-                      opacity: item.value === 0 ? 0.3 : 1
+                      opacity: item.value === 0 ? 0.3 : 1,
                     }}
                   ></div>
                   <span className="bar-label">{item.month}</span>

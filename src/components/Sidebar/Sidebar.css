@@ -1,7 +1,7 @@
 .sidebar {
   width: 280px;
   height: 100vh;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: #0b0b0b;
   color: white;
   position: fixed;
   left: 0;
@@ -16,6 +16,8 @@
 .sidebar.collapsed {
   width: 80px;
 }
+
+/* Hover expansion removido - agora controlado manualmente */
 
 .sidebar-header {
   padding: 1.5rem;
@@ -34,9 +36,10 @@
 
 .app-name {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #FFD700;
+  font-weight: 600;
+  color: #ffd700;
   white-space: nowrap;
+  font-family: "Poppins", sans-serif;
 }
 
 .menu-toggle {
@@ -57,7 +60,8 @@
 .menu-toggle img {
   width: 20px;
   height: 20px;
-  filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%) hue-rotate(7deg) brightness(118%) contrast(109%);
+  filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%)
+    hue-rotate(7deg) brightness(118%) contrast(109%);
 }
 
 .sidebar-nav {
@@ -79,6 +83,7 @@
   padding: 0 1.5rem;
   margin-bottom: 1rem;
   display: block;
+  font-family: "Poppins", sans-serif;
 }
 
 .nav-list {
@@ -99,19 +104,21 @@
   cursor: pointer;
   transition: all 0.2s;
   font-size: 1rem;
+  font-weight: 500;
   text-align: left;
   border-left: 3px solid transparent;
+  font-family: "Poppins", sans-serif;
 }
 
 .nav-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  border-left-color: #FFD700;
+  border-left-color: #ffd700;
 }
 
 .nav-item.active {
   background-color: rgba(255, 215, 0, 0.1);
-  border-left-color: #FFD700;
-  color: #FFD700;
+  border-left-color: #ffd700;
+  color: #ffd700;
   font-weight: 600;
 }
 
@@ -124,7 +131,8 @@
 }
 
 .nav-item.active .nav-icon {
-  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%) hue-rotate(5deg) brightness(104%) contrast(101%);
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+    hue-rotate(5deg) brightness(104%) contrast(101%);
 }
 
 .collapsed .nav-item {
@@ -135,6 +143,8 @@
 .collapsed .nav-item span {
   display: none;
 }
+
+/* Hover expansion dos nav-items removido - agora controlado manualmente */
 
 /* Responsivo */
 @media (max-width: 600px) {
@@ -147,7 +157,7 @@
     z-index: 1000;
     transition: all 0.3s ease;
     width: 280px; /* Largura total quando aberta */
-    background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+    background: #0b0b0b;
     border-right: 1px solid #333;
   }
 
@@ -206,7 +216,8 @@
   .sidebar.mobile .menu-toggle img {
     width: 22px;
     height: 22px;
-    filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%) hue-rotate(7deg) brightness(118%) contrast(109%);
+    filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%)
+      hue-rotate(7deg) brightness(118%) contrast(109%);
   }
 
   /* Navegação completamente escondida quando fechado */
@@ -263,8 +274,8 @@
   /* Item ativo mobile */
   .sidebar.mobile .nav-item.active {
     background: rgba(255, 215, 0, 0.1);
-    border-left-color: #FFD700;
-    color: #FFD700;
+    border-left-color: #ffd700;
+    color: #ffd700;
   }
 
   .sidebar.mobile .nav-item:hover {
@@ -280,7 +291,8 @@
   }
 
   .sidebar.mobile .nav-item.active .nav-icon {
-    filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%) hue-rotate(7deg) brightness(118%) contrast(109%);
+    filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%)
+      hue-rotate(7deg) brightness(118%) contrast(109%);
   }
 
   /* Ajuste do conteúdo principal mobile */
@@ -302,12 +314,12 @@
   .sidebar.mobile .app-name {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #FFD700;
+    color: #ffd700;
   }
 
   /* Overlay quando sidebar está aberta no mobile */
   .sidebar:not(.collapsed).mobile::after {
-    content: '';
+    content: "";
     position: fixed;
     top: 0;
     left: 280px;
@@ -367,6 +379,6 @@
   .nav-item:hover,
   .nav-item.active {
     border-left: none;
-    border-bottom-color: #FFD700;
+    border-bottom-color: #ffd700;
   }
 }

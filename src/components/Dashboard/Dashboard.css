@@ -1,6 +1,8 @@
 .dashboard {
   padding: 2rem;
-  background: #0f0f0f;
+  margin: 1%;
+  border-radius: 16px;
+  background: #0b0b0b;
   min-height: calc(100vh - 100px);
   color: white;
 }
@@ -14,31 +16,92 @@
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
+/* Primeira linha com cards específicos */
+.dashboard-first-row {
+  display: grid;
+  grid-template-columns: 65% 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Segunda linha para outros cards */
+.dashboard-second-row {
+  display: grid;
+  grid-template-columns: 65% 1fr;
+  gap: 1.5rem;
+}
+
+/* Responsividade para a primeira linha */
+@media (max-width: 1000px) {
+  .dashboard-first-row {
+    grid-template-columns: 1fr;
+  }
+
+  .transactions-card {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .expenses-chart-card {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
 .dashboard-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: #121212;
   border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #333;
+  border: 1px solid #121212;
   transition: all 0.3s ease;
+}
+
+/* Card específico para Últimas Transações */
+.transactions-card {
+  width: 100%;
+  min-height: 267px;
+  display: flex;
+  flex-direction: column;
+}
+
+.transactions-card .table-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Card específico para Despesas por categoria */
+.expenses-chart-card {
+  width: 100%;
+  min-height: 267px;
+  display: flex;
+  flex-direction: column;
+}
+
+.expenses-chart-card .chart-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-content: center;
 }
 
 .dashboard-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: #FFD700;
+  box-shadow: 0 8px 25px rgba(135, 131, 131, 0.3);
+  border-color: #ffd900;
 }
 
 .card-header {
-  color: #FFD700;
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0 0 1.5rem 0;
   padding-bottom: 0.75rem;
   border-bottom: 2px solid #333;
+  font-family: "Poppins", sans-serif;
 }
 
 .table-container {
@@ -113,10 +176,10 @@
   height: 200px;
   border-radius: 50%;
   background: conic-gradient(
-    #FF6B6B 0deg 144deg,
-    #4ECDC4 144deg 252deg,
-    #45B7D1 252deg 324deg,
-    #96CEB4 324deg 360deg
+    #ff6b6b 0deg 144deg,
+    #4ecdc4 144deg 252deg,
+    #45b7d1 252deg 324deg,
+    #96ceb4 324deg 360deg
   );
   display: flex;
   align-items: center;
@@ -126,10 +189,10 @@
 }
 
 .chart-placeholder::before {
-  content: '';
+  content: "";
   width: 120px;
   height: 120px;
-  background: #1a1a1a;
+  background: #121212;
   border-radius: 50%;
   position: absolute;
 }
@@ -149,7 +212,7 @@
 }
 
 .total-value {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 1rem;
   font-weight: 700;
   margin-top: 0.25rem;
@@ -181,15 +244,15 @@
 }
 
 .bills-container {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 15% 1fr;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .bills-icon {
-  width: 80px;
-  height: 80px;
-  background: rgba(255, 215, 0, 0.1);
+  width: 100%;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -198,9 +261,9 @@
 }
 
 .bills-icon img {
-  width: 48px;
-  height: 48px;
-  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%) hue-rotate(5deg) brightness(104%) contrast(101%);
+  width: 300px;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+    hue-rotate(5deg) brightness(104%) contrast(101%);
 }
 
 .category-bars {
@@ -339,13 +402,12 @@
   .dashboard-card {
     padding: 1rem;
     border-radius: 12px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    background: #121212;
     border: 1px solid #333;
   }
 
   .card-header {
     font-size: 1.125rem;
-    color: #FFD700;
     font-weight: 700;
     margin-bottom: 1rem;
     padding-bottom: 0.5rem;
@@ -366,10 +428,10 @@
     height: 130px;
     border-radius: 50%;
     background: conic-gradient(
-      #4ECDC4 0deg 108deg,
-      #FFD700 108deg 216deg,
-      #FF6B6B 216deg 324deg,
-      #96CEB4 324deg 360deg
+      #4ecdc4 0deg 108deg,
+      #ffd700 108deg 216deg,
+      #ff6b6b 216deg 324deg,
+      #96ceb4 324deg 360deg
     );
     display: flex;
     align-items: center;
@@ -379,10 +441,10 @@
   }
 
   .chart-placeholder::before {
-    content: '';
+    content: "";
     width: 80px;
     height: 80px;
-    background: #1a1a1a;
+    background: #121212;
     border-radius: 50%;
     position: absolute;
   }
@@ -402,7 +464,7 @@
   }
 
   .total-value {
-    color: #FFD700;
+    color: #ffd700;
     font-size: 0.9rem;
     font-weight: 700;
     margin-top: 0.25rem;
@@ -435,17 +497,17 @@
   }
 
   .legend-bar.alimentacao {
-    background: #4ECDC4;
+    background: #4ecdc4;
     height: 70px;
   }
 
   .legend-bar.transporte {
-    background: #FFD700;
+    background: #ffd700;
     height: 50px;
   }
 
   .legend-bar.despesas {
-    background: #FF6B6B;
+    background: #ff6b6b;
     height: 60px;
   }
 
@@ -551,7 +613,8 @@
   .bills-icon img {
     width: 70px;
     height: 70px;
-    filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%) hue-rotate(7deg) brightness(118%) contrast(109%);
+    filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%)
+      hue-rotate(7deg) brightness(118%) contrast(109%);
   }
 
   /* Tabela de contas mobile - layout específico da imagem */
@@ -603,7 +666,7 @@
   /* Categoria laranja */
   .bills-table .category.expense {
     background: transparent;
-    color: #FF8C00;
+    color: #ff8c00;
     border: none;
     padding: 0;
     font-size: 0.8rem;
@@ -614,28 +677,28 @@
 
   /* Valores em vermelho */
   .bills-table .value.expense {
-    color: #FF6B6B;
+    color: #ff6b6b;
     font-weight: 700;
     font-size: 0.8rem;
   }
 
   /* Destacar linha amarela à direita de cada item */
   .bills-table tbody tr::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     right: 0;
     width: 4px;
     height: 100%;
-    background: #FFD700;
+    background: #ffd700;
     border-radius: 0 12px 12px 0;
   }
 
   /* Botão "Ver todas as transações" mobile */
   .view-all-btn {
     background: rgba(255, 215, 0, 0.1);
-    border: 1px solid #FFD700;
-    color: #FFD700;
+    border: 1px solid #ffd700;
+    color: #ffd700;
     padding: 0.75rem 1rem;
     border-radius: 8px;
     font-size: 0.75rem;

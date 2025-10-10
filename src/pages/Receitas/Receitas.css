@@ -1,6 +1,8 @@
 .receitas-page {
   padding: 2rem;
-  background: #0f0f0f;
+  margin: 1%;
+  border-radius: 16px;
+  background: #0b0b0b;
   min-height: calc(100vh - 100px);
   color: white;
 }
@@ -10,7 +12,7 @@
 }
 
 .page-header h1 {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -40,7 +42,7 @@
 }
 
 .receitas-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: #121212;
   border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid #333;
@@ -50,11 +52,10 @@
 .receitas-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 .card-header {
-  color: #FFD700;
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0 0 1.5rem 0;
@@ -184,7 +185,7 @@
 .bar {
   width: 100%;
   max-width: 40px;
-  background: linear-gradient(to top, #FFD700, #FFA500);
+  background: linear-gradient(to top, #ffd700, #ffa500);
   border-radius: 4px 4px 0 0;
   transition: all 0.3s ease;
   min-height: 4px;

@@ -12,7 +12,7 @@
 }
 
 .transaction-form {
-  background: #1a1a1a;
+  background: #121212;
   border-radius: 12px;
   padding: 2rem;
   width: 100%;
@@ -21,7 +21,7 @@
 }
 
 .transaction-form h2 {
-  color: #FFD700;
+  color: #ffd700;
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -51,7 +51,7 @@
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #FFD700;
+  border-color: #ffd700;
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
 }
 
@@ -82,7 +82,7 @@
 }
 
 .btn-save {
-  background: #FFD700;
+  background: #ffd700;
   color: #1a1a1a;
   font-weight: 600;
 }

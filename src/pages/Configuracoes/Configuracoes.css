@@ -1,6 +1,8 @@
 .configuracoes-page {
   padding: 2rem;
-  background: #0f0f0f;
+  margin: 1%;
+  border-radius: 16px;
+  background: #0b0b0b;
   min-height: calc(100vh - 100px);
   color: white;
 }
@@ -10,7 +12,7 @@
 }
 
 .page-header h1 {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -23,7 +25,7 @@
 }
 
 .brand-name {
-  color: #FFD700;
+  color: #ffd700;
   font-weight: 600;
 }
 
@@ -34,7 +36,7 @@
 }
 
 .config-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: #121212;
   border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid #333;
@@ -44,7 +46,7 @@
 .config-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 .bancos-card {
@@ -63,11 +65,12 @@
 .card-icon {
   width: 32px;
   height: 32px;
-  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%) hue-rotate(5deg) brightness(104%) contrast(101%);
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+    hue-rotate(5deg) brightness(104%) contrast(101%);
 }
 
 .card-header h3 {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0;
@@ -87,7 +90,7 @@
 }
 
 .form-group label {
-  color: #FFD700;
+  color: #ffd700;
   font-weight: 600;
   font-size: 0.875rem;
   text-transform: uppercase;
@@ -106,13 +109,13 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #FFD700;
-  background: #3a3a3a;
+  border-color: #ffd700;
+  background: #121212;
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
 }
 
 .save-button {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
+  background: linear-gradient(135deg, #ffd700, #ffa500);
   border: none;
   border-radius: 8px;
   padding: 0.875rem 2rem;
@@ -186,8 +189,8 @@
 }
 
 .toggle-switch.enabled {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  border-color: #FFD700;
+  background: linear-gradient(135deg, #ffd700, #ffa500);
+  border-color: #ffd700;
 }
 
 .toggle-circle {
@@ -252,7 +255,7 @@
 }
 
 .add-banco {
-  border-color: #FFD700;
+  border-color: #ffd700;
   border-style: dashed;
   border-width: 2px;
   background: rgba(0, 0, 0, 0.2);
@@ -260,11 +263,11 @@
 
 .add-banco:hover {
   background: rgba(255, 215, 0, 0.1);
-  border-color: #FFA500;
+  border-color: #ffa500;
 }
 
 .add-logo {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
+  background: linear-gradient(135deg, #ffd700, #ffa500);
   color: #000;
   border-radius: 8px;
   display: flex;
@@ -275,7 +278,8 @@
 .plus-icon {
   width: 24px;
   height: 24px;
-  filter: brightness(0) saturate(100%) invert(0%) sepia(100%) saturate(0%) hue-rotate(0deg) brightness(0%) contrast(100%);
+  filter: brightness(0) saturate(100%) invert(0%) sepia(100%) saturate(0%)
+    hue-rotate(0deg) brightness(0%) contrast(100%);
 }
 
 /* Responsivo */

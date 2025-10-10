@@ -1,6 +1,8 @@
 .despesas-page {
   padding: 2rem;
-  background: #0f0f0f;
+  margin: 1%;
+  border-radius: 16px;
+  background: #0b0b0b;
   min-height: calc(100vh - 100px);
   color: white;
 }
@@ -10,7 +12,7 @@
 }
 
 .page-header h1 {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 2.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem 0;
@@ -40,7 +42,7 @@
 }
 
 .despesas-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  background: #121212;
   border-radius: 16px;
   padding: 1.5rem;
   border: 1px solid #333;
@@ -54,11 +56,10 @@
 .despesas-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: #FFD700;
+  border-color: #ffd700;
 }
 
 .card-header {
-  color: #FFD700;
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0 0 1.5rem 0;
@@ -182,13 +183,13 @@
   height: 100%;
   border-radius: 50%;
   background: conic-gradient(
-    #4ECDC4 0deg 108deg,
-    #FFD700 108deg 198deg,
-    #FF6B6B 198deg 270deg,
-    #45B7D1 270deg 324deg,
-    #96CEB4 324deg 342deg,
-    #FFEAA7 342deg 353deg,
-    #A8E6CF 353deg 360deg
+    #4ecdc4 0deg 108deg,
+    #ffd700 108deg 198deg,
+    #ff6b6b 198deg 270deg,
+    #45b7d1 270deg 324deg,
+    #96ceb4 324deg 342deg,
+    #ffeaa7 342deg 353deg,
+    #a8e6cf 353deg 360deg
   );
   display: flex;
   align-items: center;
@@ -197,10 +198,10 @@
 }
 
 .pie-chart-circle::before {
-  content: '';
+  content: "";
   width: 120px;
   height: 120px;
-  background: #1a1a1a;
+  background: #121212;
   border-radius: 50%;
   position: absolute;
 }
@@ -220,7 +221,7 @@
 }
 
 .total-value {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 1rem;
   font-weight: 700;
   margin-top: 0.25rem;

@@ -1,8 +1,8 @@
-import React from 'react';
-import './Despesas.css';
-import FinancialCard from '../../components/Cards/FinancialCard';
-import carteiraCardDespesasdoMês from '../../assets/carteiraCardDespesasdoMês.png';
-import simboloMenuBolsoContasAPagar from '../../assets/simboloMenuBolsoContasAPagar.png';
+import React from "react";
+import "./Despesas.css";
+import FinancialCard from "../../components/Cards/FinancialCard";
+import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
+import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
 interface DespesaEntry {
   date: string;
@@ -13,37 +13,37 @@ interface DespesaEntry {
 
 const Despesas: React.FC = () => {
   const despesasData: DespesaEntry[] = [
-    { date: '06/10', category: 'iFood', type: 'Variável', value: 'R$ 5.000,00' },
-    { date: '10/10', category: 'Contas', type: 'Fixa', value: 'R$ 550,00' },
+    {
+      date: "06/10",
+      category: "iFood",
+      type: "Variável",
+      value: "R$ 5.000,00",
+    },
+    { date: "10/10", category: "Contas", type: "Fixa", value: "R$ 550,00" },
   ];
 
   // Dados para o gráfico de pizza
   const pieChartData = [
-    { name: 'Moradia', percentage: 30, color: '#4ECDC4' },
-    { name: 'Moradia', percentage: 25, color: '#FFD700' },
-    { name: 'Alimentação', percentage: 20, color: '#FF6B6B' },
-    { name: 'Transporte', percentage: 15, color: '#45B7D1' },
-    { name: 'Saúde', percentage: 5, color: '#96CEB4' },
-    { name: 'Contas', percentage: 3, color: '#FFEAA7' },
-    { name: 'Educação', percentage: 2, color: '#A8E6CF' },
+    { name: "Moradia", percentage: 30, color: "#4ECDC4" },
+    { name: "Moradia", percentage: 25, color: "#FFD700" },
+    { name: "Alimentação", percentage: 20, color: "#FF6B6B" },
+    { name: "Transporte", percentage: 15, color: "#45B7D1" },
+    { name: "Saúde", percentage: 5, color: "#96CEB4" },
+    { name: "Contas", percentage: 3, color: "#FFEAA7" },
+    { name: "Educação", percentage: 2, color: "#A8E6CF" },
   ];
 
   // Dados para barras de visão por categoria
   const categoryBarsData = [
-    { name: 'iFood', spent: 40.00, total: 100.00, color: '#FF6B6B' },
-    { name: 'Uber', spent: 10.00, total: 85.00, color: '#4ECDC4' },
-    { name: 'Roupas', spent: 5.00, total: 80.00, color: '#45B7D1' },
-    { name: 'Despesas Fixas', spent: 0.00, total: 100.00, color: '#96CEB4' },
-    { name: 'Contas Variáveis', spent: 0.00, total: 100.00, color: '#FFEAA7' },
+    { name: "iFood", spent: 40.0, total: 100.0, color: "#FF6B6B" },
+    { name: "Uber", spent: 10.0, total: 85.0, color: "#4ECDC4" },
+    { name: "Roupas", spent: 5.0, total: 80.0, color: "#45B7D1" },
+    { name: "Despesas Fixas", spent: 0.0, total: 100.0, color: "#96CEB4" },
+    { name: "Contas Variáveis", spent: 0.0, total: 100.0, color: "#FFEAA7" },
   ];
 
   return (
     <div className="despesas-page">
-      <div className="page-header">
-        <h1>Despesas</h1>
-        <p>Controle os valores que saem da sua conta</p>
-      </div>
-
       {/* Cards principais */}
       <div className="despesas-cards">
         <FinancialCard
@@ -106,11 +106,13 @@ const Despesas: React.FC = () => {
             <div className="pie-legend">
               {pieChartData.map((item, index) => (
                 <div key={index} className="legend-item">
-                  <div 
-                    className="legend-color" 
+                  <div
+                    className="legend-color"
                     style={{ backgroundColor: item.color }}
                   ></div>
-                  <span className="legend-label">{item.name} ({item.percentage}%)</span>
+                  <span className="legend-label">
+                    {item.name} ({item.percentage}%)
+                  </span>
                 </div>
               ))}
             </div>
@@ -130,11 +132,11 @@ const Despesas: React.FC = () => {
                   </span>
                 </div>
                 <div className="progress-bar">
-                  <div 
+                  <div
                     className="progress-fill"
-                    style={{ 
+                    style={{
                       width: `${(item.spent / item.total) * 100}%`,
-                      backgroundColor: item.color 
+                      backgroundColor: item.color,
                     }}
                   ></div>
                 </div>

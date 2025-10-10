@@ -1,7 +1,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background: #0f0f0f;
+  background: #000000;
 }
 
 .main-content {
@@ -10,6 +10,10 @@
   transition: margin-left 0.3s ease;
   display: flex;
   flex-direction: column;
+}
+
+.main-content.sidebar-collapsed {
+  margin-left: 80px;
 }
 
 .content {
@@ -29,7 +33,7 @@
 }
 
 .page-placeholder h2 {
-  color: #FFD700;
+  color: #ffd700;
   font-size: 2rem;
   margin-bottom: 1rem;
 }
@@ -77,8 +81,13 @@
     width: calc(100% - 50px);
   }
 
+  .main-content.sidebar-collapsed {
+    margin-left: 50px; /* Sidebar collapsed no mobile */
+    width: calc(100% - 50px);
+  }
+
   /* Quando sidebar está aberta no mobile */
-  .sidebar:not(.collapsed) ~ .main-content {
+  .main-content:not(.sidebar-collapsed) {
     margin-left: 280px;
     width: calc(100% - 280px);
   }

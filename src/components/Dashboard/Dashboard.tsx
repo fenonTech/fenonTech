@@ -1,16 +1,16 @@
-import React from 'react';
-import './Dashboard.css';
-import FinancialCard from '../Cards/FinancialCard';
-import dinheiroSaldo from '../../assets/dinheiroSaldo.png';
-import sacoDeDinheiro from '../../assets/sacoDeDinheiro.png';
-import setaParaBaixo from '../../assets/setaParaBaixo.png';
+import React from "react";
+import "./Dashboard.css";
+import FinancialCard from "../Cards/FinancialCard";
+import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
+import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
+import setaParaBaixo from "../../assets/setaParaBaixo.png";
 
 interface Transaction {
   date: string;
   description: string;
   category: string;
   value: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
 }
 
 interface Bill {
@@ -22,26 +22,77 @@ interface Bill {
 
 const Dashboard: React.FC = () => {
   const transactions: Transaction[] = [
-    { date: '31/10', description: 'iFood', category: 'Alimentação', value: 'R$ 50,00', type: 'expense' },
-    { date: '28/10', description: 'Uber', category: 'Locomoção', value: 'R$ 30,00', type: 'expense' },
-    { date: '27/10', description: 'Aluguel', category: 'Despesa Fixa', value: 'R$ 50,00', type: 'expense' },
-    { date: '26/10', description: 'Desenvolvimento Sistema', category: 'Entrada', value: 'R$ 50,00', type: 'income' },
-    { date: '25/10', description: 'Empréstimo', category: 'Despesa Variável', value: 'R$ 50,00', type: 'expense' },
-    { date: '24/10', description: 'Freelancer', category: 'Entrada', value: 'R$ 50,00', type: 'income' },
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+      type: "expense",
+    },
+    {
+      date: "28/10",
+      description: "Uber",
+      category: "Locomoção",
+      value: "R$ 30,00",
+      type: "expense",
+    },
+    {
+      date: "27/10",
+      description: "Aluguel",
+      category: "Despesa Fixa",
+      value: "R$ 50,00",
+      type: "expense",
+    },
+    {
+      date: "26/10",
+      description: "Desenvolvimento Sistema",
+      category: "Entrada",
+      value: "R$ 50,00",
+      type: "income",
+    },
+    {
+      date: "25/10",
+      description: "Empréstimo",
+      category: "Despesa Variável",
+      value: "R$ 50,00",
+      type: "expense",
+    },
+    {
+      date: "24/10",
+      description: "Freelancer",
+      category: "Entrada",
+      value: "R$ 50,00",
+      type: "income",
+    },
   ];
 
   const bills: Bill[] = [
-    { date: '31/10', description: 'iFood', category: 'Alimentação', value: 'R$ 50,00' },
-    { date: '31/10', description: 'iFood', category: 'Alimentação', value: 'R$ 50,00' },
-    { date: '31/10', description: 'iFood', category: 'Alimentação', value: 'R$ 50,00' },
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+    },
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+    },
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+    },
   ];
 
   const categoryData = [
-    { name: 'iFood', percentage: 40, color: '#FF6B6B' },
-    { name: 'Uber', percentage: 30, color: '#4ECDC4' },
-    { name: 'Aluguel', percentage: 20, color: '#45B7D1' },
-    { name: 'Despesas Fixas', percentage: 35, color: '#96CEB4' },
-    { name: 'Contas Variáveis', percentage: 25, color: '#FFEAA7' },
+    { name: "iFood", percentage: 40, color: "#FF6B6B" },
+    { name: "Uber", percentage: 30, color: "#4ECDC4" },
+    { name: "Aluguel", percentage: 20, color: "#45B7D1" },
+    { name: "Despesas Fixas", percentage: 35, color: "#96CEB4" },
+    { name: "Contas Variáveis", percentage: 25, color: "#FFEAA7" },
   ];
 
   return (
@@ -116,11 +167,13 @@ const Dashboard: React.FC = () => {
             <div className="chart-legend">
               {categoryData.map((item, index) => (
                 <div key={index} className="legend-item">
-                  <div 
-                    className="legend-color" 
+                  <div
+                    className="legend-color"
                     style={{ backgroundColor: item.color }}
                   ></div>
-                  <span className="legend-label">{item.name} ({item.percentage}%)</span>
+                  <span className="legend-label">
+                    {item.name} ({item.percentage}%)
+                  </span>
                 </div>
               ))}
             </div>
@@ -176,11 +229,11 @@ const Dashboard: React.FC = () => {
                   </span>
                 </div>
                 <div className="progress-bar">
-                  <div 
+                  <div
                     className="progress-fill"
-                    style={{ 
+                    style={{
                       width: `${item.percentage}%`,
-                      backgroundColor: item.color 
+                      backgroundColor: item.color,
                     }}
                   ></div>
                 </div>

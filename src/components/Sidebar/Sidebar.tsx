@@ -1,57 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import './Sidebar.css';
-import logo from '../../assets/logo.png';
-import simboloDashboard from '../../assets/simboloDashboardAmarelo.png';
-import simboloReceita from '../../assets/simboloMenuReceita.png';
-import simboloDespesas from '../../assets/simboloMenuDespesas.png';
-import simboloConfiguracao from '../../assets/simboloConfiguracao.png';
-import simboloSaida from '../../assets/simboloSaida.png';
-import simboloMenuBurguer from '../../assets/simboloMenuBurguer.png';
+import React, { useState, useEffect } from "react";
+import "./Sidebar.css";
+import logo from "../../assets/logo.png";
+import simboloDashboard from "../../assets/simboloDashboardAmarelo.png";
+import simboloReceita from "../../assets/simboloMenuReceita.png";
+import simboloDespesas from "../../assets/simboloMenuDespesas.png";
+import simboloConfiguracao from "../../assets/simboloConfiguracao.png";
+import simboloSaida from "../../assets/simboloSaida.png";
+import simboloMenuBurguer from "../../assets/simboloMenuBurguer.png";
 
 interface SidebarProps {
   activeItem: string;
   onItemClick: (item: string) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: (collapsed: boolean) => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+const Sidebar: React.FC<SidebarProps> = ({
+  activeItem,
+  onItemClick,
+  isCollapsed: externalIsCollapsed,
+  onToggleCollapse,
+}) => {
+  const [internalIsCollapsed, setInternalIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Use controlled state if provided, otherwise use internal state
+  const isCollapsed =
+    externalIsCollapsed !== undefined
+      ? externalIsCollapsed
+      : internalIsCollapsed;
+
+  // Toggle function
+  const toggleCollapse = () => {
+    const newCollapsedState = !isCollapsed;
+    if (onToggleCollapse) {
+      onToggleCollapse(newCollapsedState);
+    } else {
+      setInternalIsCollapsed(newCollapsedState);
+    }
+  };
 
   // Detectar se está em mobile e inicializar como fechado
   useEffect(() => {
     const checkMobile = () => {
       const mobile = window.innerWidth <= 600;
       setIsMobile(mobile);
-      if (mobile) {
-        setIsCollapsed(true); // Inicia fechado no mobile
+      if (mobile && externalIsCollapsed === undefined) {
+        setInternalIsCollapsed(true); // Inicia fechado no mobile apenas se não for controlado
       }
     };
 
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, [externalIsCollapsed]);
 
   const menuItems = [
-    { id: 'dashboard', label: 'DashBoard', icon: simboloDashboard },
-    { id: 'receitas', label: 'Receitas', icon: simboloReceita },
-    { id: 'despesas', label: 'Despesas', icon: simboloDespesas },
+    { id: "dashboard", label: "DashBoard", icon: simboloDashboard },
+    { id: "receitas", label: "Receitas", icon: simboloReceita },
+    { id: "despesas", label: "Despesas", icon: simboloDespesas },
   ];
 
   const systemItems = [
-    { id: 'configuracao', label: 'Configuração', icon: simboloConfiguracao },
-    { id: 'sair', label: 'Sair', icon: simboloSaida },
+    { id: "configuracao", label: "Configuração", icon: simboloConfiguracao },
+    { id: "sair", label: "Sair", icon: simboloSaida },
   ];
 
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''} ${isMobile ? 'mobile' : ''}`}>
+    <div
+      className={`sidebar ${isCollapsed ? "collapsed" : ""} ${
+        isMobile ? "mobile" : ""
+      }`}
+    >
       <div className="sidebar-header">
-        {(!isCollapsed || !isMobile) && <img src={logo} alt="Meu Bolso" className="logo" />}
+        {(!isCollapsed || !isMobile) && (
+          <img src={logo} alt="Meu Bolso" className="logo" />
+        )}
         {!isCollapsed && <span className="app-name">Meu Bolso</span>}
-        <button 
-          className="menu-toggle"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
+        <button className="menu-toggle" onClick={toggleCollapse}>
           <img src={simboloMenuBurguer} alt="Menu" />
         </button>
       </div>
@@ -66,10 +92,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
                 {menuItems.map((item) => (
                   <li key={item.id}>
                     <button
-                      className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
+                      className={`nav-item ${
+                        activeItem === item.id ? "active" : ""
+                      }`}
                       onClick={() => onItemClick(item.id)}
                     >
-                      <img src={item.icon} alt={item.label} className="nav-icon" />
+                      <img
+                        src={item.icon}
+                        alt={item.label}
+                        className="nav-icon"
+                      />
                       {!isCollapsed && <span>{item.label}</span>}
                     </button>
                   </li>
@@ -83,10 +115,16 @@ const Sidebar: React.FC<SidebarProps> = ({ activeItem, onItemClick }) => {
                 {systemItems.map((item) => (
                   <li key={item.id}>
                     <button
-                      className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
+                      className={`nav-item ${
+                        activeItem === item.id ? "active" : ""
+                      }`}
                       onClick={() => onItemClick(item.id)}
                     >
-                      <img src={item.icon} alt={item.label} className="nav-icon" />
+                      <img
+                        src={item.icon}
+                        alt={item.label}
+                        className="nav-icon"
+                      />
                       {!isCollapsed && <span>{item.label}</span>}
                     </button>
                   </li>

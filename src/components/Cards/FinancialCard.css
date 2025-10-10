@@ -1,18 +1,17 @@
 .financial-card {
-  background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+  background: #121212;
   border-radius: 16px;
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  border: 1px solid #444;
+  gap: 2rem;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
 
 .financial-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -36,7 +35,7 @@
 }
 
 .financial-card.neutral {
-  --accent-color: #FFD700;
+  --accent-color: #ffd700;
 }
 
 .card-icon {
@@ -46,14 +45,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 215, 0, 0.1);
   flex-shrink: 0;
 }
 
 .card-icon img {
-  width: 32px;
-  height: 32px;
-  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%) hue-rotate(5deg) brightness(104%) contrast(101%);
+  width: 60px;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+    hue-rotate(5deg) brightness(104%) contrast(101%);
 }
 
 .card-content {
@@ -68,14 +66,16 @@
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-family: "Poppins", sans-serif;
 }
 
 .card-value {
   color: white;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 600;
   margin: 0;
   word-break: break-all;
+  font-family: "Poppins", sans-serif;
 }
 
 .financial-card.positive .card-value {
@@ -87,7 +87,7 @@
 }
 
 .financial-card.neutral .card-value {
-  color: #FFD700;
+  color: #ffd700;
 }
 
 @media (max-width: 768px) {
