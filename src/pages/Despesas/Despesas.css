@@ -60,6 +60,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .despesas-charts-row {
@@ -735,5 +736,163 @@
   .pie-legend::-webkit-scrollbar,
   .chart-legend::-webkit-scrollbar {
     height: 4px;
+  }
+}
+
+/* SISTEMA MOBILE INTEGRADO - PADRÃO DASHBOARD */
+/* Desktop - garantir que tudo seja visível */
+@media (min-width: 769px) {
+  .desktop-content {
+    display: block !important; /* Sempre mostrar no desktop */
+  }
+
+  .mobile-only {
+    display: none !important; /* Esconder conteúdo mobile no desktop */
+  }
+
+  .financial-card-container {
+    display: none !important; /* Esconder navegação mobile */
+  }
+
+  /* Garantir que os cards fiquem em linha no desktop */
+  .despesas-cards {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 1.5rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Aumentar espaçamento entre as seções no desktop */
+  .despesas-content {
+    gap: 3rem !important; /* Aumentado de 1.5rem para 3rem */
+  }
+}
+
+/* Tablet pequeno */
+@media (max-width: 768px) and (min-width: 601px) {
+  /* Conteúdo Desktop - ESCONDIDO NO TABLET */
+  .desktop-content {
+    display: none !important;
+  }
+
+  /* Conteúdo Mobile - VISÍVEL NO TABLET */
+  .mobile-only {
+    display: block !important;
+  }
+
+  .financial-card-container {
+    display: flex !important;
+  }
+}
+
+/* Mobile - Sistema Completo */
+@media (max-width: 600px) {
+  .despesas-page {
+    padding: 1rem;
+    margin: 0.5%;
+  }
+
+  /* Esconder cards desktop */
+  .despesas-cards {
+    display: none !important;
+  }
+
+  /* Conteúdo Desktop - ESCONDIDO NO MOBILE */
+  .desktop-content {
+    display: none !important;
+  }
+
+  /* Conteúdo Mobile - VISÍVEL NO MOBILE */
+  .mobile-only {
+    display: block !important;
+  }
+
+  /* Tab content mobile */
+  .mobile-only .tab-content[style*="display: none"] {
+    display: none !important;
+  }
+
+  .mobile-only .tab-content[style*="display: block"] {
+    display: block !important;
+  }
+
+  /* Sistema de Navegação Integrado - APENAS MOBILE - SUPER MINIMALISTA */
+  .financial-card-container {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .financial-card-navigation {
+    background: #ffd700;
+    border-radius: 16px 16px 0 0;
+    padding: 0.4rem;
+    display: flex;
+    gap: 0.25rem;
+    width: 100%;
+    max-width: 350px;
+    justify-content: center;
+  }
+
+  .nav-button {
+    display: block !important;
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Poppins", sans-serif;
+    text-transform: capitalize;
+    letter-spacing: 0;
+    min-width: auto;
+    text-align: center;
+  }
+
+  .nav-button.active {
+    background: #fff;
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .nav-button:not(.active):hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .single-financial-card {
+    display: block !important;
+    width: 100%;
+    max-width: 350px;
+    transition: all 0.4s ease;
+    margin-top: -1px; /* Conecta com a navegação */
+    z-index: 1;
+  }
+
+  .single-financial-card .financial-card {
+    border-radius: 0 0 16px 16px !important;
+    border-top: none !important;
+  }
+
+  /* Conteúdo mobile simples */
+  .despesas-mobile-content {
+    margin-top: 1rem;
+  }
+
+  /* Dashboard grid mobile */
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 }

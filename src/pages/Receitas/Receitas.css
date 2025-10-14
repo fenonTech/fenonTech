@@ -86,6 +86,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .receitas-table-card {
@@ -253,6 +254,43 @@
   font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
+}
+
+/* SISTEMA DUAL - DESKTOP/MOBILE */
+/* Desktop - garantir que tudo seja visível */
+@media (min-width: 769px) {
+  .desktop-content {
+    display: block !important; /* Sempre mostrar no desktop */
+  }
+
+  .mobile-only {
+    display: none !important; /* Esconder conteúdo mobile no desktop */
+  }
+
+  .receitas-card-container {
+    display: none !important; /* Esconder navegação mobile */
+  }
+
+  .receitas-content {
+    display: block !important; /* Mostrar conteúdo desktop */
+  }
+}
+
+/* Tablet pequeno */
+@media (max-width: 768px) and (min-width: 601px) {
+  /* Conteúdo Desktop - ESCONDIDO NO TABLET */
+  .receitas-content {
+    display: none !important;
+  }
+
+  /* Conteúdo Mobile - VISÍVEL NO TABLET */
+  .mobile-only {
+    display: block !important;
+  }
+
+  .receitas-card-container {
+    display: flex !important;
+  }
 }
 
 /* Responsivo */
@@ -677,5 +715,28 @@
 
   .single-receitas-card .financial-card .balance-toggle-btn:hover .eye-icon {
     color: #333 !important;
+  }
+
+  /* SISTEMA MOBILE INTEGRADO - SEM TABS */
+  /* Esconder conteúdo desktop */
+  .receitas-content {
+    display: none !important;
+  }
+
+  /* Conteúdo Mobile - VISÍVEL NO MOBILE */
+  .mobile-only {
+    display: block !important;
+  }
+
+  /* Conteúdo mobile simples */
+  .receitas-mobile-content {
+    margin-top: 1rem;
+  }
+
+  /* Dashboard grid mobile */
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
   }
 }

@@ -255,8 +255,36 @@ const Receitas: React.FC = () => {
         </div>
       </div>
 
-      {/* Conteúdo principal */}
-      <div className="receitas-content">
+      {/* Conteúdo Mobile - Apenas Tabela */}
+      <div className="receitas-mobile-content mobile-only">
+        <div className="dashboard-grid">
+          {/* Mostrar tabela baseada no card ativo */}
+          {activeCard === "receita" ? (
+            <TransactionTable
+              title="Últimas Entradas"
+              columns={receitasColumns}
+              data={receitasData}
+              className="receitas-table-card"
+              showSummary={true}
+              summaryCountLabel="Entradas"
+              valueKey="value"
+            />
+          ) : (
+            <TransactionTable
+              title="Contas a Receber"
+              columns={contasAReceberColumns}
+              data={contasAReceberData}
+              className="receitas-table-card"
+              showSummary={true}
+              summaryCountLabel="Contas"
+              valueKey="value"
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Conteúdo Desktop - Sempre Visível */}
+      <div className="receitas-content desktop-content">
         {/* Primeira linha com tabelas */}
         <div className="receitas-tables-row">
           {/* Últimas Entradas */}

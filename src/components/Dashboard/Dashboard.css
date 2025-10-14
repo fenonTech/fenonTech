@@ -319,12 +319,10 @@
 }
 
 /* No desktop, sempre mostrar o conteúdo principal */
-.tab-content {
-  display: block; /* Sempre visível no desktop */
-}
-
-.tab-content.active {
-  display: block;
+@media (min-width: 769px) {
+  .tab-content {
+    display: block !important; /* Sempre visível no desktop */
+  }
 }
 
 /* Scrollbar padrão aplicada globalmente */
@@ -478,6 +476,16 @@
     display: none !important; /* Escondido também no tablet pequeno */
   }
 
+  /* Conteúdo Desktop - ESCONDIDO NO TABLET */
+  .desktop-content {
+    display: none !important;
+  }
+
+  /* Conteúdo Mobile - VISÍVEL NO TABLET */
+  .mobile-only {
+    display: block !important;
+  }
+
   .dashboard-first-row,
   .dashboard-second-row {
     grid-template-columns: 1fr;
@@ -592,8 +600,8 @@
   }
 
   /* Tab content mobile */
-  .mobile-only .tab-content {
-    display: none;
+  .mobile-only .tab-content[style*="display: none"] {
+    display: none !important;
   }
 
   .mobile-only .tab-content[style*="display: block"] {
@@ -1179,8 +1187,8 @@
   }
 
   /* Tab content mobile pequeno */
-  .mobile-only .tab-content {
-    display: none;
+  .mobile-only .tab-content[style*="display: none"] {
+    display: none !important;
   }
 
   .mobile-only .tab-content[style*="display: block"] {
@@ -1317,5 +1325,43 @@
   .bills-table tbody td:before {
     font-size: 0.65rem;
     width: 70px;
+  }
+}
+
+/* === REGRAS PARA TABS MOBILE === */
+@media (max-width: 768px) {
+  /* Esconde todos os tab-content por padrão no mobile */
+  .mobile-only .tab-content {
+    display: none !important;
+  }
+
+  /* Mostra apenas o tab ativo */
+  .mobile-only .tab-content.active {
+    display: block !important;
+  }
+
+  /* Regras específicas para cada tab */
+  .mobile-only .tab-principal:not(.active) {
+    display: none !important;
+  }
+
+  .mobile-only .tab-analise:not(.active) {
+    display: none !important;
+  }
+
+  .mobile-only .tab-principal.active {
+    display: block !important;
+  }
+
+  .mobile-only .tab-analise.active {
+    display: block !important;
+  }
+
+  /* Botões das tabs */
+  .tab-buttons-row {
+    display: flex !important;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
   }
 }

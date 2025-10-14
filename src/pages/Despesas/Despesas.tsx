@@ -3,6 +3,7 @@ import "./Despesas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
+import useDespesasNavigation from "../../hooks/useDespesasNavigation";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
@@ -22,8 +23,21 @@ interface ContasAPagarEntry {
 }
 
 const Despesas: React.FC = () => {
+  const { activeCard, switchCard, cardData } =
+    useDespesasNavigation("despesas");
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
+
+  const getCardIcon = () => {
+    switch (activeCard) {
+      case "despesas":
+        return carteiraCardDespesasdoMês;
+      case "contas":
+        return simboloMenuBolsoContasAPagar;
+      default:
+        return carteiraCardDespesasdoMês;
+    }
+  };
 
   const despesasData: DespesaEntry[] = [
     {
@@ -122,8 +136,42 @@ const Despesas: React.FC = () => {
 
   return (
     <div className="despesas-page">
-      {/* Cards principais */}
-      <div className="despesas-cards">
+      {/* Sistema de Navegação Integrado - APENAS MOBILE */}
+      <div className="financial-card-container">
+        {/* Menu de navegação integrado com card */}
+        <div className="financial-card-navigation">
+          <button
+            className={`nav-button ${
+              activeCard === "despesas" ? "active" : ""
+            }`}
+            onClick={() => switchCard("despesas")}
+          >
+            Despesas do mês
+          </button>
+          <button
+            className={`nav-button ${activeCard === "contas" ? "active" : ""}`}
+            onClick={() => switchCard("contas")}
+          >
+            Contas a pagar
+          </button>
+        </div>
+
+        {/* Card Único */}
+        <div className="single-financial-card">
+          <FinancialCard
+            title={cardData.title}
+            value={formatValue(cardData.value)}
+            icon={getCardIcon()}
+            type={cardData.type}
+            showToggle={true}
+            isBalanceVisible={isBalanceVisible}
+            onToggleVisibility={toggleBalanceVisibility}
+          />
+        </div>
+      </div>
+
+      {/* Cards principais - Desktop */}
+      <div className="despesas-cards desktop-content">
         <FinancialCard
           title="Despesas do mês"
           value={formatValue("R$ 1.185,70")}
@@ -146,8 +194,36 @@ const Despesas: React.FC = () => {
         />
       </div>
 
-      {/* Conteúdo principal */}
-      <div className="despesas-content">
+      {/* Conteúdo Mobile - Apenas Tabela */}
+      <div className="despesas-mobile-content mobile-only">
+        <div className="dashboard-grid">
+          {/* Mostrar tabela baseada no card ativo */}
+          {activeCard === "despesas" ? (
+            <TransactionTable
+              title="Últimas Saídas"
+              columns={despesasColumns}
+              data={despesasData}
+              className="despesas-table-card"
+              showSummary={true}
+              summaryCountLabel="Saídas"
+              valueKey="value"
+            />
+          ) : (
+            <TransactionTable
+              title="Contas a Pagar"
+              columns={contasAPagarColumns}
+              data={contasAPagarData}
+              className="despesas-table-card"
+              showSummary={true}
+              summaryCountLabel="Contas"
+              valueKey="value"
+            />
+          )}
+        </div>
+      </div>
+
+      {/* Conteúdo Desktop - Sempre Visível */}
+      <div className="despesas-content desktop-content">
         {/* Primeira linha com tabelas */}
         <div className="despesas-tables-row">
           {/* Últimas Saídas */}

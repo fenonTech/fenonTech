@@ -280,58 +280,6 @@ const Dashboard: React.FC = () => {
         </button>
       </div>
 
-      {/* Conteúdo Mobile - Tabs funcionando */}
-      <div className="mobile-only">
-        <div
-          className="tab-content"
-          data-tab="principal"
-          style={{ display: activeTab === "principal" ? "block" : "none" }}
-        >
-          {/* Apenas Últimas Transações no mobile */}
-          <TransactionTable
-            title="Últimas Transações"
-            columns={transactionColumns}
-            data={transactions}
-            className="transactions-card"
-            showSummary={true}
-            summaryCountLabel="Transações"
-            valueKey="value"
-          />
-        </div>
-
-        <div
-          className="tab-content"
-          data-tab="graficos"
-          style={{ display: activeTab === "graficos" ? "block" : "none" }}
-        >
-          {/* Apenas Gráfico de Despesas no mobile */}
-          <div className="dashboard-card expenses-chart-card">
-            <h3 className="card-header">Despesas por categoria</h3>
-            <div className="chart-container">
-              <div className="chart-placeholder">
-                <div className="chart-center">
-                  <div className="total-label">TOTAL DESPESAS</div>
-                  <div className="total-value">R$ 6.749,63</div>
-                </div>
-              </div>
-              <div className="chart-legend">
-                {categoryData.map((item, index) => (
-                  <div key={index} className="legend-item">
-                    <div
-                      className="legend-color"
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span className="legend-label">
-                      {item.name} ({item.percentage}%)
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Conteúdo Desktop - Sempre Visível */}
       <div className="desktop-content">
         {/* Primeira Linha - Transações + Gráfico Pizza */}
@@ -420,7 +368,7 @@ const Dashboard: React.FC = () => {
 
       {/* Conteúdo Tab Principal - Apenas Mobile */}
       <div
-        className={`tab-content mobile-only ${
+        className={`tab-content mobile-only tab-principal ${
           activeTab === "principal" ? "active" : ""
         }`}
       >
@@ -440,7 +388,7 @@ const Dashboard: React.FC = () => {
 
       {/* Conteúdo Tab Análise - Apenas Mobile */}
       <div
-        className={`tab-content mobile-only ${
+        className={`tab-content mobile-only tab-analise ${
           activeTab === "graficos" ? "active" : ""
         }`}
       >
@@ -468,6 +416,32 @@ const Dashboard: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Visão por categoria */}
+          <div className="dashboard-card">
+            <h3 className="card-header">Visão por categoria</h3>
+            <div className="category-bars">
+              {categoryData.map((item, index) => (
+                <div key={index} className="category-bar-item">
+                  <div className="category-info">
+                    <span className="category-name">{item.name}</span>
+                    <span className="category-amount">
+                      (R$ {(item.percentage * 67.49).toFixed(2)} de R$ 100,00)
+                    </span>
+                  </div>
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{
+                        width: `${item.percentage}%`,
+                        backgroundColor: item.color,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
