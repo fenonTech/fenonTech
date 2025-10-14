@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useCallback } from "react";
+import { useFinancial } from "../contexts/FinancialContext";
 
 interface UseBalanceVisibilityReturn {
   isBalanceVisible: boolean;
@@ -7,11 +8,8 @@ interface UseBalanceVisibilityReturn {
 }
 
 export const useBalanceVisibility = (): UseBalanceVisibilityReturn => {
-  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
-
-  const toggleBalanceVisibility = useCallback(() => {
-    setIsBalanceVisible((prev) => !prev);
-  }, []);
+  const { state, toggleBalanceVisibility } = useFinancial();
+  const { isBalanceVisible } = state;
 
   const formatValue = useCallback(
     (value: string): string => {

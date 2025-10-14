@@ -1,7 +1,7 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import type { Transaction, FinancialSummary, Category, Bank } from '../types';
-import { apiService } from '../services';
+import { createContext, useContext, useReducer, useEffect } from "react";
+import type { ReactNode } from "react";
+import type { Transaction, FinancialSummary, Category, Bank } from "../types";
+import { apiService } from "../services";
 
 interface FinancialState {
   transactions: Transaction[];
@@ -10,19 +10,21 @@ interface FinancialState {
   banks: Bank[];
   loading: boolean;
   error: string | null;
+  isBalanceVisible: boolean;
 }
 
 type FinancialAction =
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null }
-  | { type: 'SET_TRANSACTIONS'; payload: Transaction[] }
-  | { type: 'ADD_TRANSACTION'; payload: Transaction }
-  | { type: 'UPDATE_TRANSACTION'; payload: Transaction }
-  | { type: 'DELETE_TRANSACTION'; payload: string }
-  | { type: 'SET_SUMMARY'; payload: FinancialSummary }
-  | { type: 'SET_CATEGORIES'; payload: Category[] }
-  | { type: 'SET_BANKS'; payload: Bank[] }
-  | { type: 'UPDATE_BANK'; payload: Bank };
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_ERROR"; payload: string | null }
+  | { type: "SET_TRANSACTIONS"; payload: Transaction[] }
+  | { type: "ADD_TRANSACTION"; payload: Transaction }
+  | { type: "UPDATE_TRANSACTION"; payload: Transaction }
+  | { type: "DELETE_TRANSACTION"; payload: string }
+  | { type: "SET_SUMMARY"; payload: FinancialSummary }
+  | { type: "SET_CATEGORIES"; payload: Category[] }
+  | { type: "SET_BANKS"; payload: Bank[] }
+  | { type: "UPDATE_BANK"; payload: Bank }
+  | { type: "TOGGLE_BALANCE_VISIBILITY" };
 
 const initialState: FinancialState = {
   transactions: [],
@@ -31,49 +33,58 @@ const initialState: FinancialState = {
   banks: [],
   loading: false,
   error: null,
+  isBalanceVisible: true,
 };
 
-function financialReducer(state: FinancialState, action: FinancialAction): FinancialState {
+function financialReducer(
+  state: FinancialState,
+  action: FinancialAction
+): FinancialState {
   switch (action.type) {
-    case 'SET_LOADING':
+    case "SET_LOADING":
       return { ...state, loading: action.payload };
-    case 'SET_ERROR':
+    case "SET_ERROR":
       return { ...state, error: action.payload, loading: false };
-    case 'SET_TRANSACTIONS':
+    case "SET_TRANSACTIONS":
       return { ...state, transactions: action.payload, loading: false };
-    case 'ADD_TRANSACTION':
-      return { 
-        ...state, 
-        transactions: [...state.transactions, action.payload],
-        loading: false 
-      };
-    case 'UPDATE_TRANSACTION':
+    case "ADD_TRANSACTION":
       return {
         ...state,
-        transactions: state.transactions.map(t => 
+        transactions: [...state.transactions, action.payload],
+        loading: false,
+      };
+    case "UPDATE_TRANSACTION":
+      return {
+        ...state,
+        transactions: state.transactions.map((t) =>
           t.id === action.payload.id ? action.payload : t
         ),
-        loading: false
+        loading: false,
       };
-    case 'DELETE_TRANSACTION':
+    case "DELETE_TRANSACTION":
       return {
         ...state,
-        transactions: state.transactions.filter(t => t.id !== action.payload),
-        loading: false
+        transactions: state.transactions.filter((t) => t.id !== action.payload),
+        loading: false,
       };
-    case 'SET_SUMMARY':
+    case "SET_SUMMARY":
       return { ...state, summary: action.payload, loading: false };
-    case 'SET_CATEGORIES':
+    case "SET_CATEGORIES":
       return { ...state, categories: action.payload, loading: false };
-    case 'SET_BANKS':
+    case "SET_BANKS":
       return { ...state, banks: action.payload, loading: false };
-    case 'UPDATE_BANK':
+    case "UPDATE_BANK":
       return {
         ...state,
-        banks: state.banks.map(b => 
+        banks: state.banks.map((b) =>
           b.id === action.payload.id ? action.payload : b
         ),
-        loading: false
+        loading: false,
+      };
+    case "TOGGLE_BALANCE_VISIBILITY":
+      return {
+        ...state,
+        isBalanceVisible: !state.isBalanceVisible,
       };
     default:
       return state;
@@ -84,119 +95,148 @@ interface FinancialContextType {
   state: FinancialState;
   // Transações
   loadTransactions: (filters?: any) => Promise<void>;
-  createTransaction: (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
-  updateTransaction: (id: string, transaction: Partial<Transaction>) => Promise<void>;
+  createTransaction: (
+    transaction: Omit<Transaction, "id" | "createdAt" | "updatedAt">
+  ) => Promise<void>;
+  updateTransaction: (
+    id: string,
+    transaction: Partial<Transaction>
+  ) => Promise<void>;
   deleteTransaction: (id: string) => Promise<void>;
   // Resumo
   loadSummary: (period?: string) => Promise<void>;
   // Categorias
   loadCategories: () => Promise<void>;
-  createCategory: (category: Omit<Category, 'id'>) => Promise<void>;
+  createCategory: (category: Omit<Category, "id">) => Promise<void>;
   // Bancos
   loadBanks: () => Promise<void>;
   syncBank: (bankId: string) => Promise<void>;
   // Webhooks
   handleWebhookData: (event: string, data: any) => void;
+  // Balance Visibility
+  toggleBalanceVisibility: () => void;
 }
 
-const FinancialContext = createContext<FinancialContextType | undefined>(undefined);
+const FinancialContext = createContext<FinancialContextType | undefined>(
+  undefined
+);
 
 export function FinancialProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(financialReducer, initialState);
 
   // Transações
   const loadTransactions = async (filters?: any) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const response = await apiService.getTransactions(filters);
       if (response.success && response.data) {
-        dispatch({ type: 'SET_TRANSACTIONS', payload: response.data });
+        dispatch({ type: "SET_TRANSACTIONS", payload: response.data });
       } else {
-        dispatch({ type: 'SET_ERROR', payload: response.error || 'Erro ao carregar transações' });
+        dispatch({
+          type: "SET_ERROR",
+          payload: response.error || "Erro ao carregar transações",
+        });
       }
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao carregar transações' });
+      dispatch({ type: "SET_ERROR", payload: "Erro ao carregar transações" });
     }
   };
 
-  const createTransaction = async (transaction: Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
+  const createTransaction = async (
+    transaction: Omit<Transaction, "id" | "createdAt" | "updatedAt">
+  ) => {
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const response = await apiService.createTransaction(transaction);
       if (response.success && response.data) {
-        dispatch({ type: 'ADD_TRANSACTION', payload: response.data });
-        
+        dispatch({ type: "ADD_TRANSACTION", payload: response.data });
+
         // Enviar para N8N
         await apiService.sendToN8N({
-          event: 'transaction.created',
+          event: "transaction.created",
           data: response.data,
           timestamp: new Date().toISOString(),
-          source: 'meu-bolso-app'
+          source: "meu-bolso-app",
         });
       } else {
-        dispatch({ type: 'SET_ERROR', payload: response.error || 'Erro ao criar transação' });
+        dispatch({
+          type: "SET_ERROR",
+          payload: response.error || "Erro ao criar transação",
+        });
       }
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao criar transação' });
+      dispatch({ type: "SET_ERROR", payload: "Erro ao criar transação" });
     }
   };
 
-  const updateTransaction = async (id: string, transaction: Partial<Transaction>) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
+  const updateTransaction = async (
+    id: string,
+    transaction: Partial<Transaction>
+  ) => {
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const response = await apiService.updateTransaction(id, transaction);
       if (response.success && response.data) {
-        dispatch({ type: 'UPDATE_TRANSACTION', payload: response.data });
-        
+        dispatch({ type: "UPDATE_TRANSACTION", payload: response.data });
+
         // Enviar para N8N
         await apiService.sendToN8N({
-          event: 'transaction.updated',
+          event: "transaction.updated",
           data: response.data,
           timestamp: new Date().toISOString(),
-          source: 'meu-bolso-app'
+          source: "meu-bolso-app",
         });
       } else {
-        dispatch({ type: 'SET_ERROR', payload: response.error || 'Erro ao atualizar transação' });
+        dispatch({
+          type: "SET_ERROR",
+          payload: response.error || "Erro ao atualizar transação",
+        });
       }
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao atualizar transação' });
+      dispatch({ type: "SET_ERROR", payload: "Erro ao atualizar transação" });
     }
   };
 
   const deleteTransaction = async (id: string) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const response = await apiService.deleteTransaction(id);
       if (response.success) {
-        dispatch({ type: 'DELETE_TRANSACTION', payload: id });
-        
+        dispatch({ type: "DELETE_TRANSACTION", payload: id });
+
         // Enviar para N8N
         await apiService.sendToN8N({
-          event: 'transaction.deleted',
+          event: "transaction.deleted",
           data: { id },
           timestamp: new Date().toISOString(),
-          source: 'meu-bolso-app'
+          source: "meu-bolso-app",
         });
       } else {
-        dispatch({ type: 'SET_ERROR', payload: response.error || 'Erro ao deletar transação' });
+        dispatch({
+          type: "SET_ERROR",
+          payload: response.error || "Erro ao deletar transação",
+        });
       }
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao deletar transação' });
+      dispatch({ type: "SET_ERROR", payload: "Erro ao deletar transação" });
     }
   };
 
   // Resumo
   const loadSummary = async (period?: string) => {
-    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: "SET_LOADING", payload: true });
     try {
       const response = await apiService.getFinancialSummary(period);
       if (response.success && response.data) {
-        dispatch({ type: 'SET_SUMMARY', payload: response.data });
+        dispatch({ type: "SET_SUMMARY", payload: response.data });
       } else {
-        dispatch({ type: 'SET_ERROR', payload: response.error || 'Erro ao carregar resumo' });
+        dispatch({
+          type: "SET_ERROR",
+          payload: response.error || "Erro ao carregar resumo",
+        });
       }
     } catch (error) {
-      dispatch({ type: 'SET_ERROR', payload: 'Erro ao carregar resumo' });
+      dispatch({ type: "SET_ERROR", payload: "Erro ao carregar resumo" });
     }
   };
 
@@ -205,21 +245,24 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     try {
       const response = await apiService.getCategories();
       if (response.success && response.data) {
-        dispatch({ type: 'SET_CATEGORIES', payload: response.data });
+        dispatch({ type: "SET_CATEGORIES", payload: response.data });
       }
     } catch (error) {
-      console.error('Erro ao carregar categorias:', error);
+      console.error("Erro ao carregar categorias:", error);
     }
   };
 
-  const createCategory = async (category: Omit<Category, 'id'>) => {
+  const createCategory = async (category: Omit<Category, "id">) => {
     try {
       const response = await apiService.createCategory(category);
       if (response.success && response.data) {
-        dispatch({ type: 'SET_CATEGORIES', payload: [...state.categories, response.data] });
+        dispatch({
+          type: "SET_CATEGORIES",
+          payload: [...state.categories, response.data],
+        });
       }
     } catch (error) {
-      console.error('Erro ao criar categoria:', error);
+      console.error("Erro ao criar categoria:", error);
     }
   };
 
@@ -228,10 +271,10 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     try {
       const response = await apiService.getBanks();
       if (response.success && response.data) {
-        dispatch({ type: 'SET_BANKS', payload: response.data });
+        dispatch({ type: "SET_BANKS", payload: response.data });
       }
     } catch (error) {
-      console.error('Erro ao carregar bancos:', error);
+      console.error("Erro ao carregar bancos:", error);
     }
   };
 
@@ -239,30 +282,30 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     try {
       const response = await apiService.syncBank(bankId);
       if (response.success && response.data) {
-        dispatch({ type: 'UPDATE_BANK', payload: response.data });
+        dispatch({ type: "UPDATE_BANK", payload: response.data });
       }
     } catch (error) {
-      console.error('Erro ao sincronizar banco:', error);
+      console.error("Erro ao sincronizar banco:", error);
     }
   };
 
   // Handler para webhooks recebidos
   const handleWebhookData = (event: string, data: any) => {
     switch (event) {
-      case 'transaction.created':
-        dispatch({ type: 'ADD_TRANSACTION', payload: data });
+      case "transaction.created":
+        dispatch({ type: "ADD_TRANSACTION", payload: data });
         break;
-      case 'transaction.updated':
-        dispatch({ type: 'UPDATE_TRANSACTION', payload: data });
+      case "transaction.updated":
+        dispatch({ type: "UPDATE_TRANSACTION", payload: data });
         break;
-      case 'transaction.deleted':
-        dispatch({ type: 'DELETE_TRANSACTION', payload: data.id });
+      case "transaction.deleted":
+        dispatch({ type: "DELETE_TRANSACTION", payload: data.id });
         break;
-      case 'summary.updated':
-        dispatch({ type: 'SET_SUMMARY', payload: data });
+      case "summary.updated":
+        dispatch({ type: "SET_SUMMARY", payload: data });
         break;
       default:
-        console.warn('Evento de webhook não reconhecido:', event);
+        console.warn("Evento de webhook não reconhecido:", event);
     }
   };
 
@@ -273,6 +316,11 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     loadCategories();
     loadBanks();
   }, []);
+
+  // Balance Visibility
+  const toggleBalanceVisibility = () => {
+    dispatch({ type: "TOGGLE_BALANCE_VISIBILITY" });
+  };
 
   const contextValue: FinancialContextType = {
     state,
@@ -286,6 +334,7 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
     loadBanks,
     syncBank,
     handleWebhookData,
+    toggleBalanceVisibility,
   };
 
   return (
@@ -298,7 +347,9 @@ export function FinancialProvider({ children }: { children: ReactNode }) {
 export function useFinancial() {
   const context = useContext(FinancialContext);
   if (context === undefined) {
-    throw new Error('useFinancial deve ser usado dentro de um FinancialProvider');
+    throw new Error(
+      "useFinancial deve ser usado dentro de um FinancialProvider"
+    );
   }
   return context;
 }
