@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Layout.css";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import BottomNavigation from "./BottomNavigation";
 import Dashboard from "../pages/Dashboard";
 import Receitas from "../pages/Receitas";
 import Despesas from "../pages/Despesas";
@@ -97,6 +98,7 @@ const Layout: React.FC = () => {
         />
         <main className="content">{renderContent()}</main>
       </div>
+      <BottomNavigation activeTab={activeItem} onTabChange={handleItemClick} />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import "./Dashboard.css";
 import FinancialCard from "../Cards/FinancialCard";
+import useTabs from "../../hooks/useTabs";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import setaParaBaixo from "../../assets/setaParaBaixo.png";
@@ -128,6 +129,8 @@ const Dashboard: React.FC = () => {
     { name: "Contas Variáveis", percentage: 25, color: "#FFEAA7" },
   ];
 
+  const { activeTab, switchTab } = useTabs("principal");
+
   return (
     <div className="dashboard">
       {/* Cards principais */}
@@ -152,76 +155,32 @@ const Dashboard: React.FC = () => {
         />
       </div>
 
-      {/* Seção de gráficos e tabelas */}
-      <div className="dashboard-grid">
-        {/* Últimas Transações */}
-        <div className="dashboard-card">
-          <h3 className="card-header">Últimas Transações</h3>
-          <div className="table-container">
-            <table className="transactions-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Descrição</th>
-                  <th>Categoria</th>
-                  <th>Valor</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((transaction, index) => (
-                  <tr key={index}>
-                    <td>{transaction.date}</td>
-                    <td>{transaction.description}</td>
-                    <td>
-                      <span className={`category ${transaction.type}`}>
-                        {transaction.category}
-                      </span>
-                    </td>
-                    <td className={`value ${transaction.type}`}>
-                      {transaction.value}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+      {/* Sistema de Tabs - apenas no mobile */}
+      <div className="dashboard-tabs">
+        <button
+          className={`tab-button ${activeTab === "principal" ? "active" : ""}`}
+          onClick={() => switchTab("principal")}
+        >
+          Principal
+        </button>
+        <button
+          className={`tab-button ${activeTab === "graficos" ? "active" : ""}`}
+          onClick={() => switchTab("graficos")}
+        >
+          Análise
+        </button>
+      </div>
 
-        {/* Despesas por categoria (simulando gráfico de pizza) */}
-        <div className="dashboard-card">
-          <h3 className="card-header">Despesas por categoria</h3>
-          <div className="chart-container">
-            <div className="chart-placeholder">
-              <div className="chart-center">
-                <div className="total-label">TOTAL DESPESAS</div>
-                <div className="total-value">R$ 6.749,63</div>
-              </div>
-            </div>
-            <div className="chart-legend">
-              {categoryData.map((item, index) => (
-                <div key={index} className="legend-item">
-                  <div
-                    className="legend-color"
-                    style={{ backgroundColor: item.color }}
-                  ></div>
-                  <span className="legend-label">
-                    {item.name} ({item.percentage}%)
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Contas a pagar */}
-        <div className="dashboard-card">
-          <h3 className="card-header">Contas a pagar</h3>
-          <div className="bills-container">
-            <div className="bills-icon">
-              <img src={sacoDeDinheiro} alt="Contas" />
-            </div>
+      {/* Conteúdo Tab Principal */}
+      <div
+        className={`tab-content ${activeTab === "principal" ? "active" : ""}`}
+      >
+        <div className="dashboard-grid">
+          {/* Últimas Transações */}
+          <div className="dashboard-card">
+            <h3 className="card-header">Últimas Transações</h3>
             <div className="table-container">
-              <table className="bills-table">
+              <table className="transactions-table">
                 <thead>
                   <tr>
                     <th>Data</th>
@@ -231,47 +190,118 @@ const Dashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {bills.map((bill, index) => (
+                  {transactions.map((transaction, index) => (
                     <tr key={index}>
-                      <td>{bill.date}</td>
-                      <td>{bill.description}</td>
+                      <td>{transaction.date}</td>
+                      <td>{transaction.description}</td>
                       <td>
-                        <span className="category expense">
-                          {bill.category}
+                        <span className={`category ${transaction.type}`}>
+                          {transaction.category}
                         </span>
                       </td>
-                      <td className="value expense">{bill.value}</td>
+                      <td className={`value ${transaction.type}`}>
+                        {transaction.value}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-        </div>
 
-        {/* Visão por categoria */}
-        <div className="dashboard-card">
-          <h3 className="card-header">Visão por categoria</h3>
-          <div className="category-bars">
-            {categoryData.map((item, index) => (
-              <div key={index} className="category-bar-item">
-                <div className="category-info">
-                  <span className="category-name">{item.name}</span>
-                  <span className="category-amount">
-                    (R$ {(item.percentage * 67.49).toFixed(2)} de R$ 100,00)
-                  </span>
-                </div>
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{
-                      width: `${item.percentage}%`,
-                      backgroundColor: item.color,
-                    }}
-                  ></div>
+          {/* Contas a pagar */}
+          <div className="dashboard-card">
+            <h3 className="card-header">Contas a pagar</h3>
+            <div className="bills-container">
+              <div className="bills-icon">
+                <img src={sacoDeDinheiro} alt="Contas" />
+              </div>
+              <div className="table-container">
+                <table className="bills-table">
+                  <thead>
+                    <tr>
+                      <th>Data</th>
+                      <th>Descrição</th>
+                      <th>Categoria</th>
+                      <th>Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bills.map((bill, index) => (
+                      <tr key={index}>
+                        <td>{bill.date}</td>
+                        <td>{bill.description}</td>
+                        <td>
+                          <span className="category expense">
+                            {bill.category}
+                          </span>
+                        </td>
+                        <td className="value expense">{bill.value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Conteúdo Tab Gráficos */}
+      <div
+        className={`tab-content ${activeTab === "graficos" ? "active" : ""}`}
+      >
+        <div className="dashboard-grid">
+          {/* Despesas por categoria (simulando gráfico de pizza) */}
+          <div className="dashboard-card">
+            <h3 className="card-header">Despesas por categoria</h3>
+            <div className="chart-container">
+              <div className="chart-placeholder">
+                <div className="chart-center">
+                  <div className="total-label">TOTAL DESPESAS</div>
+                  <div className="total-value">R$ 6.749,63</div>
                 </div>
               </div>
-            ))}
+              <div className="chart-legend">
+                {categoryData.map((item, index) => (
+                  <div key={index} className="legend-item">
+                    <div
+                      className="legend-color"
+                      style={{ backgroundColor: item.color }}
+                    ></div>
+                    <span className="legend-label">
+                      {item.name} ({item.percentage}%)
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Visão por categoria */}
+          <div className="dashboard-card">
+            <h3 className="card-header">Visão por categoria</h3>
+            <div className="category-bars">
+              {categoryData.map((item, index) => (
+                <div key={index} className="category-bar-item">
+                  <div className="category-info">
+                    <span className="category-name">{item.name}</span>
+                    <span className="category-amount">
+                      (R$ {(item.percentage * 67.49).toFixed(2)} de R$ 100,00)
+                    </span>
+                  </div>
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{
+                        width: `${item.percentage}%`,
+                        backgroundColor: item.color,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

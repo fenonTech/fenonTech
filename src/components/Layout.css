@@ -43,14 +43,30 @@
   font-size: 1.125rem;
 }
 
-/* Responsivo */
+/* Responsivo - Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .main-content {
+    margin-left: 260px;
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 70px;
+  }
+}
+
+/* Responsivo - Tablet pequeno */
 @media (max-width: 768px) and (min-width: 601px) {
   .layout {
-    flex-direction: column;
+    display: flex;
   }
 
   .main-content {
-    margin-left: 0;
+    margin-left: 50px;
+    transition: margin-left 0.3s ease;
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 50px;
   }
 
   .page-placeholder {
@@ -67,41 +83,75 @@
   }
 }
 
+/* Responsivo - Mobile com Bottom Navigation */
 @media (max-width: 600px) {
-  /* Layout permanece em flexbox para mobile com sidebar lateral */
   .layout {
     display: flex;
-    flex-direction: row; /* Mantém lado a lado no mobile */
+    flex-direction: row;
+    position: relative;
+    padding-bottom: 80px; /* Espaço para bottom navigation */
   }
 
-  /* Conteúdo principal ajustado para sidebar mobile */
+  /* Conteúdo principal mobile */
   .main-content {
-    margin-left: 50px; /* Espaço para sidebar fechada (apenas menu burger) */
-    transition: margin-left 0.3s ease;
-    width: calc(100% - 50px);
+    margin-left: 0;
+    width: 100%;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: calc(100vh - 80px); /* Ajustado para bottom nav */
   }
 
+  /* Quando sidebar está fechada no mobile */
   .main-content.sidebar-collapsed {
-    margin-left: 50px; /* Sidebar collapsed no mobile */
-    width: calc(100% - 50px);
+    margin-left: 0;
+    width: 100%;
   }
 
-  /* Quando sidebar está aberta no mobile */
-  .main-content:not(.sidebar-collapsed) {
-    margin-left: 280px;
-    width: calc(100% - 280px);
+  /* Remover overlay - usaremos bottom navigation */
+  .main-content:not(.sidebar-collapsed)::before {
+    display: none;
+  }
+
+  .content {
+    padding: 0;
+    overflow-x: hidden;
+    padding-bottom: 1rem; /* Espaço antes da bottom nav */
   }
 
   .page-placeholder {
     padding: 1rem;
-    min-height: 250px;
+    min-height: calc(100vh - 280px); /* Ajustado para bottom nav */
+  }
+
+  .page-placeholder h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .page-placeholder p {
+    font-size: 1rem;
+  }
+
+  /* Esconder sidebar lateral no mobile */
+  .sidebar {
+    display: none !important;
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+  .page-placeholder {
+    padding: 0.75rem;
+    min-height: calc(100vh - 180px);
   }
 
   .page-placeholder h2 {
     font-size: 1.25rem;
+    margin-bottom: 0.5rem;
   }
 
   .page-placeholder p {
     font-size: 0.875rem;
+    line-height: 1.4;
   }
 }

@@ -3,6 +3,7 @@ import "./Despesas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
+import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
@@ -21,6 +22,9 @@ interface ContasAPagarEntry {
 }
 
 const Despesas: React.FC = () => {
+  const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
+    useBalanceVisibility();
+
   const despesasData: DespesaEntry[] = [
     {
       date: "06/10",
@@ -122,17 +126,23 @@ const Despesas: React.FC = () => {
       <div className="despesas-cards">
         <FinancialCard
           title="Despesas do mês"
-          value="R$ 1.185,70"
+          value={formatValue("R$ 1.185,70")}
           icon={carteiraCardDespesasdoMês}
           type="negative"
           className="despesa-card-large"
+          showToggle={true}
+          isBalanceVisible={isBalanceVisible}
+          onToggleVisibility={toggleBalanceVisibility}
         />
         <FinancialCard
           title="Contas a pagar"
-          value="R$ 729,90"
+          value={formatValue("R$ 729,90")}
           icon={simboloMenuBolsoContasAPagar}
           type="neutral"
           className="despesa-card-large"
+          showToggle={true}
+          isBalanceVisible={isBalanceVisible}
+          onToggleVisibility={toggleBalanceVisibility}
         />
       </div>
 

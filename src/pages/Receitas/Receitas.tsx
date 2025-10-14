@@ -3,6 +3,8 @@ import "./Receitas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
+import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
+import useReceitasNavigation from "../../hooks/useReceitasNavigation";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import simboloMeuBolsoContasAReceberCard from "../../assets/simboloMeuBolsoContasAReceberCard.png";
 
@@ -21,6 +23,10 @@ interface ContasAReceberEntry {
 }
 
 const Receitas: React.FC = () => {
+  const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
+    useBalanceVisibility();
+  const { activeCard, switchCard, cardData } = useReceitasNavigation("receita");
+
   const receitasData: ReceitaEntry[] = [
     { date: "06/10", category: "Salário", type: "Fixa", value: "R$ 5.000,00" },
     {
@@ -178,24 +184,75 @@ const Receitas: React.FC = () => {
     },
   ];
 
+  const getCardIcon = () => {
+    switch (activeCard) {
+      case "receita":
+        return sacoDeDinheiro;
+      case "contas-a-receber":
+        return simboloMeuBolsoContasAReceberCard;
+      default:
+        return sacoDeDinheiro;
+    }
+  };
+
   return (
     <div className="receitas-page">
-      {/* Cards principais */}
+      {/* Cards principais - DESKTOP */}
       <div className="receitas-cards">
         <FinancialCard
           title="Receita do mês"
-          value="R$ 1.250,37"
+          value={formatValue("R$ 1.250,37")}
           icon={sacoDeDinheiro}
           type="positive"
           className="receita-card-large"
+          showToggle={true}
+          isBalanceVisible={isBalanceVisible}
+          onToggleVisibility={toggleBalanceVisibility}
         />
         <FinancialCard
           title="Contas a receber"
-          value="R$ 600,00"
+          value={formatValue("R$ 600,00")}
           icon={simboloMeuBolsoContasAReceberCard}
           type="neutral"
           className="receita-card-large"
+          showToggle={true}
+          isBalanceVisible={isBalanceVisible}
+          onToggleVisibility={toggleBalanceVisibility}
         />
+      </div>
+
+      {/* Sistema de Navegação - APENAS MOBILE */}
+      <div className="receitas-card-container">
+        {/* Navegação dos Cards */}
+        <div className="receitas-card-navigation">
+          <button
+            className={`nav-button ${activeCard === "receita" ? "active" : ""}`}
+            onClick={() => switchCard("receita")}
+          >
+            Receita
+          </button>
+          <button
+            className={`nav-button ${
+              activeCard === "contas-a-receber" ? "active" : ""
+            }`}
+            onClick={() => switchCard("contas-a-receber")}
+          >
+            Contas a Receber
+          </button>
+        </div>
+
+        {/* Card Único */}
+        <div className="single-receitas-card">
+          <FinancialCard
+            title={cardData.title}
+            value={formatValue(cardData.value)}
+            icon={getCardIcon()}
+            type={cardData.type}
+            showToggle={true}
+            isBalanceVisible={isBalanceVisible}
+            onToggleVisibility={toggleBalanceVisibility}
+          />
+        </div>
       </div>
 
       {/* Conteúdo principal */}

@@ -199,8 +199,35 @@
   font-weight: 600;
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
+/* Responsivo */
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .transaction-table-card {
+    padding: 1.25rem;
+  }
+
+  .card-header {
+    font-size: 1.2rem;
+  }
+
+  .table-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .table-icon img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .data-table {
+    font-size: 0.9rem;
+  }
+}
+
+/* Tablet pequeno */
+@media (max-width: 768px) and (min-width: 601px) {
   .transaction-table-card {
     padding: 1rem;
   }
@@ -211,15 +238,13 @@
   }
 
   .table-icon {
-    top: 1rem;
-    right: 1rem;
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
   }
 
   .table-icon img {
-    width: 24px;
-    height: 24px;
+    width: 26px;
+    height: 26px;
   }
 
   .data-table {
@@ -228,54 +253,180 @@
 
   .data-table th,
   .data-table td {
-    padding: 0.5rem;
+    padding: 0.625rem 0.75rem;
+  }
+
+  .category {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+  }
+}
+
+/* Mobile - Minimalista e Compacto */
+@media (max-width: 600px) {
+  .transaction-table-card {
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .card-header {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.375rem;
+    border-bottom: 1px solid #1a1a1a;
+    color: #ffd700;
+    font-weight: 600;
+  }
+
+  .table-icon {
+    top: 0.5rem;
+    left: 0.5rem;
+    right: auto;
+    width: 24px;
+    height: 24px;
+  }
+
+  .table-icon img {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Layout de cards no mobile - Remover completamente o cabeçalho */
+  .data-table thead {
+    display: none !important;
   }
 
   .data-table th {
-    display: none;
+    display: none !important;
   }
 
   .data-table,
-  .data-table thead,
   .data-table tbody,
-  .data-table th,
   .data-table td,
   .data-table tr {
     display: block;
   }
 
+  /* Container da tabela sem espaço para cabeçalho */
+  .table-container {
+    overflow: visible;
+    max-height: none;
+  }
+
+  /* Card minimalista da transação */
   .data-table tbody tr {
-    border: 1px solid #333333;
+    border: 1px solid #2a2a2a;
     border-radius: 8px;
     margin-bottom: 0.75rem;
-    padding: 0.5rem;
+    padding: 0;
     background: #1a1a1a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .data-table tbody tr::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ffd700;
+  }
+
+  .data-table tbody tr:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.15);
+    border-color: #ffd700;
+  }
+
+  /* Layout de 2 linhas horizontais - estrutura reorganizada */
+  .data-table tbody tr {
+    display: flex;
+    flex-direction: column;
   }
 
   .data-table tbody td {
     border: none;
-    border-bottom: 1px solid #333333;
     position: relative;
-    padding-left: 50% !important;
-    text-align: right;
-  }
-
-  .data-table tbody td:before {
-    content: attr(data-label) ": ";
-    position: absolute;
-    left: 6px;
-    width: 45%;
-    padding-right: 10px;
-    white-space: nowrap;
-    color: #cccccc;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-  }
-
-  .data-table tbody td:last-child {
+    padding: 0.375rem 0.75rem !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     border-bottom: none;
+  }
+
+  /* LINHA 1: Categoria (esquerda) + Valor (direita) */
+  .data-table tbody td:nth-child(3) {
+    /* category */
+    order: 1;
+    padding: 0.75rem 0.75rem 0.375rem 0.75rem !important;
+    background: rgba(255, 215, 0, 0.01);
+  }
+
+  /* LINHA 2: Descrição (esquerda) + Data (direita) */
+  .data-table tbody td:nth-child(2) {
+    /* description */
+    order: 2;
+    padding: 0.375rem 0.75rem 0.75rem 0.75rem !important;
+  }
+
+  /* Data aparece na mesma linha da descrição */
+  .data-table tbody td:nth-child(1) {
+    /* date */
+    order: 2;
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    padding: 0 !important;
+    width: auto;
+    background: none;
+  }
+
+  /* Valor fica posicionado na linha 1 */
+  .data-table tbody td:nth-child(4) {
+    /* value */
+    order: 1;
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    padding: 0 !important;
+    width: auto;
+    background: none;
+  }
+
+  /* Tipografia compacta - categoria */
+  .data-table tbody td:nth-child(3) > * {
+    /* category */
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffd700;
+    margin: 0;
+  }
+
+  /* Tipografia compacta - descrição */
+  .data-table tbody td:nth-child(2) > * {
+    /* description */
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #ccc;
+    margin: 0;
+  }
+
+  /* Tipografia compacta - data */
+  .data-table tbody td:nth-child(1) > * {
+    /* date */
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: #888;
+    margin: 0;
+  }
+
+  /* Remover todos os labels :before */
+  .data-table tbody td:before {
+    display: none;
   }
 
   /* Responsividade para layout com ícone à esquerda */
@@ -288,25 +439,25 @@
   }
 
   .bills-icon {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     background: transparent;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    margin-top: 0.5rem;
+    margin-top: 0.375rem;
   }
 
   .bills-icon img {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
   }
 
-  /* Responsividade do summary */
+  /* Summary compacto */
   .table-summary {
-    padding: 0.75rem 1rem;
+    padding: 0.75rem;
     margin-top: 0.75rem;
   }
 
@@ -319,58 +470,203 @@
   }
 }
 
+/* Categorias minimalistas - mobile */
+.data-table tbody td .category {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  display: inline-block;
+}
+
+.data-table tbody td .category.income {
+  background: rgba(40, 167, 69, 0.15);
+  color: #28a745;
+}
+
+.data-table tbody td .category.expense {
+  background: rgba(220, 53, 69, 0.15);
+  color: #dc3545;
+}
+
+.data-table tbody td .category.fixa {
+  background: rgba(40, 167, 69, 0.15);
+  color: #28a745;
+}
+
+.data-table tbody td .category.variavel {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+}
+
+/* Valores compactos - mobile */
+.data-table tbody td .value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.data-table tbody td .value.income {
+  color: #28a745;
+}
+
+.data-table tbody td .value.expense {
+  color: #dc3545;
+}
+
+/* Summary minimalista - mobile em linha */
+@media (max-width: 600px) {
+  .table-summary {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    margin-top: 0.75rem;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .summary-count {
+    color: #999;
+    font-size: 0.8rem;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .summary-total {
+    color: #28a745;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: right;
+    flex-shrink: 0;
+  }
+}
+
+/* Mobile muito pequeno */
 @media (max-width: 480px) {
   .transaction-table-card {
-    padding: 0.75rem;
+    padding: 0.875rem;
+    border-radius: 10px;
   }
 
   .card-header {
     font-size: 1rem;
+    margin-bottom: 0.875rem;
   }
 
   .table-icon {
-    width: 36px;
-    height: 36px;
-  }
-
-  .table-icon img {
+    top: 0.375rem;
+    left: 0.375rem;
+    right: auto;
     width: 20px;
     height: 20px;
   }
 
-  .data-table {
+  .table-icon img {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Garantir que cabeçalho continue oculto */
+  .data-table thead {
+    display: none !important;
+  }
+
+  .data-table th {
+    display: none !important;
+  }
+
+  /* Cards de transação compactos */
+  .data-table tbody tr {
+    margin-bottom: 0.875rem;
+    border-radius: 10px;
+  }
+
+  /* Ajustes para telas muito pequenas - layout 2 linhas */
+  .data-table tbody td:nth-child(3) {
+    /* category */
+    padding: 0.875rem 0.875rem 0.375rem 0.875rem !important;
+  }
+
+  .data-table tbody td:nth-child(2) {
+    /* description */
+    padding: 0.375rem 0.875rem 0.875rem 0.875rem !important;
+  }
+
+  .data-table tbody td:nth-child(4) {
+    /* value */
+    top: 0.875rem;
+    right: 0.875rem;
+  }
+
+  .data-table tbody td:nth-child(1) {
+    /* date */
+    bottom: 0.875rem;
+    right: 0.875rem;
+  }
+
+  /* Tamanhos de fonte compactos */
+  .data-table tbody td:nth-child(3) > * {
+    /* category */
+    font-size: 0.9rem;
+  }
+
+  .data-table tbody td:nth-child(2) > * {
+    /* description */
     font-size: 0.8rem;
   }
 
-  .category {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
+  .data-table tbody td:nth-child(1) > * {
+    /* date */
+    font-size: 0.75rem;
   }
 
-  /* Responsividade adicional para layout com ícone à esquerda em telas pequenas */
-  .bills-icon {
-    width: 60px;
-    height: 60px;
+  /* Categorias menores */
+  .data-table tbody td .category {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
   }
 
-  .bills-icon img {
-    width: 50px;
-    height: 50px;
+  /* Valores menores */
+  .data-table tbody td .value {
+    font-size: 1rem;
+    font-weight: 800;
   }
 
-  /* Responsividade adicional do summary */
+  /* Summary compacto em linha */
   .table-summary {
-    padding: 0.5rem 0.75rem;
-    flex-direction: column;
-    gap: 0.25rem;
-    align-items: flex-start;
+    padding: 0.625rem 0.875rem;
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   .summary-count {
     font-size: 0.75rem;
+    flex: 1;
   }
 
   .summary-total {
     font-size: 0.85rem;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Layout com ícone à esquerda compacto */
+  .bills-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .bills-icon img {
+    width: 60px;
+    height: 60px;
   }
 }
