@@ -53,12 +53,9 @@
   height: 28px;
   transition: all 0.3s ease;
   display: block;
-  object-fit: contain;
   margin: 0 auto;
   /* Debug: garantir visibilidade */
   opacity: 1;
-  background: rgba(255, 0, 0, 0.1); /* Fundo temporário para debug */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Borda para visualizar área */
 }
 
 .bottom-nav-item.active .bottom-nav-icon {
