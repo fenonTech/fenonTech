@@ -30,6 +30,27 @@ const Dashboard: React.FC = () => {
       type: "expense",
     },
     {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+      type: "expense",
+    },
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+      type: "expense",
+    },
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+      type: "expense",
+    },
+    {
       date: "28/10",
       description: "Uber",
       category: "Locomoção",
@@ -67,6 +88,18 @@ const Dashboard: React.FC = () => {
   ];
 
   const bills: Bill[] = [
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+    },
+    {
+      date: "31/10",
+      description: "iFood",
+      category: "Alimentação",
+      value: "R$ 50,00",
+    },
     {
       date: "31/10",
       description: "iFood",

@@ -25,8 +25,9 @@
 }
 
 .despesas-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -315,28 +316,7 @@
   text-align: center;
 }
 
-/* Scrollbar customizada para a legenda */
-.pie-legend::-webkit-scrollbar,
-.chart-legend::-webkit-scrollbar {
-  height: 6px;
-}
-
-.pie-legend::-webkit-scrollbar-track,
-.chart-legend::-webkit-scrollbar-track {
-  background: #333;
-  border-radius: 10px;
-}
-
-.pie-legend::-webkit-scrollbar-thumb,
-.chart-legend::-webkit-scrollbar-thumb {
-  background: #ffd700;
-  border-radius: 10px;
-}
-
-.pie-legend::-webkit-scrollbar-thumb:hover,
-.chart-legend::-webkit-scrollbar-thumb:hover {
-  background: #e6c200;
-}
+/* Scrollbar padrão aplicada globalmente */
 
 /* Barras de Categoria */
 .category-bars {

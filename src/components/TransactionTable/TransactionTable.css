@@ -71,7 +71,7 @@
 .table-container {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 400px;
+  max-height: 15rem;
 }
 
 .data-table {
@@ -92,7 +92,7 @@
 }
 
 .data-table td {
-  padding: 1rem;
+  padding: 0.5rem;
   color: #ffffff;
   font-size: 0.875rem;
   border-bottom: 1px solid #1a1a1a;

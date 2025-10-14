@@ -25,3 +25,43 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+
+/* Padrão de scrollbar customizada para todo o projeto */
+.scrollbar-standard::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-standard::-webkit-scrollbar-track {
+  background: #333;
+  border-radius: 10px;
+}
+
+.scrollbar-standard::-webkit-scrollbar-thumb {
+  background: #ffd700;
+  border-radius: 10px;
+}
+
+.scrollbar-standard::-webkit-scrollbar-thumb:hover {
+  background: #e6c200;
+}
+
+/* Aplicar o padrão globalmente em elementos que comumente têm scroll */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #333;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #ffd700;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #e6c200;
+}

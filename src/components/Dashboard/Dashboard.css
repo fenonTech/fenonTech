@@ -8,8 +8,9 @@
 }
 
 .financial-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  display: flex;
+  justify-content: center;
+  align-items: center;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -295,24 +296,7 @@
   text-align: center;
 }
 
-/* Scrollbar customizada para a legenda */
-.chart-legend::-webkit-scrollbar {
-  height: 6px;
-}
-
-.chart-legend::-webkit-scrollbar-track {
-  background: #333;
-  border-radius: 10px;
-}
-
-.chart-legend::-webkit-scrollbar-thumb {
-  background: #ffd700;
-  border-radius: 10px;
-}
-
-.chart-legend::-webkit-scrollbar-thumb:hover {
-  background: #e6c200;
-}
+/* Scrollbar padrão aplicada globalmente */
 
 .bills-container {
   display: grid;

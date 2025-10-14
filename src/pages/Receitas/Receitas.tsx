@@ -29,9 +29,81 @@ const Receitas: React.FC = () => {
       type: "Variável",
       value: "R$ 550,00",
     },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
+    {
+      date: "10/10",
+      category: "Freelancer",
+      type: "Variável",
+      value: "R$ 550,00",
+    },
   ];
 
   const contasAReceberData: ContasAReceberEntry[] = [
+    {
+      date: "15/10",
+      category: "Consultoria",
+      type: "Pendente",
+      value: "R$ 2.500,00",
+    },
+    {
+      date: "15/10",
+      category: "Consultoria",
+      type: "Pendente",
+      value: "R$ 2.500,00",
+    },
+    {
+      date: "15/10",
+      category: "Consultoria",
+      type: "Pendente",
+      value: "R$ 2.500,00",
+    },
     {
       date: "15/10",
       category: "Consultoria",
