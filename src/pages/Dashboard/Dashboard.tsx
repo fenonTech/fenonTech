@@ -1,6 +1,8 @@
 import React from "react";
 import "./Dashboard.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
+import TransactionTable from "../../components/TransactionTable";
+import type { TableColumn } from "../../components/TransactionTable";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import setaParaBaixo from "../../assets/setaParaBaixo.png";
@@ -96,6 +98,42 @@ const Dashboard: React.FC = () => {
     { name: "Contas Variáveis", percentage: 25, color: "#FFEAA7" },
   ];
 
+  // Definir colunas para a tabela de transações
+  const transactionColumns: TableColumn[] = [
+    { key: "date", label: "Data" },
+    { key: "description", label: "Descrição" },
+    {
+      key: "category",
+      label: "Categoria",
+      render: (value, row) => (
+        <span className={`category ${row.type}`}>{value}</span>
+      ),
+    },
+    {
+      key: "value",
+      label: "Valor",
+      render: (value, row) => (
+        <span className={`value ${row.type}`}>{value}</span>
+      ),
+    },
+  ];
+
+  // Definir colunas para a tabela de contas a pagar
+  const billsColumns: TableColumn[] = [
+    { key: "date", label: "Data" },
+    { key: "description", label: "Descrição" },
+    {
+      key: "category",
+      label: "Categoria",
+      render: (value) => <span className="category expense">{value}</span>,
+    },
+    {
+      key: "value",
+      label: "Valor",
+      render: (value) => <span className="value expense">{value}</span>,
+    },
+  ];
+
   return (
     <div className="dashboard">
       {/* Cards principais */}
@@ -124,37 +162,15 @@ const Dashboard: React.FC = () => {
       {/* Primeira linha com cards específicos */}
       <div className="dashboard-first-row">
         {/* Últimas Transações */}
-        <div className="dashboard-card transactions-card">
-          <h3 className="card-header">Últimas Transações</h3>
-          <div className="table-container">
-            <table className="transactions-table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Descrição</th>
-                  <th>Categoria</th>
-                  <th>Valor</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((transaction, index) => (
-                  <tr key={index}>
-                    <td>{transaction.date}</td>
-                    <td>{transaction.description}</td>
-                    <td>
-                      <span className={`category ${transaction.type}`}>
-                        {transaction.category}
-                      </span>
-                    </td>
-                    <td className={`value ${transaction.type}`}>
-                      {transaction.value}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <TransactionTable
+          title="Últimas Transações"
+          columns={transactionColumns}
+          data={transactions}
+          className="transactions-card"
+          showSummary={true}
+          summaryCountLabel="Transações"
+          valueKey="value"
+        />
 
         {/* Despesas por categoria (simulando gráfico de pizza) */}
         <div className="dashboard-card expenses-chart-card">
@@ -168,17 +184,34 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="chart-legend">
               <div className="legend-item">
-                <div className="legend-bar alimentacao"></div>
-                <span className="legend-label">Básicos</span>
+                <div
+                  className="legend-color"
+                  style={{ backgroundColor: "#FF6B6B" }}
+                ></div>
+                <span className="legend-label">Alimentação (35%)</span>
               </div>
               <div className="legend-item">
-                <div className="legend-bar transporte"></div>
-                <span className="legend-label">Transporte</span>
+                <div
+                  className="legend-color"
+                  style={{ backgroundColor: "#4ECDC4" }}
+                ></div>
+                <span className="legend-label">Transporte (25%)</span>
               </div>
               <div className="legend-item">
-                <div className="legend-bar despesas"></div>
-                <span className="legend-label">Despesas</span>
+                <div
+                  className="legend-color"
+                  style={{ backgroundColor: "#45B7D1" }}
+                ></div>
+                <span className="legend-label">Moradia (30%)</span>
               </div>
+              <div className="legend-item">
+                <div
+                  className="legend-color"
+                  style={{ backgroundColor: "#96CEB4" }}
+                ></div>
+                <span className="legend-label">Outros (10%)</span>
+              </div>
+              ={" "}
             </div>
           </div>
         </div>
@@ -187,42 +220,18 @@ const Dashboard: React.FC = () => {
       {/* Segunda linha com outros cards */}
       <div className="dashboard-second-row">
         {/* Contas a pagar */}
-        <div className="dashboard-card">
-          <h3 className="card-header">Contas a pagar</h3>
-          <div className="bills-container">
-            <div className="bills-icon">
-              <img src={simboloMenuBolsoContasAPagar} alt="Contas" />
-            </div>
-            <div className="table-container">
-              <table className="bills-table">
-                <thead>
-                  <tr>
-                    <th>Data</th>
-                    <th>Descrição</th>
-                    <th>Categoria</th>
-                    <th>Valor</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bills.map((bill, index) => (
-                    <tr key={index}>
-                      <td data-label="Data">{bill.date}</td>
-                      <td data-label="Descrição">{bill.description}</td>
-                      <td data-label="Categoria">
-                        <span className="category expense">
-                          {bill.category}
-                        </span>
-                      </td>
-                      <td data-label="Valor" className="value expense">
-                        {bill.value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        <TransactionTable
+          title="Contas a pagar"
+          columns={billsColumns}
+          data={bills}
+          showIcon={true}
+          icon={simboloMenuBolsoContasAPagar}
+          iconPosition="left"
+          showSummary={true}
+          summaryCountLabel="Contas"
+          valueKey="value"
+          className="bills-table-orange"
+        />
 
         {/* Visão por categoria */}
         <div className="dashboard-card">

@@ -1,0 +1,376 @@
+.transaction-table-card {
+  background: #121212;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #121212;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.transaction-table-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(135, 131, 131, 0.3);
+  border-color: #ffd900;
+}
+
+.card-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+  font-family: "Poppins", sans-serif;
+}
+
+.table-icon {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.table-icon img {
+  width: 32px;
+  height: 32px;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+    hue-rotate(5deg) brightness(104%) contrast(101%);
+}
+
+/* Layout com ícone à esquerda */
+.bills-container {
+  display: grid;
+  grid-template-columns: 15% 1fr;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.bills-icon {
+  width: 100%;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.bills-icon img {
+  width: 300px;
+}
+
+.bills-container .table-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.table-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Poppins", sans-serif;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: #cccccc;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #333333;
+}
+
+.data-table td {
+  padding: 1rem;
+  color: #ffffff;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(255, 217, 0, 0.05);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Category styling */
+.category {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.category.income {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+}
+
+.category.expense {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.category.fixa {
+  background: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+}
+
+.category.variavel {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+/* Value styling */
+.value {
+  font-weight: 600;
+  text-align: right;
+}
+
+.value.income {
+  color: #28a745;
+}
+
+.value.expense {
+  color: #dc3545;
+}
+
+/* Estilos específicos para tabela de contas a pagar com cores laranjas */
+.bills-table-orange .category.expense {
+  background: rgba(254, 97, 0, 0.2);
+  color: #fe6100;
+  border: none;
+}
+
+.bills-table-orange .value.expense {
+  color: #fe6100;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #666666;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Table Summary */
+.table-summary {
+  margin-top: 1rem;
+  padding: 1rem 1.5rem;
+  background: #1a1a1a;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #333;
+  font-family: "Poppins", sans-serif;
+}
+
+.summary-count {
+  color: #ccc;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.summary-total {
+  color: #28a745;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .transaction-table-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+  }
+
+  .table-icon {
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .table-icon img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .data-table {
+    font-size: 0.875rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.5rem;
+  }
+
+  .data-table th {
+    display: none;
+  }
+
+  .data-table,
+  .data-table thead,
+  .data-table tbody,
+  .data-table th,
+  .data-table td,
+  .data-table tr {
+    display: block;
+  }
+
+  .data-table tbody tr {
+    border: 1px solid #333333;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    padding: 0.5rem;
+    background: #1a1a1a;
+  }
+
+  .data-table tbody td {
+    border: none;
+    border-bottom: 1px solid #333333;
+    position: relative;
+    padding-left: 50% !important;
+    text-align: right;
+  }
+
+  .data-table tbody td:before {
+    content: attr(data-label) ": ";
+    position: absolute;
+    left: 6px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    color: #cccccc;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+  }
+
+  .data-table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  /* Responsividade para layout com ícone à esquerda */
+  .bills-container {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0;
+  }
+
+  .bills-icon {
+    width: 80px;
+    height: 80px;
+    background: transparent;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.5rem;
+  }
+
+  .bills-icon img {
+    width: 70px;
+    height: 70px;
+  }
+
+  /* Responsividade do summary */
+  .table-summary {
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .summary-count {
+    font-size: 0.8rem;
+  }
+
+  .summary-total {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .transaction-table-card {
+    padding: 0.75rem;
+  }
+
+  .card-header {
+    font-size: 1rem;
+  }
+
+  .table-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .table-icon img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .data-table {
+    font-size: 0.8rem;
+  }
+
+  .category {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+  /* Responsividade adicional para layout com ícone à esquerda em telas pequenas */
+  .bills-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .bills-icon img {
+    width: 50px;
+    height: 50px;
+  }
+
+  /* Responsividade adicional do summary */
+  .table-summary {
+    padding: 0.5rem 0.75rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-start;
+  }
+
+  .summary-count {
+    font-size: 0.75rem;
+  }
+
+  .summary-total {
+    font-size: 0.85rem;
+  }
+}

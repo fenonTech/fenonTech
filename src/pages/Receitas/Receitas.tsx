@@ -1,10 +1,19 @@
 import React from "react";
 import "./Receitas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
+import TransactionTable from "../../components/TransactionTable";
+import type { TableColumn } from "../../components/TransactionTable";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import simboloMeuBolsoContasAReceberCard from "../../assets/simboloMeuBolsoContasAReceberCard.png";
 
 interface ReceitaEntry {
+  date: string;
+  category: string;
+  type: string;
+  value: string;
+}
+
+interface ContasAReceberEntry {
   date: string;
   category: string;
   type: string;
@@ -19,6 +28,27 @@ const Receitas: React.FC = () => {
       category: "Freelancer",
       type: "Variável",
       value: "R$ 550,00",
+    },
+  ];
+
+  const contasAReceberData: ContasAReceberEntry[] = [
+    {
+      date: "15/10",
+      category: "Consultoria",
+      type: "Pendente",
+      value: "R$ 2.500,00",
+    },
+    {
+      date: "20/10",
+      category: "Projeto",
+      type: "Pendente",
+      value: "R$ 1.800,00",
+    },
+    {
+      date: "25/10",
+      category: "Manutenção",
+      type: "Atrasado",
+      value: "R$ 900,00",
     },
   ];
 
@@ -39,6 +69,42 @@ const Receitas: React.FC = () => {
   ];
 
   const maxValue = Math.max(...monthlyData.map((item) => item.value));
+
+  // Definir colunas para a tabela de receitas
+  const receitasColumns: TableColumn[] = [
+    { key: "date", label: "Data" },
+    { key: "category", label: "Categoria" },
+    {
+      key: "type",
+      label: "Tipo",
+      render: (value) => (
+        <span className={`category ${value.toLowerCase()}`}>{value}</span>
+      ),
+    },
+    {
+      key: "value",
+      label: "Valor",
+      render: (value) => <span className="value income">{value}</span>,
+    },
+  ];
+
+  // Definir colunas para a tabela de contas a receber
+  const contasAReceberColumns: TableColumn[] = [
+    { key: "date", label: "Data" },
+    { key: "category", label: "Categoria" },
+    {
+      key: "type",
+      label: "Tipo",
+      render: (value) => (
+        <span className={`category ${value.toLowerCase()}`}>{value}</span>
+      ),
+    },
+    {
+      key: "value",
+      label: "Valor",
+      render: (value) => <span className="value income">{value}</span>,
+    },
+  ];
 
   return (
     <div className="receitas-page">
@@ -62,31 +128,29 @@ const Receitas: React.FC = () => {
 
       {/* Conteúdo principal */}
       <div className="receitas-content">
-        {/* Últimas Entradas */}
-        <div className="receitas-card">
-          <h3 className="card-header">Últimas Entradas</h3>
-          <div className="entradas-summary">
-            <div className="summary-item">
-              <span className="summary-label">Data</span>
-              <span className="summary-label">Categoria</span>
-              <span className="summary-label">Tipo</span>
-              <span className="summary-label">Valor</span>
-            </div>
-            {receitasData.map((entry, index) => (
-              <div key={index} className="summary-item">
-                <span className="summary-date">{entry.date}</span>
-                <span className="summary-category">{entry.category}</span>
-                <span className={`summary-type ${entry.type.toLowerCase()}`}>
-                  {entry.type}
-                </span>
-                <span className="summary-value income">{entry.value}</span>
-              </div>
-            ))}
-            <div className="summary-footer">
-              <span className="entries-count">Entradas: 2</span>
-              <span className="entries-total">Total: R$ 3.550,00</span>
-            </div>
-          </div>
+        {/* Primeira linha com tabelas */}
+        <div className="receitas-tables-row">
+          {/* Últimas Entradas */}
+          <TransactionTable
+            title="Últimas Entradas"
+            columns={receitasColumns}
+            data={receitasData}
+            className="receitas-table-card"
+            showSummary={true}
+            summaryCountLabel="Entradas"
+            valueKey="value"
+          />
+
+          {/* Contas a Receber */}
+          <TransactionTable
+            title="Contas a Receber"
+            columns={contasAReceberColumns}
+            data={contasAReceberData}
+            className="receitas-table-card"
+            showSummary={true}
+            summaryCountLabel="Contas"
+            valueKey="value"
+          />
         </div>
 
         {/* Gráfico de Receitas Mensais */}
