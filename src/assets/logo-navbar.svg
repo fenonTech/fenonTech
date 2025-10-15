@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Saco de dinheiro -->
+  <g fill="#F5D76E" stroke="#E6C659" stroke-width="2">
+    <!-- Corpo do saco -->
+    <ellipse cx="30" cy="65" rx="18" ry="22"/>
+    <!-- Topo do saco -->
+    <rect x="20" y="35" width="20" height="8" rx="2"/>
+    <!-- Cordão -->
+    <path d="M15,40 Q25,45 35,40" fill="none" stroke="#D4AF37" stroke-width="2"/>
+  </g>
+  
+  <!-- Símbolo R$ -->
+  <text x="65" y="50" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#D4AF37">R$</text>
+  
+  <!-- Nota de dinheiro -->
+  <g fill="#90EE90" stroke="#7CCD7C" stroke-width="1.5">
+    <rect x="55" y="60" width="35" height="20" rx="3"/>
+    <!-- Linhas decorativas da nota -->
+    <line x1="60" y1="65" x2="85" y2="65" stroke="#228B22" stroke-width="1"/>
+    <line x1="60" y1="70" x2="85" y2="70" stroke="#228B22" stroke-width="1"/>
+    <line x1="60" y1="75" x2="85" y2="75" stroke="#228B22" stroke-width="1"/>
+  </g>
+</svg>

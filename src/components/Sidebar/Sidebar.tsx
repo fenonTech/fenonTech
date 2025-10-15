@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
 import logo from "../../assets/logo.png";
-import simboloDashboard from "../../assets/simboloDashboardAmarelo.png";
 import simboloReceita from "../../assets/simboloMenuReceita.png";
 import simboloDespesas from "../../assets/simboloMenuDespesas.png";
 import simboloConfiguracao from "../../assets/simboloConfiguracao.png";
@@ -56,15 +55,35 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, [externalIsCollapsed]);
 
   const menuItems = [
-    { id: "dashboard", label: "DashBoard", icon: simboloDashboard },
+    { id: "dashboard", label: "Dashboard", icon: "dashboard-svg" },
     { id: "receitas", label: "Receitas", icon: simboloReceita },
     { id: "despesas", label: "Despesas", icon: simboloDespesas },
   ];
 
   const systemItems = [
-    { id: "configuracao", label: "Configuração", icon: simboloConfiguracao },
+    { id: "configuracao", label: "Configurações", icon: simboloConfiguracao },
     { id: "sair", label: "Sair", icon: simboloSaida },
   ];
+
+  const renderIcon = (item: { id: string; icon: string; label: string }) => {
+    if (item.id === "dashboard") {
+      return (
+        <svg
+          className="nav-icon dashboard-icon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
+            fill="white"
+          />
+        </svg>
+      );
+    }
+    return <img src={item.icon} alt={item.label} className="nav-icon" />;
+  };
 
   return (
     <div
@@ -97,11 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       }`}
                       onClick={() => onItemClick(item.id)}
                     >
-                      <img
-                        src={item.icon}
-                        alt={item.label}
-                        className="nav-icon"
-                      />
+                      {renderIcon(item)}
                       {!isCollapsed && <span>{item.label}</span>}
                     </button>
                   </li>
@@ -120,11 +135,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       }`}
                       onClick={() => onItemClick(item.id)}
                     >
-                      <img
-                        src={item.icon}
-                        alt={item.label}
-                        className="nav-icon"
-                      />
+                      {renderIcon(item)}
                       {!isCollapsed && <span>{item.label}</span>}
                     </button>
                   </li>

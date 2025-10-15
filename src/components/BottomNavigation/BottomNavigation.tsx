@@ -1,6 +1,5 @@
 import React from "react";
 import "./BottomNavigation.css";
-import simboloDashboard from "../../assets/simboloDashboardAmarelo.png";
 import simboloReceita from "../../assets/simboloMenuReceita.png";
 import simboloDespesas from "../../assets/simboloMenuDespesas.png";
 import simboloConfiguracao from "../../assets/simboloConfiguracao.png";
@@ -16,7 +15,6 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
 }) => {
   // Debug: verificar se as imagens estão sendo importadas
   console.log("BottomNavigation - Ícones carregados:", {
-    simboloDashboard,
     simboloReceita,
     simboloDespesas,
     simboloConfiguracao,
@@ -26,7 +24,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
     {
       id: "dashboard",
       label: "Dashboard",
-      icon: simboloDashboard,
+      icon: "dashboard-svg",
       path: "/",
     },
     {
@@ -41,13 +39,42 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
       icon: simboloDespesas,
       path: "/despesas",
     },
-    {
-      id: "configuracao",
-      label: "Config",
-      icon: simboloConfiguracao,
-      path: "/configuracoes",
-    },
+    // Configuração removida do mobile - agora fica no dropdown do header
   ];
+
+  const renderIcon = (item: {
+    id: string;
+    icon: string | any;
+    label: string;
+  }) => {
+    if (item.id === "dashboard") {
+      return (
+        <svg
+          className="bottom-nav-icon dashboard-icon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
+            fill="white"
+          />
+        </svg>
+      );
+    }
+    return (
+      <img
+        src={item.icon}
+        alt={item.label}
+        className="bottom-nav-icon"
+        onError={() =>
+          console.error("Erro ao carregar imagem:", item.label, item.icon)
+        }
+        onLoad={() => console.log("Imagem carregada com sucesso:", item.label)}
+      />
+    );
+  };
 
   console.log("BottomNavigation renderizando com activeTab:", activeTab);
 
@@ -63,17 +90,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
             onClick={() => onTabChange(item.id)}
             aria-label={item.label}
           >
-            <img
-              src={item.icon}
-              alt={item.label}
-              className="bottom-nav-icon"
-              onError={() =>
-                console.error("Erro ao carregar imagem:", item.label, item.icon)
-              }
-              onLoad={() =>
-                console.log("Imagem carregada com sucesso:", item.label)
-              }
-            />
+            {renderIcon(item)}
             <span className="bottom-nav-label">{item.label}</span>
             {activeTab === item.id && <div className="bottom-nav-indicator" />}
           </button>

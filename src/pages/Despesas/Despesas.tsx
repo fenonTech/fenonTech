@@ -1,9 +1,11 @@
 import React from "react";
 import "./Despesas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
+import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import useDespesasNavigation from "../../hooks/useDespesasNavigation";
+import useTabs from "../../hooks/useTabs";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
@@ -23,21 +25,30 @@ interface ContasAPagarEntry {
 }
 
 const Despesas: React.FC = () => {
-  const { activeCard, switchCard, cardData } =
-    useDespesasNavigation("despesas");
+  const { activeCard, switchCard } = useDespesasNavigation("despesas");
+  const { activeTab, switchTab } = useTabs("graficos");
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
 
-  const getCardIcon = () => {
-    switch (activeCard) {
-      case "despesas":
-        return carteiraCardDespesasdoMês;
-      case "contas":
-        return simboloMenuBolsoContasAPagar;
-      default:
-        return carteiraCardDespesasdoMês;
-    }
-  };
+  // Configuração das opções do card mobile
+  const mobileCardOptions = [
+    {
+      key: "despesas",
+      label: "Despesas",
+      title: "Despesas do mês",
+      value: "R$ 1.185,70",
+      icon: carteiraCardDespesasdoMês,
+      type: "negative" as const,
+    },
+    {
+      key: "contas",
+      label: "Contas a Pagar",
+      title: "Contas a pagar",
+      value: "R$ 890,50",
+      icon: simboloMenuBolsoContasAPagar,
+      type: "negative" as const,
+    },
+  ];
 
   const despesasData: DespesaEntry[] = [
     {
@@ -137,38 +148,12 @@ const Despesas: React.FC = () => {
   return (
     <div className="despesas-page">
       {/* Sistema de Navegação Integrado - APENAS MOBILE */}
-      <div className="financial-card-container">
-        {/* Menu de navegação integrado com card */}
-        <div className="financial-card-navigation">
-          <button
-            className={`nav-button ${
-              activeCard === "despesas" ? "active" : ""
-            }`}
-            onClick={() => switchCard("despesas")}
-          >
-            Despesas do mês
-          </button>
-          <button
-            className={`nav-button ${activeCard === "contas" ? "active" : ""}`}
-            onClick={() => switchCard("contas")}
-          >
-            Contas a pagar
-          </button>
-        </div>
-
-        {/* Card Único */}
-        <div className="single-financial-card">
-          <FinancialCard
-            title={cardData.title}
-            value={formatValue(cardData.value)}
-            icon={getCardIcon()}
-            type={cardData.type}
-            showToggle={true}
-            isBalanceVisible={isBalanceVisible}
-            onToggleVisibility={toggleBalanceVisibility}
-          />
-        </div>
-      </div>
+      <MobileFinancialCard
+        navigationOptions={mobileCardOptions}
+        activeCard={activeCard}
+        onCardSwitch={(cardKey) => switchCard(cardKey as any)}
+        className="despesas-mobile-card"
+      />
 
       {/* Cards principais - Desktop */}
       <div className="despesas-cards desktop-content">
@@ -194,8 +179,29 @@ const Despesas: React.FC = () => {
         />
       </div>
 
-      {/* Conteúdo Mobile - Apenas Tabela */}
-      <div className="despesas-mobile-content mobile-only">
+      {/* Sistema de Tabs - apenas no mobile */}
+      <div className="dashboard-tabs mobile-only">
+        <button
+          className={`tab-button ${activeTab === "graficos" ? "active" : ""}`}
+          onClick={() => switchTab("graficos")}
+        >
+          Gráfico
+        </button>
+        <button
+          className={`tab-button ${activeTab === "principal" ? "active" : ""}`}
+          onClick={() => switchTab("principal")}
+        >
+          Transações
+        </button>
+      </div>
+
+      {/* Conteúdo Tab Principal - Apenas Mobile */}
+      <div
+        className={`tab-content mobile-only tab-principal ${
+          activeTab === "principal" ? "active" : ""
+        }`}
+        style={{ display: activeTab === "principal" ? "block" : "none" }}
+      >
         <div className="dashboard-grid">
           {/* Mostrar tabela baseada no card ativo */}
           {activeCard === "despesas" ? (
@@ -219,6 +225,42 @@ const Despesas: React.FC = () => {
               valueKey="value"
             />
           )}
+        </div>
+      </div>
+
+      {/* Conteúdo Tab Análise - Apenas Mobile */}
+      <div
+        className={`tab-content mobile-only tab-analise ${
+          activeTab === "graficos" ? "active" : ""
+        }`}
+        style={{ display: activeTab === "graficos" ? "block" : "none" }}
+      >
+        <div className="dashboard-grid">
+          {/* Despesas por categoria - Gráfico de Pizza */}
+          <div className="despesas-card chart-card">
+            <h3 className="card-header">Despesas por categoria</h3>
+            <div className="chart-container">
+              <div className="chart-placeholder">
+                <div className="chart-center">
+                  <div className="total-label">TOTAL DESPESAS</div>
+                  <div className="total-value">R$ 1.915,60</div>
+                </div>
+              </div>
+              <div className="chart-legend">
+                {pieChartData.map((item, index) => (
+                  <div key={index} className="legend-item">
+                    <div
+                      className="legend-color"
+                      style={{ backgroundColor: item.color }}
+                    ></div>
+                    <span className="legend-label">
+                      {item.name} ({item.percentage}%)
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import React from "react";
 import "./Receitas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
+import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
@@ -25,7 +26,27 @@ interface ContasAReceberEntry {
 const Receitas: React.FC = () => {
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
-  const { activeCard, switchCard, cardData } = useReceitasNavigation("receita");
+  const { activeCard, switchCard } = useReceitasNavigation("receita");
+
+  // Configuração das opções do card mobile
+  const mobileCardOptions = [
+    {
+      key: "receita",
+      label: "Receitas",
+      title: "Receitas do mês",
+      value: "R$ 2.850,00",
+      icon: sacoDeDinheiro,
+      type: "positive" as const,
+    },
+    {
+      key: "contas",
+      label: "A Receber",
+      title: "Contas a receber",
+      value: "R$ 1.120,00",
+      icon: simboloMeuBolsoContasAReceberCard,
+      type: "positive" as const,
+    },
+  ];
 
   const receitasData: ReceitaEntry[] = [
     { date: "06/10", category: "Salário", type: "Fixa", value: "R$ 5.000,00" },
@@ -184,17 +205,6 @@ const Receitas: React.FC = () => {
     },
   ];
 
-  const getCardIcon = () => {
-    switch (activeCard) {
-      case "receita":
-        return sacoDeDinheiro;
-      case "contas-a-receber":
-        return simboloMeuBolsoContasAReceberCard;
-      default:
-        return sacoDeDinheiro;
-    }
-  };
-
   return (
     <div className="receitas-page">
       {/* Cards principais - DESKTOP */}
@@ -222,38 +232,12 @@ const Receitas: React.FC = () => {
       </div>
 
       {/* Sistema de Navegação - APENAS MOBILE */}
-      <div className="receitas-card-container">
-        {/* Navegação dos Cards */}
-        <div className="receitas-card-navigation">
-          <button
-            className={`nav-button ${activeCard === "receita" ? "active" : ""}`}
-            onClick={() => switchCard("receita")}
-          >
-            Receita
-          </button>
-          <button
-            className={`nav-button ${
-              activeCard === "contas-a-receber" ? "active" : ""
-            }`}
-            onClick={() => switchCard("contas-a-receber")}
-          >
-            Contas a Receber
-          </button>
-        </div>
-
-        {/* Card Único */}
-        <div className="single-receitas-card">
-          <FinancialCard
-            title={cardData.title}
-            value={formatValue(cardData.value)}
-            icon={getCardIcon()}
-            type={cardData.type}
-            showToggle={true}
-            isBalanceVisible={isBalanceVisible}
-            onToggleVisibility={toggleBalanceVisibility}
-          />
-        </div>
-      </div>
+      <MobileFinancialCard
+        navigationOptions={mobileCardOptions}
+        activeCard={activeCard}
+        onCardSwitch={(cardKey) => switchCard(cardKey as any)}
+        className="receitas-mobile-card"
+      />
 
       {/* Conteúdo Mobile - Apenas Tabela */}
       <div className="receitas-mobile-content mobile-only">

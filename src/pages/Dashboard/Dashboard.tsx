@@ -1,6 +1,7 @@
 import React from "react";
 import "./Dashboard.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
+import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import useTabs from "../../hooks/useTabs";
@@ -174,24 +175,38 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const { activeTab, switchTab } = useTabs("principal");
-  const { activeCard, switchCard, cardData } =
-    useFinancialCardNavigation("saldo");
+  const { activeTab, switchTab } = useTabs("graficos");
+  const { activeCard, switchCard } = useFinancialCardNavigation("saldo");
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
 
-  const getCardIcon = () => {
-    switch (activeCard) {
-      case "saldo":
-        return dinheiroSaldo;
-      case "receita":
-        return sacoDeDinheiro;
-      case "despesa":
-        return setaParaBaixo;
-      default:
-        return dinheiroSaldo;
-    }
-  };
+  // Configuração das opções do card mobile
+  const mobileCardOptions = [
+    {
+      key: "saldo",
+      label: "Saldo",
+      title: "Saldo Atual",
+      value: "R$ 1.250,37",
+      icon: dinheiroSaldo,
+      type: "neutral" as const,
+    },
+    {
+      key: "receita",
+      label: "Receita",
+      title: "Receita do mês",
+      value: "R$ 2.850,00",
+      icon: sacoDeDinheiro,
+      type: "positive" as const,
+    },
+    {
+      key: "despesa",
+      label: "Despesa",
+      title: "Despesas do mês",
+      value: "R$ 1.599,63",
+      icon: setaParaBaixo,
+      type: "negative" as const,
+    },
+  ];
 
   return (
     <div className="dashboard">
@@ -227,56 +242,26 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Sistema de Navegação - APENAS MOBILE */}
-      <div className="financial-card-container">
-        {/* Navegação dos Cards */}
-        <div className="financial-card-navigation">
-          <button
-            className={`nav-button ${activeCard === "saldo" ? "active" : ""}`}
-            onClick={() => switchCard("saldo")}
-          >
-            Saldo
-          </button>
-          <button
-            className={`nav-button ${activeCard === "receita" ? "active" : ""}`}
-            onClick={() => switchCard("receita")}
-          >
-            Receita
-          </button>
-          <button
-            className={`nav-button ${activeCard === "despesa" ? "active" : ""}`}
-            onClick={() => switchCard("despesa")}
-          >
-            Despesa
-          </button>
-        </div>
-
-        {/* Card Único */}
-        <div className="single-financial-card">
-          <FinancialCard
-            title={cardData.title}
-            value={formatValue(cardData.value)}
-            icon={getCardIcon()}
-            type={cardData.type}
-            showToggle={true}
-            isBalanceVisible={isBalanceVisible}
-            onToggleVisibility={toggleBalanceVisibility}
-          />
-        </div>
-      </div>
+      <MobileFinancialCard
+        navigationOptions={mobileCardOptions}
+        activeCard={activeCard}
+        onCardSwitch={(cardKey) => switchCard(cardKey as any)}
+        className="dashboard-mobile-card"
+      />
 
       {/* Sistema de Tabs - apenas no mobile */}
       <div className="dashboard-tabs">
         <button
-          className={`tab-button ${activeTab === "principal" ? "active" : ""}`}
-          onClick={() => switchTab("principal")}
-        >
-          Principal
-        </button>
-        <button
           className={`tab-button ${activeTab === "graficos" ? "active" : ""}`}
           onClick={() => switchTab("graficos")}
         >
-          Análise
+          Gráfico{" "}
+        </button>
+        <button
+          className={`tab-button ${activeTab === "principal" ? "active" : ""}`}
+          onClick={() => switchTab("principal")}
+        >
+          Transações
         </button>
       </div>
 
@@ -371,6 +356,7 @@ const Dashboard: React.FC = () => {
         className={`tab-content mobile-only tab-principal ${
           activeTab === "principal" ? "active" : ""
         }`}
+        style={{ display: activeTab === "principal" ? "block" : "none" }}
       >
         <div className="dashboard-grid">
           {/* Últimas Transações */}
@@ -391,34 +377,9 @@ const Dashboard: React.FC = () => {
         className={`tab-content mobile-only tab-analise ${
           activeTab === "graficos" ? "active" : ""
         }`}
+        style={{ display: activeTab === "graficos" ? "block" : "none" }}
       >
         <div className="dashboard-grid">
-          {/* Despesas por categoria (simulando gráfico de pizza) */}
-          <div className="dashboard-card expenses-chart-card">
-            <h3 className="card-header">Despesas por categoria</h3>
-            <div className="chart-container">
-              <div className="chart-placeholder">
-                <div className="chart-center">
-                  <div className="total-label">TOTAL DESPESAS</div>
-                  <div className="total-value">R$ 6.749,63</div>
-                </div>
-              </div>
-              <div className="chart-legend">
-                {categoryData.map((item, index) => (
-                  <div key={index} className="legend-item">
-                    <div
-                      className="legend-color"
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span className="legend-label">
-                      {item.name} ({item.percentage}%)
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
           {/* Visão por categoria */}
           <div className="dashboard-card">
             <h3 className="card-header">Visão por categoria</h3>

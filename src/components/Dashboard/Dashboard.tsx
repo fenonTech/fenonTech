@@ -161,13 +161,13 @@ const Dashboard: React.FC = () => {
           className={`tab-button ${activeTab === "principal" ? "active" : ""}`}
           onClick={() => switchTab("principal")}
         >
-          Principal
+          Transações
         </button>
         <button
           className={`tab-button ${activeTab === "graficos" ? "active" : ""}`}
           onClick={() => switchTab("graficos")}
         >
-          Análise
+          Gráfico
         </button>
       </div>
 

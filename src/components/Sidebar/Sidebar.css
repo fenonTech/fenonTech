@@ -102,7 +102,6 @@
   align-items: center;
   gap: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
   font-size: 1rem;
   font-weight: 500;
   text-align: left;
@@ -126,13 +125,27 @@
   width: 24px;
   height: 24px;
   filter: brightness(0) invert(1);
-  transition: filter 0.2s;
   flex-shrink: 0;
 }
 
 .nav-item.active .nav-icon {
   filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
     hue-rotate(5deg) brightness(104%) contrast(101%);
+}
+
+/* Estilos específicos para o ícone SVG do dashboard */
+.dashboard-icon {
+  width: 24px;
+  height: 24px;
+  filter: none;
+}
+
+.dashboard-icon path {
+  fill: white;
+}
+
+.nav-item.active .dashboard-icon path {
+  fill: #ffd700;
 }
 
 .collapsed .nav-item {
@@ -234,13 +247,39 @@
 /* Mobile - Sidebar escondida (usamos bottom navigation) */
 @media (max-width: 600px) {
   .sidebar {
-    display: none !important; /* Esconder completamente no mobile */
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 2000;
+    background: #0b0b0b;
+    border-right: 1px solid #333;
+    transition: transform 0.3s ease;
   }
 
   /* Sidebar fechada no mobile - move para fora da tela */
   .sidebar.collapsed {
     transform: translateX(-100%);
-    width: 280px; /* Mantém largura para animação suave */
+    width: 320px; /* Largura maior para acomodar nomes completos */
+  }
+
+  /* Sidebar aberta no mobile */
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
+    width: 320px; /* Largura maior para nomes completos */
+  }
+
+  /* Overlay para fechar sidebar no mobile */
+  .sidebar:not(.collapsed)::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 320px;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: -1;
   }
 
   /* Header mobile otimizado */
@@ -312,16 +351,31 @@
 
   .nav-item {
     width: 100%;
-    padding: 1rem;
+    padding: 1rem 1.25rem;
     font-size: 0.9rem;
     text-align: left;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
     border-left: 3px solid transparent;
     border-radius: 0;
+    line-height: 1.3;
+    min-height: 56px;
+    white-space: normal;
+    overflow: visible !important;
+  }
+
+  .nav-item span {
+    flex: 1;
+    font-weight: 500;
+    color: #e0e0e0;
+    line-height: 1.3;
+    overflow: visible !important;
+    white-space: normal !important;
+    text-overflow: unset !important;
+    word-wrap: break-word;
   }
 
   .nav-item:hover {
@@ -340,17 +394,56 @@
     height: 20px;
     opacity: 0.8;
     flex-shrink: 0;
+    margin-top: 2px;
+    filter: brightness(0) invert(1);
   }
 
   .nav-item.active img {
     opacity: 1;
+    filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+      hue-rotate(5deg) brightness(104%) contrast(101%);
+  }
+
+  /* Ícone SVG do dashboard no mobile */
+  .dashboard-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+    flex-shrink: 0;
+    margin-top: 2px;
+    filter: none;
+  }
+
+  .dashboard-icon path {
+    fill: white;
+  }
+
+  .nav-item.active .dashboard-icon {
+    opacity: 1;
+  }
+
+  .nav-item.active .dashboard-icon path {
+    fill: #ffd700;
   }
 }
 
 /* Mobile pequeno - Ajustes adicionais */
 @media (max-width: 480px) {
   .sidebar {
-    width: 260px; /* Largura menor para telas pequenas */
+    width: 300px; /* Largura suficiente para nomes completos */
+  }
+
+  .sidebar.collapsed {
+    width: 300px;
+  }
+
+  .sidebar:not(.collapsed) {
+    width: 300px;
+  }
+
+  /* Ajustar overlay para telas menores */
+  .sidebar:not(.collapsed)::before {
+    left: 300px;
   }
 
   .sidebar-header {
@@ -379,14 +472,48 @@
   }
 
   .nav-item {
-    padding: 0.875rem;
-    font-size: 0.875rem;
-    gap: 0.625rem;
+    padding: 0.875rem 1rem;
+    font-size: 0.85rem;
+    gap: 0.875rem;
+    min-height: 52px;
+  }
+
+  .nav-item span {
+    font-size: 0.85rem;
+    line-height: 1.2;
   }
 
   .nav-item img {
     width: 18px;
     height: 18px;
+    filter: brightness(0) invert(1);
+  }
+
+  .nav-item.active img {
+    filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+      hue-rotate(5deg) brightness(104%) contrast(101%);
+  }
+
+  /* Ícone SVG do dashboard em mobile pequeno */
+  .dashboard-icon {
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+    flex-shrink: 0;
+    margin-top: 2px;
+    filter: none;
+  }
+
+  .dashboard-icon path {
+    fill: white;
+  }
+
+  .nav-item.active .dashboard-icon {
+    opacity: 1;
+  }
+
+  .nav-item.active .dashboard-icon path {
+    fill: #ffd700;
   }
 
   .nav-title {

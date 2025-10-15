@@ -1,0 +1,195 @@
+/* ===== MOBILE FINANCIAL CARD COMPONENT ===== */
+
+.mobile-financial-card-container {
+  display: none; /* Escondido por padrão (só aparece no mobile) */
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Navegação dos Cards */
+.mobile-financial-card-navigation {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+}
+
+.mobile-nav-button {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  color: #ccc;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-button:hover {
+  background: #252525;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.mobile-nav-button.active {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border-color: #ffd700;
+  color: #000;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Card Container */
+.mobile-single-financial-card {
+  display: flex;
+  justify-content: center;
+  padding: 0 1rem;
+}
+
+.mobile-single-financial-card .financial-card {
+  width: 100%;
+  max-width: 100%;
+  min-height: 120px;
+
+  /* Forçar layout desktop mesmo no mobile */
+  flex-direction: row !important;
+  align-items: center !important;
+  padding: 1.5rem !important;
+  gap: 2rem !important;
+}
+
+/* Garantir que o ícone principal seja mostrado */
+.mobile-single-financial-card .financial-card > .card-icon {
+  display: flex !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  flex-shrink: 0 !important;
+}
+
+.mobile-single-financial-card .financial-card > .card-icon img {
+  width: 60px !important;
+  height: auto !important;
+}
+
+/* Esconder ícone do título no mobile card */
+.mobile-single-financial-card .card-title .card-icon {
+  display: none !important;
+}
+
+/* Layout do título normal (sem ícone) */
+.mobile-single-financial-card .card-title {
+  display: block !important;
+  color: #ccc !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  margin: 0 0 0.5rem 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  font-family: "Poppins", sans-serif !important;
+}
+
+/* Conteúdo do card alinhado */
+.mobile-single-financial-card .card-content {
+  flex: 1 !important;
+  min-width: 0 !important;
+  display: block !important;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Tablet pequeno - Mostrar card mobile */
+@media (max-width: 768px) and (min-width: 601px) {
+  .mobile-financial-card-container {
+    display: flex !important;
+  }
+}
+
+/* Mobile - Mostrar card mobile */
+@media (max-width: 600px) {
+  .mobile-financial-card-container {
+    display: flex !important;
+    margin-bottom: 1rem;
+  }
+
+  .mobile-nav-button {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.8rem;
+    min-height: 44px;
+  }
+
+  .mobile-financial-card-navigation {
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+  }
+
+  .mobile-single-financial-card {
+    padding: 0 0.75rem;
+  }
+
+  /* Ajustar espaçamento no mobile mas manter layout desktop */
+  .mobile-single-financial-card .financial-card {
+    padding: 1.25rem !important;
+    gap: 1.5rem !important;
+  }
+
+  .mobile-single-financial-card .financial-card > .card-icon {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .mobile-single-financial-card .financial-card > .card-icon img {
+    width: 50px !important;
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 480px) {
+  .mobile-nav-button {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.75rem;
+    min-height: 42px;
+  }
+
+  .mobile-financial-card-navigation {
+    gap: 0.375rem;
+    padding: 0 0.5rem;
+  }
+
+  .mobile-single-financial-card {
+    padding: 0 0.5rem;
+  }
+
+  /* Ajustar ainda mais no mobile pequeno */
+  .mobile-single-financial-card .financial-card {
+    padding: 1rem !important;
+    gap: 1.25rem !important;
+  }
+
+  .mobile-single-financial-card .financial-card > .card-icon {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .mobile-single-financial-card .financial-card > .card-icon img {
+    width: 45px !important;
+  }
+
+  .mobile-single-financial-card .card-title {
+    font-size: 0.8rem !important;
+  }
+
+  .mobile-single-financial-card .card-value {
+    font-size: 1.3rem !important;
+  }
+}
