@@ -173,8 +173,8 @@
   }
 
   .expenses-pie-chart .chart-placeholder::before {
-    width: 75px;
-    height: 75px;
+    width: 85px;
+    height: 85px;
   }
 
   .expenses-pie-chart .total-label {
@@ -284,8 +284,8 @@
   }
 
   .expenses-pie-chart .chart-placeholder::before {
-    width: 65px;
-    height: 65px;
+    width: 75px;
+    height: 75px;
   }
 
   .expenses-pie-chart .total-label {
