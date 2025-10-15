@@ -7,6 +7,16 @@
   color: white;
 }
 
+/* Header com filtro de mês/ano */
+.dashboard-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #333;
+}
+
 .financial-cards {
   display: flex;
   justify-content: center;
@@ -586,6 +596,12 @@
     background: #0b0b0b;
     min-height: calc(100vh - 220px); /* Ajustado para bottom navigation */
     padding-bottom: 1rem; /* Espaço extra antes da bottom nav */
+  }
+
+  .dashboard-header {
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
   }
 
   /* Cards originais - ESCONDIDOS NO MOBILE */
@@ -1343,5 +1359,54 @@
 
   .tab-analise.active {
     display: block !important;
+  }
+}
+
+/* Botão Flutuante de Adicionar */
+.floating-add-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  border: none;
+  border-radius: 50%;
+  color: #121212;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.floating-add-button:hover {
+  background: linear-gradient(135deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6);
+}
+
+.floating-add-button:active {
+  transform: translateY(0);
+}
+
+/* Responsividade do botão flutuante */
+@media (max-width: 768px) {
+  .floating-add-button {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (max-width: 600px) {
+  .floating-add-button {
+    bottom: 6rem; /* Espaço para bottom navigation */
+    right: 1rem;
+    width: 48px;
+    height: 48px;
   }
 }

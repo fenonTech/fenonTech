@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Receitas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
+import MonthYearSelector from "../../components/MonthYearSelector";
+import { IncomeModal } from "../../components/Modals";
+import type { IncomeData } from "../../components/Modals";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import useReceitasNavigation from "../../hooks/useReceitasNavigation";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
@@ -24,9 +27,79 @@ interface ContasAReceberEntry {
 }
 
 const Receitas: React.FC = () => {
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
+  const [editingIncome, setEditingIncome] = useState<IncomeData | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
   const { activeCard, switchCard } = useReceitasNavigation("receita");
+
+  // Função para adicionar nova receita/conta a receber
+  const handleAddReceita = () => {
+    setIsEditMode(false);
+    setEditingIncome(null);
+    setIsIncomeModalOpen(true);
+  };
+
+  // Função para editar receita
+  const handleEditIncome = (income: any) => {
+    const incomeData: IncomeData = {
+      category: income.category,
+      value: income.value,
+      date: income.date,
+    };
+    setEditingIncome(incomeData);
+    setIsEditMode(true);
+    setIsIncomeModalOpen(true);
+  };
+
+  // Função para excluir receita
+  const handleDeleteIncome = (income: any, index: number) => {
+    const confirmDelete = window.confirm(
+      `Tem certeza que deseja excluir a receita "${income.category}" no valor de ${income.value}?`
+    );
+
+    if (confirmDelete) {
+      console.log("Excluindo receita:", income, "índice:", index);
+      // Aqui você implementaria a lógica para excluir do backend/estado
+      alert("Receita excluída com sucesso!");
+    }
+  };
+
+  // Função para fechar o modal
+  const handleCloseIncomeModal = () => {
+    setIsIncomeModalOpen(false);
+    setIsEditMode(false);
+    setEditingIncome(null);
+  };
+
+  // Função para salvar receita
+  const handleSaveIncome = (incomeData: IncomeData) => {
+    console.log("Nova receita criada:", incomeData);
+
+    // Aqui você pode implementar a lógica para:
+    // 1. Enviar os dados para o backend/API
+    // 2. Atualizar o estado local
+    // 3. Mostrar notificação de sucesso
+
+    // Exemplo de lógica para determinar se é receita ou conta a receber:
+    const incomeDate = new Date(incomeData.date);
+    const today = new Date();
+    const isContaAReceber = incomeDate > today;
+
+    console.log(
+      isContaAReceber
+        ? "Conta a receber adicionada para o futuro"
+        : "Receita atual registrada"
+    );
+
+    // Fechar o modal após salvar
+    setIsIncomeModalOpen(false);
+  };
 
   // Configuração das opções do card mobile
   const mobileCardOptions = [
@@ -207,6 +280,17 @@ const Receitas: React.FC = () => {
 
   return (
     <div className="receitas-page">
+      {/* Filtro de Mês e Ano */}
+      <div className="receitas-header">
+        <MonthYearSelector
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+          className="header-style"
+        />
+      </div>
+
       {/* Cards principais - DESKTOP */}
       <div className="receitas-cards">
         <FinancialCard
@@ -252,6 +336,9 @@ const Receitas: React.FC = () => {
               showSummary={true}
               summaryCountLabel="Entradas"
               valueKey="value"
+              showActions={true}
+              onEdit={handleEditIncome}
+              onDelete={handleDeleteIncome}
             />
           ) : (
             <TransactionTable
@@ -262,6 +349,9 @@ const Receitas: React.FC = () => {
               showSummary={true}
               summaryCountLabel="Contas"
               valueKey="value"
+              showActions={true}
+              onEdit={handleEditIncome}
+              onDelete={handleDeleteIncome}
             />
           )}
         </div>
@@ -280,6 +370,9 @@ const Receitas: React.FC = () => {
             showSummary={true}
             summaryCountLabel="Entradas"
             valueKey="value"
+            showActions={true}
+            onEdit={handleEditIncome}
+            onDelete={handleDeleteIncome}
           />
 
           {/* Contas a Receber */}
@@ -291,6 +384,9 @@ const Receitas: React.FC = () => {
             showSummary={true}
             summaryCountLabel="Contas"
             valueKey="value"
+            showActions={true}
+            onEdit={handleEditIncome}
+            onDelete={handleDeleteIncome}
           />
         </div>
 
@@ -315,6 +411,38 @@ const Receitas: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Botão Flutuante de Adicionar */}
+      <button
+        className="floating-add-button"
+        onClick={handleAddReceita}
+        aria-label="Adicionar nova receita"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {/* Modal de Receitas */}
+      <IncomeModal
+        isOpen={isIncomeModalOpen}
+        onClose={handleCloseIncomeModal}
+        onSave={handleSaveIncome}
+        editData={editingIncome || undefined}
+        isEditMode={isEditMode}
+      />
     </div>
   );
 };

@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Dashboard.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
+import MonthYearSelector from "../../components/MonthYearSelector";
 import useTabs from "../../hooks/useTabs";
 import useFinancialCardNavigation from "../../hooks/useFinancialCardNavigation";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
@@ -29,6 +30,10 @@ interface Bill {
 }
 
 const Dashboard: React.FC = () => {
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+
   const transactions: Transaction[] = [
     {
       date: "31/10",
@@ -211,6 +216,17 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="dashboard">
+      {/* Filtro de Mês e Ano */}
+      <div className="dashboard-header">
+        <MonthYearSelector
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+          className="header-style"
+        />
+      </div>
+
       {/* Cards Originais - DESKTOP */}
       <div className="financial-cards">
         <FinancialCard

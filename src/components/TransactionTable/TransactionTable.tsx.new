@@ -19,7 +19,8 @@ export interface TransactionTableProps {
   showSummary?: boolean;
   summaryCountLabel?: string; // ex: "Entradas", "Transações", "Contas"
   valueKey?: string; // chave do objeto que contém o valor monetário
-  showActions?: boolean; // mostrar botões de editar/excluir - Mantido para compatibilidade, mas não usado
+  // Propriedades relacionadas às ações, mantidas para compatibilidade com código existente
+  showActions?: boolean;
   onEdit?: (item: any, index: number) => void;
   onDelete?: (item: any, index: number) => void;
 }
@@ -36,9 +37,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   showSummary = false,
   summaryCountLabel = "Registros",
   valueKey = "value",
-  showActions = false, // Não utilizado mais - Coluna de ações removida
-  onEdit, // Mantido para compatibilidade
-  onDelete, // Mantido para compatibilidade
+  // Propriedades de ações não são mais utilizadas, coluna foi removida
+  showActions = false,
+  onEdit, 
+  onDelete,
 }) => {
   // Função para extrair valor numérico de string monetária
   const parseMoneyValue = (value: string): number => {
@@ -75,11 +77,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   };
 
   const summary = calculateSummary();
-
-  // Ignorar o warning de variáveis não usadas
-  void showActions;
-  void onEdit;
-  void onDelete;
 
   return (
     <div className={`transaction-table-card ${className}`}>

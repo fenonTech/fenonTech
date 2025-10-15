@@ -670,3 +670,78 @@
     height: 60px;
   }
 }
+
+/* Botões de Ação */
+.actions-column {
+  width: 100px;
+  text-align: center;
+  display: none;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.edit-btn {
+  color: #ffd700;
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.edit-btn:hover {
+  background: rgba(255, 215, 0, 0.2);
+  transform: scale(1.1);
+}
+
+.delete-btn {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
+}
+
+/* Responsivo para botões de ação */
+@media (max-width: 768px) {
+  .actions-column {
+    width: auto;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .action-btn {
+    padding: 6px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .action-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}

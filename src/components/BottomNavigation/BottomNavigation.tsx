@@ -39,6 +39,7 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
       icon: simboloDespesas,
       path: "/despesas",
     },
+
     // Configuração removida do mobile - agora fica no dropdown do header
   ];
 
@@ -58,6 +59,22 @@ const BottomNavigation: React.FC<BottomNavigationProps> = ({
         >
           <path
             d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
+            fill="white"
+          />
+        </svg>
+      );
+    }
+    if (item.id === "planejamento") {
+      return (
+        <svg
+          className="bottom-nav-icon planejamento-icon"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <path
+            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
             fill="white"
           />
         </svg>

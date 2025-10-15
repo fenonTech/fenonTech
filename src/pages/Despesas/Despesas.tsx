@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Despesas.css";
 import FinancialCard from "../../components/Cards/FinancialCard";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
+import MonthYearSelector from "../../components/MonthYearSelector";
+import { ExpenseModal } from "../../components/Modals";
+import type { ExpenseData } from "../../components/Modals";
 import useDespesasNavigation from "../../hooks/useDespesasNavigation";
 import useTabs from "../../hooks/useTabs";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
@@ -26,10 +29,82 @@ interface ContasAPagarEntry {
 }
 
 const Despesas: React.FC = () => {
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<ExpenseData | null>(
+    null
+  );
+  const [isEditMode, setIsEditMode] = useState(false);
+
   const { activeCard, switchCard } = useDespesasNavigation("despesas");
   const { activeTab, switchTab } = useTabs("graficos");
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
+
+  // Função para adicionar nova despesa/conta a pagar
+  const handleAddDespesa = () => {
+    setIsEditMode(false);
+    setEditingExpense(null);
+    setIsExpenseModalOpen(true);
+  };
+
+  // Função para editar despesa
+  const handleEditExpense = (expense: any) => {
+    const expenseData: ExpenseData = {
+      category: expense.category,
+      value: expense.value,
+      date: expense.date,
+    };
+    setEditingExpense(expenseData);
+    setIsEditMode(true);
+    setIsExpenseModalOpen(true);
+  };
+
+  // Função para excluir despesa
+  const handleDeleteExpense = (expense: any, index: number) => {
+    const confirmDelete = window.confirm(
+      `Tem certeza que deseja excluir a despesa "${expense.category}" no valor de ${expense.value}?`
+    );
+
+    if (confirmDelete) {
+      console.log("Excluindo despesa:", expense, "índice:", index);
+      // Aqui você implementaria a lógica para excluir do backend/estado
+      alert("Despesa excluída com sucesso!");
+    }
+  };
+
+  // Função para fechar o modal
+  const handleCloseExpenseModal = () => {
+    setIsExpenseModalOpen(false);
+    setIsEditMode(false);
+    setEditingExpense(null);
+  };
+
+  // Função para salvar despesa
+  const handleSaveExpense = (expenseData: ExpenseData) => {
+    console.log("Nova despesa criada:", expenseData);
+
+    // Aqui você pode implementar a lógica para:
+    // 1. Enviar os dados para o backend/API
+    // 2. Atualizar o estado local
+    // 3. Mostrar notificação de sucesso
+
+    // Exemplo de lógica para determinar se é despesa ou conta a pagar:
+    const expenseDate = new Date(expenseData.date);
+    const today = new Date();
+    const isContaAPagar = expenseDate > today;
+
+    console.log(
+      isContaAPagar
+        ? "Conta a pagar adicionada para o futuro"
+        : "Despesa atual registrada"
+    );
+
+    // Fechar o modal após salvar
+    setIsExpenseModalOpen(false);
+  };
 
   // Configuração das opções do card mobile
   const mobileCardOptions = [
@@ -148,6 +223,17 @@ const Despesas: React.FC = () => {
 
   return (
     <div className="despesas-page">
+      {/* Filtro de Mês e Ano */}
+      <div className="despesas-header">
+        <MonthYearSelector
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+          className="header-style"
+        />
+      </div>
+
       {/* Sistema de Navegação Integrado - APENAS MOBILE */}
       <MobileFinancialCard
         navigationOptions={mobileCardOptions}
@@ -214,6 +300,9 @@ const Despesas: React.FC = () => {
               showSummary={true}
               summaryCountLabel="Saídas"
               valueKey="value"
+              showActions={true}
+              onEdit={handleEditExpense}
+              onDelete={handleDeleteExpense}
             />
           ) : (
             <TransactionTable
@@ -224,6 +313,9 @@ const Despesas: React.FC = () => {
               showSummary={true}
               summaryCountLabel="Contas"
               valueKey="value"
+              showActions={true}
+              onEdit={handleEditExpense}
+              onDelete={handleDeleteExpense}
             />
           )}
         </div>
@@ -261,6 +353,9 @@ const Despesas: React.FC = () => {
             showSummary={true}
             summaryCountLabel="Saídas"
             valueKey="value"
+            showActions={true}
+            onEdit={handleEditExpense}
+            onDelete={handleDeleteExpense}
           />
 
           {/* Contas a Pagar */}
@@ -272,6 +367,9 @@ const Despesas: React.FC = () => {
             showSummary={true}
             summaryCountLabel="Contas"
             valueKey="value"
+            showActions={true}
+            onEdit={handleEditExpense}
+            onDelete={handleDeleteExpense}
           />
         </div>
 
@@ -313,6 +411,38 @@ const Despesas: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Botão Flutuante de Adicionar */}
+      <button
+        className="floating-add-button"
+        onClick={handleAddDespesa}
+        aria-label="Adicionar nova despesa"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 5v14M5 12h14"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+
+      {/* Modal de Despesas */}
+      <ExpenseModal
+        isOpen={isExpenseModalOpen}
+        onClose={handleCloseExpenseModal}
+        onSave={handleSaveExpense}
+        editData={editingExpense || undefined}
+        isEditMode={isEditMode}
+      />
     </div>
   );
 };

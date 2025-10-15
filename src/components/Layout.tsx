@@ -6,6 +6,7 @@ import BottomNavigation from "./BottomNavigation";
 import Dashboard from "../pages/Dashboard";
 import Receitas from "../pages/Receitas";
 import Despesas from "../pages/Despesas";
+import Planejamento from "../pages/Planejamento";
 import Configuracoes from "../pages/Configuracoes";
 
 const Layout: React.FC = () => {
@@ -75,6 +76,11 @@ const Layout: React.FC = () => {
           title: "Despesas",
           description: "Controle seus gastos e despesas mensais",
         };
+      case "planejamento":
+        return {
+          title: "Planejamento",
+          description: "Planeje suas receitas e despesas mensais",
+        };
       case "configuracao":
         return {
           title: "Configurações",
@@ -97,6 +103,8 @@ const Layout: React.FC = () => {
         return <Receitas />;
       case "despesas":
         return <Despesas />;
+      case "planejamento":
+        return <Planejamento />;
       case "configuracao":
         return <Configuracoes />;
       default:

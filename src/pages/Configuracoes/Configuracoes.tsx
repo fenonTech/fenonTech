@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Configuracoes.css";
+import MonthYearSelector from "../../components/MonthYearSelector";
 import simboloMeuBolsoUsadoNoCardDePerfilDoUsuario from "../../assets/simboloMeuBolsoUsadoNoCardDePerfilDoUsuario.png";
 import simboloMeuBolsoUtilizadoNoCardDeNotificacoes from "../../assets/simboloMeuBolsoUtilizadoNoCardDeNotificacoes.png";
 import SimboloMeuBolsoUtilizadoNoCardDeBancosConectados from "../../assets/SimboloMeuBolsoUtilizadoNoCardDeBancosConectados.png";
@@ -16,6 +17,10 @@ interface NotificationSetting {
 }
 
 const Configuracoes: React.FC = () => {
+  const currentDate = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
+  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+
   const [userProfile, setUserProfile] = useState({
     nomeCompleto: "Rafael",
     email: "rael@gmail.com",
@@ -97,6 +102,17 @@ const Configuracoes: React.FC = () => {
 
   return (
     <div className="configuracoes-page">
+      {/* Filtro de Mês e Ano */}
+      <div className="configuracoes-header">
+        <MonthYearSelector
+          selectedMonth={selectedMonth}
+          selectedYear={selectedYear}
+          onMonthChange={setSelectedMonth}
+          onYearChange={setSelectedYear}
+          className="header-style"
+        />
+      </div>
+
       <div className="configuracoes-content">
         {/* Perfil do Usuário */}
         <div className="config-card">

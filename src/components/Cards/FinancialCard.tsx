@@ -10,6 +10,9 @@ interface FinancialCardProps {
   showToggle?: boolean;
   isBalanceVisible?: boolean;
   onToggleVisibility?: () => void;
+  showAddButton?: boolean;
+  onAddClick?: () => void;
+  addButtonText?: string;
 }
 
 const FinancialCard: React.FC<FinancialCardProps> = ({
@@ -21,6 +24,9 @@ const FinancialCard: React.FC<FinancialCardProps> = ({
   showToggle = false,
   isBalanceVisible = true,
   onToggleVisibility,
+  showAddButton = false,
+  onAddClick,
+  addButtonText = "Adicionar",
 }) => {
   return (
     <div className={`financial-card ${type} ${className}`}>
@@ -76,6 +82,33 @@ const FinancialCard: React.FC<FinancialCardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Botão de Adicionar */}
+      {showAddButton && (
+        <button
+          className="add-button"
+          onClick={onAddClick}
+          aria-label={`${addButtonText} ${title.toLowerCase()}`}
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="add-icon"
+          >
+            <path
+              d="M12 5v14M5 12h14"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <span className="add-text">{addButtonText}</span>
+        </button>
+      )}
     </div>
   );
 };
