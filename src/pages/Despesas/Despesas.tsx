@@ -4,6 +4,7 @@ import FinancialCard from "../../components/Cards/FinancialCard";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
+import ExpensesPieChart from "../../components/ExpensesPieChart";
 import useDespesasNavigation from "../../hooks/useDespesasNavigation";
 import useTabs from "../../hooks/useTabs";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
@@ -237,30 +238,13 @@ const Despesas: React.FC = () => {
       >
         <div className="dashboard-grid">
           {/* Despesas por categoria - Gráfico de Pizza */}
-          <div className="despesas-card chart-card">
-            <h3 className="card-header">Despesas por categoria</h3>
-            <div className="chart-container">
-              <div className="chart-placeholder">
-                <div className="chart-center">
-                  <div className="total-label">TOTAL DESPESAS</div>
-                  <div className="total-value">R$ 1.915,60</div>
-                </div>
-              </div>
-              <div className="chart-legend">
-                {pieChartData.map((item, index) => (
-                  <div key={index} className="legend-item">
-                    <div
-                      className="legend-color"
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span className="legend-label">
-                      {item.name} ({item.percentage}%)
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <ExpensesPieChart
+            title="Despesas por categoria"
+            totalLabel="TOTAL DESPESAS"
+            totalValue="R$ 1.915,60"
+            categories={pieChartData}
+            className="despesas-card chart-card"
+          />
         </div>
       </div>
 
@@ -294,30 +278,13 @@ const Despesas: React.FC = () => {
         {/* Segunda linha com gráficos */}
         <div className="despesas-charts-row">
           {/* Despesas por categoria - Gráfico de Pizza */}
-          <div className="despesas-card chart-card">
-            <h3 className="card-header">Despesas por categoria</h3>
-            <div className="chart-container">
-              <div className="chart-placeholder">
-                <div className="chart-center">
-                  <div className="total-label">TOTAL DESPESAS</div>
-                  <div className="total-value">R$ 1.915,60</div>
-                </div>
-              </div>
-              <div className="chart-legend">
-                {pieChartData.map((item, index) => (
-                  <div key={index} className="legend-item">
-                    <div
-                      className="legend-color"
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span className="legend-label">
-                      {item.name} ({item.percentage}%)
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <ExpensesPieChart
+            title="Despesas por categoria"
+            totalLabel="TOTAL DESPESAS"
+            totalValue="R$ 1.915,60"
+            categories={pieChartData}
+            className="despesas-card chart-card"
+          />
 
           {/* Visão por categoria */}
           <div className="despesas-card category-bars-card">

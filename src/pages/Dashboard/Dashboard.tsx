@@ -4,6 +4,7 @@ import FinancialCard from "../../components/Cards/FinancialCard";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
+import ExpensesPieChart from "../../components/ExpensesPieChart";
 import useTabs from "../../hooks/useTabs";
 import useFinancialCardNavigation from "../../hooks/useFinancialCardNavigation";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
@@ -281,30 +282,13 @@ const Dashboard: React.FC = () => {
           />
 
           {/* Despesas por categoria (gráfico de pizza) */}
-          <div className="dashboard-card expenses-chart-card">
-            <h3 className="card-header">Despesas por categoria</h3>
-            <div className="chart-container">
-              <div className="chart-placeholder">
-                <div className="chart-center">
-                  <div className="total-label">TOTAL DESPESAS</div>
-                  <div className="total-value">R$ 6.749,63</div>
-                </div>
-              </div>
-              <div className="chart-legend">
-                {categoryData.map((item, index) => (
-                  <div key={index} className="legend-item">
-                    <div
-                      className="legend-color"
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span className="legend-label">
-                      {item.name} ({item.percentage}%)
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <ExpensesPieChart
+            title="Despesas por categoria"
+            totalLabel="TOTAL DESPESAS"
+            totalValue="R$ 6.749,63"
+            categories={categoryData}
+            className="expenses-chart-card"
+          />
         </div>
 
         {/* Segunda Linha - Contas + Visão Categoria */}

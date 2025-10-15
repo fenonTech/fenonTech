@@ -1,6 +1,7 @@
 import React from "react";
 import "./Dashboard.css";
 import FinancialCard from "../Cards/FinancialCard";
+import ExpensesPieChart from "../ExpensesPieChart";
 import useTabs from "../../hooks/useTabs";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
@@ -252,31 +253,14 @@ const Dashboard: React.FC = () => {
         className={`tab-content ${activeTab === "graficos" ? "active" : ""}`}
       >
         <div className="dashboard-grid">
-          {/* Despesas por categoria (simulando gráfico de pizza) */}
-          <div className="dashboard-card">
-            <h3 className="card-header">Despesas por categoria</h3>
-            <div className="chart-container">
-              <div className="chart-placeholder">
-                <div className="chart-center">
-                  <div className="total-label">TOTAL DESPESAS</div>
-                  <div className="total-value">R$ 6.749,63</div>
-                </div>
-              </div>
-              <div className="chart-legend">
-                {categoryData.map((item, index) => (
-                  <div key={index} className="legend-item">
-                    <div
-                      className="legend-color"
-                      style={{ backgroundColor: item.color }}
-                    ></div>
-                    <span className="legend-label">
-                      {item.name} ({item.percentage}%)
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          {/* Despesas por categoria (gráfico de pizza) */}
+          <ExpensesPieChart
+            title="Despesas por categoria"
+            totalLabel="TOTAL DESPESAS"
+            totalValue="R$ 6.749,63"
+            categories={categoryData}
+            className="dashboard-card"
+          />
 
           {/* Visão por categoria */}
           <div className="dashboard-card">
