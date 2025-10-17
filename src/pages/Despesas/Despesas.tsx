@@ -1,47 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import "./Despesas.css";
-import FinancialCard from "../../components/Cards/FinancialCard";
+import { UnifiedFinancialCard } from "../../components/Cards";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
 import MonthYearSelector from "../../components/MonthYearSelector";
 import { ExpenseModal } from "../../components/Modals";
-import type { ExpenseData } from "../../components/Modals";
+
+import { useTransaction } from "../../contexts/TransactionContext";
 import useDespesasNavigation from "../../hooks/useDespesasNavigation";
 import useTabs from "../../hooks/useTabs";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
-interface DespesaEntry {
-  date: string;
-  category: string;
-  type: string;
-  value: string;
-}
-
-interface ContasAPagarEntry {
-  date: string;
-  category: string;
-  type: string;
-  value: string;
-}
-
 const Despesas: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
-  const [editingExpense, setEditingExpense] = useState<ExpenseData | null>(
-    null
-  );
+  const [editingExpense, setEditingExpense] = useState<any | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const { activeCard, switchCard } = useDespesasNavigation("despesas");
   const { activeTab, switchTab } = useTabs("graficos");
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
+  const {
+    expenses,
+    payables,
+    addExpense,
+    updateExpense,
+    deleteExpense,
+    addPayable,
+    updatePayable,
+    deletePayable,
+  } = useTransaction();
 
   // Função para adicionar nova despesa/conta a pagar
   const handleAddDespesa = () => {
@@ -52,26 +47,38 @@ const Despesas: React.FC = () => {
 
   // Função para editar despesa
   const handleEditExpense = (expense: any) => {
-    const expenseData: ExpenseData = {
-      category: expense.category,
-      value: expense.value,
-      date: expense.date,
-    };
-    setEditingExpense(expenseData);
+    // Usar os dados originais se disponíveis
+    const expenseToEdit = expense.originalData || expense;
+    setEditingExpense(expenseToEdit);
     setIsEditMode(true);
     setIsExpenseModalOpen(true);
   };
 
   // Função para excluir despesa
-  const handleDeleteExpense = (expense: any, index: number) => {
+  const handleDeleteExpense = (expense: any) => {
+    // Usar os dados originais se disponíveis
+    const expenseToDelete = expense.originalData || expense;
     const confirmDelete = window.confirm(
-      `Tem certeza que deseja excluir a despesa "${expense.category}" no valor de ${expense.value}?`
+      `Tem certeza que deseja excluir a despesa "${
+        expenseToDelete.category
+      }" no valor de ${
+        expenseToDelete.formattedValue || expenseToDelete.value
+      }?`
     );
 
     if (confirmDelete) {
-      console.log("Excluindo despesa:", expense, "índice:", index);
-      // Aqui você implementaria a lógica para excluir do backend/estado
-      alert("Despesa excluída com sucesso!");
+      // Verificar se é despesa ou conta a pagar pelo ID ou data
+      const expenseDate = new Date(
+        expenseToDelete.date || expenseToDelete.dueDate
+      );
+      const today = new Date();
+      const isPayable = expenseDate > today;
+
+      if (isPayable) {
+        deletePayable(expenseToDelete.id);
+      } else {
+        deleteExpense(expenseToDelete.id);
+      }
     }
   };
 
@@ -83,107 +90,226 @@ const Despesas: React.FC = () => {
   };
 
   // Função para salvar despesa
-  const handleSaveExpense = (expenseData: ExpenseData) => {
-    console.log("Nova despesa criada:", expenseData);
+  const handleSaveExpense = (expenseData: any) => {
+    const amount =
+      typeof expenseData.value === "string"
+        ? parseFloat(expenseData.value.replace(/[^\d,]/g, "").replace(",", "."))
+        : expenseData.value;
+    const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
 
-    // Aqui você pode implementar a lógica para:
-    // 1. Enviar os dados para o backend/API
-    // 2. Atualizar o estado local
-    // 3. Mostrar notificação de sucesso
-
-    // Exemplo de lógica para determinar se é despesa ou conta a pagar:
     const expenseDate = new Date(expenseData.date);
     const today = new Date();
     const isContaAPagar = expenseDate > today;
 
-    console.log(
-      isContaAPagar
-        ? "Conta a pagar adicionada para o futuro"
-        : "Despesa atual registrada"
-    );
+    if (isEditMode && editingExpense) {
+      // Modo edição - atualizar despesa existente
+      const baseData = {
+        date: expenseData.date,
+        description: expenseData.category,
+        category: expenseData.category,
+        value: amount,
+        formattedValue,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      if (isContaAPagar) {
+        // Atualizar conta a pagar
+        const payable = {
+          ...baseData,
+          id: `payable-${Date.now()}`,
+          dueDate: expenseData.date,
+          status: "pending" as const,
+          type: "payable" as const,
+        };
+        updatePayable(payable);
+      } else {
+        const expense = {
+          ...baseData,
+          id: `expense-${Date.now()}`,
+          type: "expense" as const,
+        };
+        updateExpense(expense);
+      }
+    } else {
+      // Modo criação - adicionar nova despesa
+      const baseData = {
+        date: expenseData.date,
+        description: expenseData.category,
+        category: expenseData.category,
+        value: amount,
+        formattedValue,
+      };
+
+      if (isContaAPagar) {
+        // Adicionar conta a pagar
+        const payable = {
+          ...baseData,
+          dueDate: expenseData.date,
+          status: "pending" as const,
+          type: "payable" as const,
+        };
+        addPayable(payable);
+      } else {
+        const expense = {
+          ...baseData,
+          type: "expense" as const,
+        };
+        addExpense(expense);
+      }
+    }
 
     // Fechar o modal após salvar
-    setIsExpenseModalOpen(false);
+    handleCloseExpenseModal();
   };
+
+  // Converter dados do contexto para formato das tabelas
+  const formatExpenseData = (expenses: any[]) => {
+    return expenses.map((expense) => ({
+      id: expense.id,
+      date: new Date(expense.date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      category: expense.category,
+      type: expense.description || "Variável",
+      value: expense.formattedValue,
+      // Manter dados originais para edição
+      originalDate: expense.date,
+      originalValue: expense.value,
+      originalData: expense,
+    }));
+  };
+
+  const formatPayableData = (payables: any[]) => {
+    return payables.map((payable) => ({
+      id: payable.id,
+      date: new Date(payable.dueDate).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      category: payable.category,
+      type: payable.status === "pending" ? "Pendente" : "Pago",
+      value: payable.formattedValue,
+      // Manter dados originais para edição
+      originalDate: payable.dueDate,
+      originalValue: payable.value,
+      originalData: payable,
+    }));
+  };
+
+  // Calcular totais
+  const totalExpenses = expenses.reduce(
+    (sum, expense) => sum + expense.value,
+    0
+  );
+  const totalPayables = payables.reduce(
+    (sum, payable) => sum + payable.value,
+    0
+  );
 
   // Configuração das opções do card mobile
   const mobileCardOptions = [
     {
       key: "despesas",
       label: "Despesas",
-      title: "Despesas do mês",
-      value: "R$ 1.185,70",
+      title: "DESPESA ATUAL",
+      value: formatValue(`R$ ${totalExpenses.toFixed(2).replace(".", ",")}`),
       icon: carteiraCardDespesasdoMês,
       type: "negative" as const,
     },
     {
       key: "contas",
-      label: "Contas a Pagar",
-      title: "Contas a pagar",
-      value: "R$ 890,50",
+      label: "A Pagar",
+      title: "CONTAS A PAGAR",
+      value: formatValue(`R$ ${totalPayables.toFixed(2).replace(".", ",")}`),
       icon: simboloMenuBolsoContasAPagar,
       type: "negative" as const,
     },
   ];
 
-  const despesasData: DespesaEntry[] = [
-    {
-      date: "06/10",
-      category: "iFood",
-      type: "Variável",
-      value: "R$ 85,50",
-    },
-    {
-      date: "10/10",
-      category: "Combustível",
-      type: "Variável",
-      value: "R$ 120,00",
-    },
-    {
-      date: "12/10",
-      category: "Supermercado",
-      type: "Variável",
-      value: "R$ 250,30",
-    },
-  ];
+  // Dados dinâmicos das tabelas
+  const despesasData = formatExpenseData(expenses);
+  const contasAPagarData = formatPayableData(payables);
 
-  const contasAPagarData: ContasAPagarEntry[] = [
-    {
-      date: "15/10",
-      category: "Energia Elétrica",
-      type: "Fixa",
-      value: "R$ 180,00",
-    },
-    {
-      date: "20/10",
-      category: "Internet",
-      type: "Fixa",
-      value: "R$ 99,90",
-    },
-    {
-      date: "25/10",
-      category: "Cartão de Crédito",
-      type: "Variável",
-      value: "R$ 450,00",
-    },
-  ];
+  // Dados dinâmicos para o gráfico de pizza
+  const pieChartData = useMemo(() => {
+    // Categorias pré-cadastradas com cores fixas
+    const predefinedCategories = [
+      { name: "Alimentação", color: "#FF6B6B" },
+      { name: "Transporte", color: "#4ECDC4" },
+      { name: "Moradia", color: "#45B7D1" },
+      { name: "Lazer", color: "#96CEB4" },
+      { name: "Saúde", color: "#FFEAA7" },
+      { name: "Educação", color: "#DDA0DD" },
+      { name: "Outros", color: "#98D8C8" },
+    ];
 
-  // Dados para o gráfico de pizza
-  const pieChartData = [
-    { name: "Alimentação", percentage: 35, color: "#FF6B6B" },
-    { name: "Transporte", percentage: 25, color: "#4ECDC4" },
-    { name: "Moradia", percentage: 30, color: "#45B7D1" },
-    { name: "Outros", percentage: 10, color: "#96CEB4" },
-  ];
+    if (expenses.length === 0) {
+      return predefinedCategories.map((cat) => ({
+        ...cat,
+        percentage: 0,
+      }));
+    }
 
-  // Dados para barras de visão por categoria
-  const categoryBarsData = [
-    { name: "Alimentação", spent: 355.8, total: 500.0, color: "#FF6B6B" },
-    { name: "Transporte", spent: 120.0, total: 300.0, color: "#4ECDC4" },
-    { name: "Contas Fixas", spent: 729.9, total: 800.0, color: "#45B7D1" },
-    { name: "Lazer", spent: 85.0, total: 200.0, color: "#96CEB4" },
-    { name: "Outros", spent: 150.0, total: 250.0, color: "#FFEAA7" },
-  ];
+    // Agrupar despesas por categoria
+    const categoryTotals: { [key: string]: number } = {};
+    expenses.forEach((expense) => {
+      const category = expense.category || "Outros";
+      categoryTotals[category] =
+        (categoryTotals[category] || 0) + expense.value;
+    });
+
+    const totalExpenseValue = Object.values(categoryTotals).reduce(
+      (sum, value) => sum + value,
+      0
+    );
+
+    // Mapear categorias pré-definidas com dados reais
+    return predefinedCategories
+      .map((predefCategory) => {
+        const value = categoryTotals[predefCategory.name] || 0;
+        return {
+          name: predefCategory.name,
+          percentage:
+            totalExpenseValue > 0
+              ? Math.round((value / totalExpenseValue) * 100)
+              : 0,
+          color: predefCategory.color,
+        };
+      })
+      .filter((cat) => cat.percentage > 0 || expenses.length === 0);
+  }, [expenses]);
+
+  // Dados dinâmicos para barras de visão por categoria
+  const categoryBarsData = useMemo(() => {
+    const predefinedCategories = [
+      { name: "Alimentação", color: "#FF6B6B", budget: 500.0 },
+      { name: "Transporte", color: "#4ECDC4", budget: 300.0 },
+      { name: "Moradia", color: "#45B7D1", budget: 800.0 },
+      { name: "Lazer", color: "#96CEB4", budget: 200.0 },
+      { name: "Saúde", color: "#FFEAA7", budget: 250.0 },
+      { name: "Educação", color: "#DDA0DD", budget: 150.0 },
+      { name: "Outros", color: "#98D8C8", budget: 100.0 },
+    ];
+
+    // Agrupar despesas por categoria
+    const categoryTotals: { [key: string]: number } = {};
+    expenses.forEach((expense) => {
+      const category = expense.category || "Outros";
+      categoryTotals[category] =
+        (categoryTotals[category] || 0) + expense.value;
+    });
+
+    return predefinedCategories
+      .map((category) => ({
+        name: category.name,
+        spent: categoryTotals[category.name] || 0,
+        total: category.budget,
+        color: category.color,
+      }))
+      .filter((cat) => cat.spent > 0 || expenses.length === 0);
+  }, [expenses]);
 
   // Definir colunas para a tabela de despesas
   const despesasColumns: TableColumn[] = [
@@ -244,9 +370,11 @@ const Despesas: React.FC = () => {
 
       {/* Cards principais - Desktop */}
       <div className="despesas-cards desktop-content">
-        <FinancialCard
-          title="Despesas do mês"
-          value={formatValue("R$ 1.185,70")}
+        <UnifiedFinancialCard
+          title="DESPESA ATUAL"
+          value={formatValue(
+            `R$ ${totalExpenses.toFixed(2).replace(".", ",")}`
+          )}
           icon={carteiraCardDespesasdoMês}
           type="negative"
           className="despesa-card-large"
@@ -254,9 +382,11 @@ const Despesas: React.FC = () => {
           isBalanceVisible={isBalanceVisible}
           onToggleVisibility={toggleBalanceVisibility}
         />
-        <FinancialCard
+        <UnifiedFinancialCard
           title="Contas a pagar"
-          value={formatValue("R$ 729,90")}
+          value={formatValue(
+            `R$ ${totalPayables.toFixed(2).replace(".", ",")}`
+          )}
           icon={simboloMenuBolsoContasAPagar}
           type="neutral"
           className="despesa-card-large"
@@ -440,8 +570,25 @@ const Despesas: React.FC = () => {
         isOpen={isExpenseModalOpen}
         onClose={handleCloseExpenseModal}
         onSave={handleSaveExpense}
-        editData={editingExpense || undefined}
-        isEditMode={isEditMode}
+        onUpdate={handleSaveExpense}
+        onDelete={
+          isEditMode
+            ? (id: string) => {
+                const expenseDate = new Date(editingExpense?.date);
+                const today = new Date();
+                const isPayable = expenseDate > today;
+
+                if (isPayable) {
+                  deletePayable(id);
+                } else {
+                  deleteExpense(id);
+                }
+                handleCloseExpenseModal();
+              }
+            : undefined
+        }
+        editingExpense={editingExpense}
+        mode={isEditMode ? "edit" : "add"}
       />
     </div>
   );

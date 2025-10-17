@@ -1,42 +1,39 @@
 import React, { useState } from "react";
 import "./Receitas.css";
-import FinancialCard from "../../components/Cards/FinancialCard";
+import { UnifiedFinancialCard } from "../../components/Cards";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import MonthYearSelector from "../../components/MonthYearSelector";
 import { IncomeModal } from "../../components/Modals";
-import type { IncomeData } from "../../components/Modals";
+
+import { useTransaction } from "../../contexts/TransactionContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import useReceitasNavigation from "../../hooks/useReceitasNavigation";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import simboloMeuBolsoContasAReceberCard from "../../assets/simboloMeuBolsoContasAReceberCard.png";
-
-interface ReceitaEntry {
-  date: string;
-  category: string;
-  type: string;
-  value: string;
-}
-
-interface ContasAReceberEntry {
-  date: string;
-  category: string;
-  type: string;
-  value: string;
-}
 
 const Receitas: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
-  const [editingIncome, setEditingIncome] = useState<IncomeData | null>(null);
+  const [editingIncome, setEditingIncome] = useState<any | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
   const { activeCard, switchCard } = useReceitasNavigation("receita");
+  const {
+    incomes,
+    receivables,
+    addIncome,
+    updateIncome,
+    deleteIncome,
+    addReceivable,
+    updateReceivable,
+    deleteReceivable,
+  } = useTransaction();
 
   // Função para adicionar nova receita/conta a receber
   const handleAddReceita = () => {
@@ -47,26 +44,36 @@ const Receitas: React.FC = () => {
 
   // Função para editar receita
   const handleEditIncome = (income: any) => {
-    const incomeData: IncomeData = {
-      category: income.category,
-      value: income.value,
-      date: income.date,
-    };
-    setEditingIncome(incomeData);
+    // Usar os dados originais se disponíveis
+    const incomeToEdit = income.originalData || income;
+    setEditingIncome(incomeToEdit);
     setIsEditMode(true);
     setIsIncomeModalOpen(true);
   };
 
   // Função para excluir receita
-  const handleDeleteIncome = (income: any, index: number) => {
+  const handleDeleteIncome = (income: any) => {
+    // Usar os dados originais se disponíveis
+    const incomeToDelete = income.originalData || income;
     const confirmDelete = window.confirm(
-      `Tem certeza que deseja excluir a receita "${income.category}" no valor de ${income.value}?`
+      `Tem certeza que deseja excluir a receita "${
+        incomeToDelete.category
+      }" no valor de ${incomeToDelete.formattedValue || incomeToDelete.value}?`
     );
 
     if (confirmDelete) {
-      console.log("Excluindo receita:", income, "índice:", index);
-      // Aqui você implementaria a lógica para excluir do backend/estado
-      alert("Receita excluída com sucesso!");
+      // Verificar se é receita ou conta a receber pelo ID ou data
+      const incomeDate = new Date(
+        incomeToDelete.date || incomeToDelete.dueDate
+      );
+      const today = new Date();
+      const isReceivable = incomeDate > today;
+
+      if (isReceivable) {
+        deleteReceivable(incomeToDelete.id);
+      } else {
+        deleteIncome(incomeToDelete.id);
+      }
     }
   };
 
@@ -78,28 +85,120 @@ const Receitas: React.FC = () => {
   };
 
   // Função para salvar receita
-  const handleSaveIncome = (incomeData: IncomeData) => {
-    console.log("Nova receita criada:", incomeData);
+  const handleSaveIncome = (incomeData: any) => {
+    const amount =
+      typeof incomeData.value === "string"
+        ? parseFloat(incomeData.value.replace(/[^\d,]/g, "").replace(",", "."))
+        : incomeData.value;
+    const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
 
-    // Aqui você pode implementar a lógica para:
-    // 1. Enviar os dados para o backend/API
-    // 2. Atualizar o estado local
-    // 3. Mostrar notificação de sucesso
-
-    // Exemplo de lógica para determinar se é receita ou conta a receber:
     const incomeDate = new Date(incomeData.date);
     const today = new Date();
     const isContaAReceber = incomeDate > today;
 
-    console.log(
-      isContaAReceber
-        ? "Conta a receber adicionada para o futuro"
-        : "Receita atual registrada"
-    );
+    if (isEditMode && editingIncome) {
+      // Modo edição - atualizar receita existente
+      const baseData = {
+        date: incomeData.date,
+        description: incomeData.category,
+        category: incomeData.category,
+        value: amount,
+        formattedValue,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      if (isContaAReceber) {
+        // Atualizar conta a receber
+        const receivable = {
+          ...baseData,
+          id: `receivable-${Date.now()}`,
+          dueDate: incomeData.date,
+          status: "pending" as const,
+          type: "receivable" as const,
+        };
+        updateReceivable(receivable);
+      } else {
+        const income = {
+          ...baseData,
+          id: `income-${Date.now()}`,
+          type: "income" as const,
+        };
+        updateIncome(income);
+      }
+    } else {
+      // Modo criação - adicionar nova receita
+      const baseData = {
+        date: incomeData.date,
+        description: incomeData.category,
+        category: incomeData.category,
+        value: amount,
+        formattedValue,
+      };
+
+      if (isContaAReceber) {
+        // Adicionar conta a receber
+        const receivable = {
+          ...baseData,
+          dueDate: incomeData.date,
+          status: "pending" as const,
+          type: "receivable" as const,
+        };
+        addReceivable(receivable);
+      } else {
+        const income = {
+          ...baseData,
+          type: "income" as const,
+        };
+        addIncome(income);
+      }
+    }
 
     // Fechar o modal após salvar
-    setIsIncomeModalOpen(false);
+    handleCloseIncomeModal();
   };
+
+  // Converter dados do contexto para formato das tabelas
+  const formatIncomeData = (incomes: any[]) => {
+    return incomes.map((income) => ({
+      id: income.id,
+      date: new Date(income.date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      category: income.category,
+      type: income.description || "Variável",
+      value: income.formattedValue,
+      // Manter dados originais para edição
+      originalDate: income.date,
+      originalValue: income.value,
+      originalData: income,
+    }));
+  };
+
+  const formatReceivableData = (receivables: any[]) => {
+    return receivables.map((receivable) => ({
+      id: receivable.id,
+      date: new Date(receivable.dueDate).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      category: receivable.category,
+      type: receivable.status === "pending" ? "Pendente" : "Pago",
+      value: receivable.formattedValue,
+      // Manter dados originais para edição
+      originalDate: receivable.dueDate,
+      originalValue: receivable.value,
+      originalData: receivable,
+    }));
+  };
+
+  // Calcular totais
+  const totalIncomes = incomes.reduce((sum, income) => sum + income.value, 0);
+  const totalReceivables = receivables.reduce(
+    (sum, receivable) => sum + receivable.value,
+    0
+  );
 
   // Configuração das opções do card mobile
   const mobileCardOptions = [
@@ -107,122 +206,23 @@ const Receitas: React.FC = () => {
       key: "receita",
       label: "Receitas",
       title: "Receitas do mês",
-      value: "R$ 2.850,00",
+      value: formatValue(`R$ ${totalIncomes.toFixed(2).replace(".", ",")}`),
       icon: sacoDeDinheiro,
       type: "positive" as const,
     },
     {
       key: "contas",
       label: "A Receber",
-      title: "Contas a receber",
-      value: "R$ 1.120,00",
+      title: "Valores a Receber",
+      value: formatValue(`R$ ${totalReceivables.toFixed(2).replace(".", ",")}`),
       icon: simboloMeuBolsoContasAReceberCard,
       type: "positive" as const,
     },
   ];
 
-  const receitasData: ReceitaEntry[] = [
-    { date: "06/10", category: "Salário", type: "Fixa", value: "R$ 5.000,00" },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-    {
-      date: "10/10",
-      category: "Freelancer",
-      type: "Variável",
-      value: "R$ 550,00",
-    },
-  ];
-
-  const contasAReceberData: ContasAReceberEntry[] = [
-    {
-      date: "15/10",
-      category: "Consultoria",
-      type: "Pendente",
-      value: "R$ 2.500,00",
-    },
-    {
-      date: "15/10",
-      category: "Consultoria",
-      type: "Pendente",
-      value: "R$ 2.500,00",
-    },
-    {
-      date: "15/10",
-      category: "Consultoria",
-      type: "Pendente",
-      value: "R$ 2.500,00",
-    },
-    {
-      date: "15/10",
-      category: "Consultoria",
-      type: "Pendente",
-      value: "R$ 2.500,00",
-    },
-    {
-      date: "20/10",
-      category: "Projeto",
-      type: "Pendente",
-      value: "R$ 1.800,00",
-    },
-    {
-      date: "25/10",
-      category: "Manutenção",
-      type: "Atrasado",
-      value: "R$ 900,00",
-    },
-  ];
+  // Dados dinâmicos das tabelas
+  const receitasData = formatIncomeData(incomes);
+  const contasAReceberData = formatReceivableData(receivables);
 
   // Dados para o gráfico de barras (simulando os valores mensais)
   const monthlyData = [
@@ -260,7 +260,7 @@ const Receitas: React.FC = () => {
     },
   ];
 
-  // Definir colunas para a tabela de contas a receber
+  // Definir colunas para a tabela de Valores a Receber
   const contasAReceberColumns: TableColumn[] = [
     { key: "date", label: "Data" },
     { key: "category", label: "Categoria" },
@@ -293,9 +293,9 @@ const Receitas: React.FC = () => {
 
       {/* Cards principais - DESKTOP */}
       <div className="receitas-cards">
-        <FinancialCard
-          title="Receita do mês"
-          value={formatValue("R$ 1.250,37")}
+        <UnifiedFinancialCard
+          title="Receita Atual"
+          value={formatValue(`R$ ${totalIncomes.toFixed(2).replace(".", ",")}`)}
           icon={sacoDeDinheiro}
           type="positive"
           className="receita-card-large"
@@ -303,9 +303,11 @@ const Receitas: React.FC = () => {
           isBalanceVisible={isBalanceVisible}
           onToggleVisibility={toggleBalanceVisibility}
         />
-        <FinancialCard
-          title="Contas a receber"
-          value={formatValue("R$ 600,00")}
+        <UnifiedFinancialCard
+          title="Valores a Receber"
+          value={formatValue(
+            `R$ ${totalReceivables.toFixed(2).replace(".", ",")}`
+          )}
           icon={simboloMeuBolsoContasAReceberCard}
           type="neutral"
           className="receita-card-large"
@@ -342,7 +344,7 @@ const Receitas: React.FC = () => {
             />
           ) : (
             <TransactionTable
-              title="Contas a Receber"
+              title="Valores a Receber"
               columns={contasAReceberColumns}
               data={contasAReceberData}
               className="receitas-table-card"
@@ -375,9 +377,9 @@ const Receitas: React.FC = () => {
             onDelete={handleDeleteIncome}
           />
 
-          {/* Contas a Receber */}
+          {/* Valores a Receber */}
           <TransactionTable
-            title="Contas a Receber"
+            title="Valores a Receber"
             columns={contasAReceberColumns}
             data={contasAReceberData}
             className="receitas-table-card"
@@ -440,8 +442,25 @@ const Receitas: React.FC = () => {
         isOpen={isIncomeModalOpen}
         onClose={handleCloseIncomeModal}
         onSave={handleSaveIncome}
-        editData={editingIncome || undefined}
-        isEditMode={isEditMode}
+        onUpdate={handleSaveIncome}
+        onDelete={
+          isEditMode
+            ? (id: string) => {
+                const incomeDate = new Date(editingIncome?.date);
+                const today = new Date();
+                const isReceivable = incomeDate > today;
+
+                if (isReceivable) {
+                  deleteReceivable(id);
+                } else {
+                  deleteIncome(id);
+                }
+                handleCloseIncomeModal();
+              }
+            : undefined
+        }
+        editingIncome={editingIncome}
+        mode={isEditMode ? "edit" : "add"}
       />
     </div>
   );

@@ -21,7 +21,7 @@ export const useDespesasNavigation = (
     switch (activeCard) {
       case "despesas":
         return {
-          title: "Despesas do mês",
+          title: "DESPESA ATUAL",
           value: "R$ 1.185,70",
           type: "negative",
         };
@@ -33,7 +33,7 @@ export const useDespesasNavigation = (
         };
       default:
         return {
-          title: "Despesas do mês",
+          title: "DESPESA ATUAL",
           value: "R$ 1.185,70",
           type: "negative",
         };

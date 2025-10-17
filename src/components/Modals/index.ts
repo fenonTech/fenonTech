@@ -1,5 +1,5 @@
-export { ExpenseModal } from "./ExpenseModal";
+export { default as ExpenseModal } from "./ExpenseModal";
 export type { ExpenseData } from "./ExpenseModal";
 
-export { IncomeModal } from "./IncomeModal";
+export { default as IncomeModal } from "./IncomeModal";
 export type { IncomeData } from "./IncomeModal";

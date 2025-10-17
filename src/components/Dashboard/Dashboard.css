@@ -427,11 +427,6 @@
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
   }
-
-  /* Esconder toggle no desktop */
-  .financial-cards .financial-card .balance-toggle-btn {
-    display: none !important;
-  }
 }
 
 /* Responsivo */
@@ -772,31 +767,36 @@
     flex: 1 !important;
   }
 
-  /* Toggle button específico para mobile dashboard */
+  /* Toggle button específico para mobile dashboard - Consistente com FinancialCard */
   .single-financial-card .financial-card .balance-toggle-btn {
-    display: flex !important;
-    background: rgba(0, 0, 0, 0.05) !important;
+    background: transparent !important;
     border: none !important;
-    padding: 0.5rem !important;
-    border-radius: 12px !important;
+    padding: 0.375rem !important;
     cursor: pointer !important;
+    border-radius: 8px !important;
     transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     flex-shrink: 0 !important;
+    opacity: 0.7 !important;
   }
 
   .single-financial-card .financial-card .balance-toggle-btn:hover {
-    background: rgba(0, 0, 0, 0.1) !important;
-    transform: scale(1.05) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
   }
 
   .single-financial-card .financial-card .eye-icon {
-    color: #666 !important;
-    width: 18px !important;
-    height: 18px !important;
+    transition: all 0.3s ease !important;
+    color: #999 !important;
+    width: 20px !important;
+    height: 20px !important;
   }
 
   .single-financial-card .financial-card .balance-toggle-btn:hover .eye-icon {
-    color: #333 !important;
+    color: #ffd700 !important;
   }
 
   /* Sistema de Tabs Mobile */

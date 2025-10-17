@@ -193,3 +193,122 @@
     font-size: 1.3rem !important;
   }
 }
+
+/* ===== ESTILOS PARA O TOGGLE DE VISIBILIDADE DE SALDO ===== */
+/* Copiados do FinancialCard.css para manter consistência */
+
+.mobile-single-financial-card .card-value-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.mobile-single-financial-card .balance-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 0.375rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.mobile-single-financial-card .balance-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.mobile-single-financial-card .eye-icon {
+  transition: all 0.3s ease;
+  color: #999;
+}
+
+.mobile-single-financial-card .balance-toggle-btn:hover .eye-icon {
+  color: #ffd700;
+}
+
+/* Card Value Animation */
+.mobile-single-financial-card .card-value {
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mobile-single-financial-card .card-value.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobile-single-financial-card .card-value.hidden {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+/* Desktop - Posicionamento padrão do toggle */
+@media (min-width: 769px) {
+  .mobile-single-financial-card .card-value-container {
+    justify-content: space-between;
+  }
+
+  .mobile-single-financial-card .balance-toggle-btn {
+    margin-left: auto;
+  }
+}
+
+/* Mobile specific styles for toggle */
+@media (max-width: 600px) {
+  .mobile-single-financial-card .balance-toggle-btn {
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    opacity: 1;
+  }
+
+  .mobile-single-financial-card .balance-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+  }
+
+  .mobile-single-financial-card .eye-icon {
+    color: #666;
+    width: 18px;
+    height: 18px;
+  }
+
+  .mobile-single-financial-card .balance-toggle-btn:hover .eye-icon {
+    color: #333;
+  }
+}
+
+/* Força a exibição do botão de visibilidade em todas as resoluções */
+.mobile-single-financial-card .balance-toggle-btn {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 0.8 !important;
+}
+
+/* Desktop - Melhor visibilidade do toggle */
+@media (min-width: 769px) {
+  .mobile-single-financial-card .balance-toggle-btn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 0.7 !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .mobile-single-financial-card .balance-toggle-btn:hover {
+    opacity: 1 !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 215, 0, 0.5) !important;
+  }
+}

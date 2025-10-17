@@ -114,6 +114,41 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                             : row[column.key]}
                         </td>
                       ))}
+                      {showActions && (
+                        <td className="actions-cell" data-label="Ações">
+                          <div className="action-buttons">
+                            {onEdit && (
+                              <button
+                                className="btn-edit"
+                                onClick={() => onEdit(row, index)}
+                                title="Editar"
+                              >
+                                <svg
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                  <path
+                                    d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -134,6 +169,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   {columns.map((column) => (
                     <th key={column.key}>{column.label}</th>
                   ))}
+                  {showActions && <th className="actions-header">Ações</th>}
                 </tr>
               </thead>
               <tbody>
@@ -146,6 +182,41 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                           : row[column.key]}
                       </td>
                     ))}
+                    {showActions && (
+                      <td className="actions-cell" data-label="Ações">
+                        <div className="action-buttons">
+                          {onEdit && (
+                            <button
+                              className="btn-edit"
+                              onClick={() => onEdit(row, index)}
+                              title="Editar"
+                            >
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <path
+                                  d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <path
+                                  d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

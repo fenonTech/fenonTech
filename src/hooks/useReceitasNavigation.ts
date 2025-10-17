@@ -27,19 +27,19 @@ const useReceitasNavigation = (
     switch (activeCard) {
       case "receita":
         return {
-          title: "Receita do mês",
+          title: "Receita Atual",
           value: "R$ 1.250,37",
           type: "positive",
         };
       case "contas-a-receber":
         return {
-          title: "Contas a receber",
+          title: "Valores a Receber",
           value: "R$ 600,00",
           type: "neutral",
         };
       default:
         return {
-          title: "Receita do mês",
+          title: "Receita Atual",
           value: "R$ 1.250,37",
           type: "positive",
         };

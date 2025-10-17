@@ -22,14 +22,14 @@ export const useFinancialCardNavigation = (
         };
       case "receita":
         return {
-          title: "Receita do mês",
+          title: "Receita atual",
           value: "R$ 2.850,00",
           type: "positive" as const,
           description: "Total de entradas no mês",
         };
       case "despesa":
         return {
-          title: "Despesas do mês",
+          title: "DESPESA ATUAL",
           value: "R$ 1.599,63",
           type: "negative" as const,
           description: "Total de gastos no mês",

@@ -143,13 +143,13 @@ const Dashboard: React.FC = () => {
           type="neutral"
         />
         <FinancialCard
-          title="Receita do mês"
+          title="Receita Atual"
           value="R$ 1.250,37"
           icon={sacoDeDinheiro}
           type="positive"
         />
         <FinancialCard
-          title="Despesas do mês"
+          title="DESPESA ATUAL"
           value="R$ 6.749,64"
           icon={setaParaBaixo}
           type="negative"

@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import "./Dashboard.css";
-import FinancialCard from "../../components/Cards/FinancialCard";
+import { UnifiedFinancialCard } from "../../components/Cards";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
 import MonthYearSelector from "../../components/MonthYearSelector";
+import { useTransaction } from "../../contexts/TransactionContext";
 import useTabs from "../../hooks/useTabs";
 import useFinancialCardNavigation from "../../hooks/useFinancialCardNavigation";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
@@ -14,122 +15,165 @@ import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import setaParaBaixo from "../../assets/setaParaBaixo.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
-interface Transaction {
-  date: string;
-  description: string;
-  category: string;
-  value: string;
-  type: "income" | "expense";
-}
-
-interface Bill {
-  date: string;
-  description: string;
-  category: string;
-  value: string;
-}
-
 const Dashboard: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
 
-  const transactions: Transaction[] = [
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-      type: "expense",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-      type: "expense",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-      type: "expense",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-      type: "expense",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-      type: "expense",
-    },
-  ];
+  // Acessar dados do contexto
+  const { incomes, expenses, payables } = useTransaction();
 
-  const bills: Bill[] = [
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-    {
-      date: "31/10",
-      description: "iFood",
-      category: "Alimentação",
-      value: "R$ 50,00",
-    },
-  ];
+  // Função para filtrar dados por mês/ano
+  const filterByMonthYear = (
+    data: any[],
+    selectedMonth: number,
+    selectedYear: number
+  ) => {
+    return data.filter((item) => {
+      const itemDate = new Date(item.date || item.dueDate);
+      return (
+        itemDate.getMonth() === selectedMonth &&
+        itemDate.getFullYear() === selectedYear
+      );
+    });
+  };
 
-  const categoryData = [
-    { name: "iFood", percentage: 40, color: "#FF6B6B" },
-    { name: "Uber", percentage: 30, color: "#4ECDC4" },
-    { name: "Aluguel", percentage: 20, color: "#45B7D1" },
-    { name: "Despesas Fixas", percentage: 35, color: "#96CEB4" },
-    { name: "Contas Variáveis", percentage: 25, color: "#FFEAA7" },
-  ];
+  // Calcular totais dinâmicos usando useMemo
+  const filteredIncomes = useMemo(
+    () => filterByMonthYear(incomes, selectedMonth, selectedYear),
+    [incomes, selectedMonth, selectedYear]
+  );
+
+  const filteredExpenses = useMemo(
+    () => filterByMonthYear(expenses, selectedMonth, selectedYear),
+    [expenses, selectedMonth, selectedYear]
+  );
+
+  const totalIncome = useMemo(
+    () => filteredIncomes.reduce((sum, income) => sum + income.value, 0),
+    [filteredIncomes]
+  );
+
+  const totalExpense = useMemo(
+    () => filteredExpenses.reduce((sum, expense) => sum + expense.value, 0),
+    [filteredExpenses]
+  );
+
+  const currentBalance = useMemo(
+    () => totalIncome - totalExpense,
+    [totalIncome, totalExpense]
+  );
+
+  // Combinar transações de receitas e despesas para a tabela
+  const allTransactions = useMemo(() => {
+    const incomeTransactions = filteredIncomes.map((income) => ({
+      id: income.id,
+      date: new Date(income.date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      description: income.description || income.category,
+      category: income.category,
+      value: income.formattedValue,
+      type: "income" as const,
+    }));
+
+    const expenseTransactions = filteredExpenses.map((expense) => ({
+      id: expense.id,
+      date: new Date(expense.date).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      }),
+      description: expense.description || expense.category,
+      category: expense.category,
+      value: expense.formattedValue,
+      type: "expense" as const,
+    }));
+
+    // Combinar e ordenar por data (mais recente primeiro)
+    return [...incomeTransactions, ...expenseTransactions]
+      .sort((a, b) => {
+        const dateA = new Date(
+          `${selectedYear}-${a.date.split("/").reverse().join("-")}`
+        );
+        const dateB = new Date(
+          `${selectedYear}-${b.date.split("/").reverse().join("-")}`
+        );
+        return dateB.getTime() - dateA.getTime();
+      })
+      .slice(0, 10); // Limitar a 10 transações mais recentes
+  }, [filteredIncomes, filteredExpenses, selectedYear]);
+
+  // Contas a pagar dinâmicas (payables)
+  const filteredPayables = useMemo(
+    () => filterByMonthYear(payables, selectedMonth, selectedYear),
+    [payables, selectedMonth, selectedYear]
+  );
+
+  const bills = useMemo(
+    () =>
+      filteredPayables
+        .map((payable) => ({
+          date: new Date(payable.dueDate).toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+          }),
+          description: payable.description || payable.category,
+          category: payable.category,
+          value: payable.formattedValue,
+        }))
+        .slice(0, 8), // Limitar a 8 contas para não sobrecarregar a tabela
+    [filteredPayables]
+  );
+
+  // Dados dinâmicos do gráfico de pizza por categoria
+  const categoryData = useMemo(() => {
+    // Categorias pré-cadastradas com cores fixas
+    const predefinedCategories = [
+      { name: "Alimentação", color: "#FF6B6B" },
+      { name: "Transporte", color: "#4ECDC4" },
+      { name: "Moradia", color: "#45B7D1" },
+      { name: "Lazer", color: "#96CEB4" },
+      { name: "Saúde", color: "#FFEAA7" },
+      { name: "Educação", color: "#DDA0DD" },
+      { name: "Outros", color: "#98D8C8" },
+    ];
+
+    if (filteredExpenses.length === 0) {
+      return predefinedCategories.map((cat) => ({
+        ...cat,
+        percentage: 0,
+      }));
+    }
+
+    // Agrupar despesas por categoria
+    const categoryTotals: { [key: string]: number } = {};
+    filteredExpenses.forEach((expense) => {
+      const category = expense.category || "Outros";
+      categoryTotals[category] =
+        (categoryTotals[category] || 0) + expense.value;
+    });
+
+    const totalExpenseValue = Object.values(categoryTotals).reduce(
+      (sum, value) => sum + value,
+      0
+    );
+
+    // Mapear categorias pré-definidas com dados reais
+    return predefinedCategories
+      .map((predefCategory) => {
+        const value = categoryTotals[predefCategory.name] || 0;
+        return {
+          name: predefCategory.name,
+          percentage:
+            totalExpenseValue > 0
+              ? Math.round((value / totalExpenseValue) * 100)
+              : 0,
+          color: predefCategory.color,
+        };
+      })
+      .filter((cat) => cat.percentage > 0 || filteredExpenses.length === 0); // Mostrar categorias com dados ou todas se não houver dados
+  }, [filteredExpenses]);
 
   const transactionColumns: TableColumn[] = [
     {
@@ -192,23 +236,23 @@ const Dashboard: React.FC = () => {
       key: "saldo",
       label: "Saldo",
       title: "Saldo Atual",
-      value: "R$ 1.250,37",
+      value: formatValue(`R$ ${currentBalance.toFixed(2).replace(".", ",")}`),
       icon: dinheiroSaldo,
       type: "neutral" as const,
     },
     {
       key: "receita",
       label: "Receita",
-      title: "Receita do mês",
-      value: "R$ 2.850,00",
+      title: "Receita Atual",
+      value: formatValue(`R$ ${totalIncome.toFixed(2).replace(".", ",")}`),
       icon: sacoDeDinheiro,
       type: "positive" as const,
     },
     {
       key: "despesa",
       label: "Despesa",
-      title: "Despesas do mês",
-      value: "R$ 1.599,63",
+      title: "DESPESA ATUAL",
+      value: formatValue(`R$ ${totalExpense.toFixed(2).replace(".", ",")}`),
       icon: setaParaBaixo,
       type: "negative" as const,
     },
@@ -229,27 +273,29 @@ const Dashboard: React.FC = () => {
 
       {/* Cards Originais - DESKTOP */}
       <div className="financial-cards">
-        <FinancialCard
+        <UnifiedFinancialCard
           title="Saldo Atual"
-          value={formatValue("R$ 1.250,37")}
+          value={formatValue(
+            `R$ ${currentBalance.toFixed(2).replace(".", ",")}`
+          )}
           icon={dinheiroSaldo}
           type="neutral"
           showToggle={true}
           isBalanceVisible={isBalanceVisible}
           onToggleVisibility={toggleBalanceVisibility}
         />
-        <FinancialCard
-          title="Receita do mês"
-          value={formatValue("R$ 2.850,00")}
+        <UnifiedFinancialCard
+          title="Receita Atual"
+          value={formatValue(`R$ ${totalIncome.toFixed(2).replace(".", ",")}`)}
           icon={sacoDeDinheiro}
           type="positive"
           showToggle={true}
           isBalanceVisible={isBalanceVisible}
           onToggleVisibility={toggleBalanceVisibility}
         />
-        <FinancialCard
-          title="Despesas do mês"
-          value={formatValue("R$ 1.599,63")}
+        <UnifiedFinancialCard
+          title="DESPESA ATUAL"
+          value={formatValue(`R$ ${totalExpense.toFixed(2).replace(".", ",")}`)}
           icon={setaParaBaixo}
           type="negative"
           showToggle={true}
@@ -290,7 +336,7 @@ const Dashboard: React.FC = () => {
           <TransactionTable
             title="Últimas Transações"
             columns={transactionColumns}
-            data={transactions}
+            data={allTransactions}
             className="transactions-card"
             showSummary={true}
             summaryCountLabel="Transações"
@@ -301,7 +347,7 @@ const Dashboard: React.FC = () => {
           <ExpensesPieChart
             title="Despesas por categoria"
             totalLabel="TOTAL DESPESAS"
-            totalValue="R$ 6.749,63"
+            totalValue={`R$ ${totalExpense.toFixed(2).replace(".", ",")}`}
             categories={categoryData}
             className="expenses-chart-card"
           />
@@ -363,7 +409,7 @@ const Dashboard: React.FC = () => {
           <TransactionTable
             title="Últimas Transações"
             columns={transactionColumns}
-            data={transactions}
+            data={allTransactions}
             className="transactions-card"
             showSummary={true}
             summaryCountLabel="Transações"

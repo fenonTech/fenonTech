@@ -1,0 +1,441 @@
+/* ===== UNIFIED FINANCIAL CARD COMPONENT ===== */
+/* Baseado no estilo das páginas de Receitas e Despesas */
+
+.unified-financial-card {
+  background: #121212;
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.unified-financial-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-color);
+}
+
+.unified-financial-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent-color);
+}
+
+.unified-financial-card.positive {
+  --accent-color: #28a745;
+}
+
+.unified-financial-card.negative {
+  --accent-color: #dc3545;
+}
+
+.unified-financial-card.neutral {
+  --accent-color: #ffd700;
+}
+
+.unified-financial-card .card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.unified-financial-card .card-icon img {
+  width: 60px;
+  filter: brightness(0) saturate(100%) invert(82%) sepia(69%) saturate(2476%)
+    hue-rotate(5deg) brightness(104%) contrast(101%);
+}
+
+.unified-financial-card .card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Por padrão, esconder ícone dentro do título (só no mobile será visível) */
+.unified-financial-card .card-title .card-icon {
+  display: none;
+}
+
+.unified-financial-card .card-title {
+  color: #ccc;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: "Poppins", sans-serif;
+}
+
+.unified-financial-card .card-value {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  word-break: break-all;
+  font-family: "Poppins", sans-serif;
+}
+
+.unified-financial-card.positive .card-value {
+  color: #28a745;
+}
+
+.unified-financial-card.negative .card-value {
+  color: #dc3545;
+}
+
+.unified-financial-card.neutral .card-value {
+  color: #ffd700;
+}
+
+/* ===== ESTILOS PARA O TOGGLE DE VISIBILIDADE DE SALDO ===== */
+/* Baseado no estilo que você gostou das páginas de Receitas/Despesas */
+
+.unified-financial-card .card-value-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+/* DESKTOP - Estilo principal do botão (baseado nas páginas de Receitas/Despesas) */
+.unified-financial-card .balance-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 0.375rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.unified-financial-card .balance-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.unified-financial-card .eye-icon {
+  transition: all 0.3s ease;
+  color: #999;
+}
+
+.unified-financial-card .balance-toggle-btn:hover .eye-icon {
+  color: #ffd700;
+}
+
+/* Card Value Animation */
+.unified-financial-card .card-value {
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.unified-financial-card .card-value.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.unified-financial-card .card-value.hidden {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+/* Desktop - Posicionamento padrão do toggle */
+@media (min-width: 769px) {
+  .unified-financial-card .card-value-container {
+    justify-content: space-between;
+  }
+
+  .unified-financial-card .balance-toggle-btn {
+    margin-left: auto;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .unified-financial-card {
+    padding: 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .unified-financial-card .card-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .unified-financial-card .card-icon img {
+    width: 54px;
+  }
+
+  .unified-financial-card .card-value {
+    font-size: 1.375rem;
+  }
+}
+
+/* Tablet pequeno */
+@media (max-width: 768px) and (min-width: 601px) {
+  .unified-financial-card {
+    padding: 1rem;
+    gap: 1rem;
+    border-radius: 14px;
+  }
+
+  .unified-financial-card .card-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .unified-financial-card .card-icon img {
+    width: 50px;
+  }
+
+  .unified-financial-card .card-title {
+    font-size: 0.8rem;
+  }
+
+  .unified-financial-card .card-value {
+    font-size: 1.3rem;
+  }
+
+  /* Esconder ícone dentro do título no tablet */
+  .unified-financial-card .card-title .card-icon {
+    display: none;
+  }
+}
+
+/* Mobile - Layout com ícone na mesma linha do título */
+@media (max-width: 600px) {
+  .unified-financial-card {
+    padding: 1rem;
+    border-radius: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 100px;
+    text-align: left;
+    position: relative;
+  }
+
+  .unified-financial-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .unified-financial-card .card-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .unified-financial-card .card-icon img {
+    width: 16px;
+    height: auto;
+  }
+
+  .unified-financial-card .card-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  /* Primeira linha: ícone + título juntos */
+  .unified-financial-card .card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+    width: 100%;
+  }
+
+  /* Esconder ícone principal no mobile */
+  .unified-financial-card > .card-icon {
+    display: none;
+  }
+
+  /* Mostrar ícone dentro do título no mobile */
+  .unified-financial-card .card-title .card-icon {
+    display: flex;
+    margin: 0;
+  }
+
+  .unified-financial-card .card-title {
+    font-size: 0.65rem;
+    margin-bottom: 0.25rem;
+    text-align: left;
+  }
+
+  .unified-financial-card .card-value {
+    font-size: 1.1rem;
+    text-align: left;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+
+  /* Mobile specific styles for toggle */
+  .unified-financial-card .balance-toggle-btn {
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    opacity: 1;
+  }
+
+  .unified-financial-card .balance-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+  }
+
+  .unified-financial-card .eye-icon {
+    color: #666;
+    width: 18px;
+    height: 18px;
+  }
+
+  .unified-financial-card .balance-toggle-btn:hover .eye-icon {
+    color: #333;
+  }
+}
+
+/* Mobile muito pequeno */
+@media (max-width: 480px) {
+  .unified-financial-card {
+    padding: 0.75rem;
+    min-height: 85px;
+    border-radius: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .unified-financial-card .card-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  .unified-financial-card .card-icon img {
+    width: 12px;
+    height: auto;
+  }
+
+  .unified-financial-card .card-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .unified-financial-card .card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 0.2rem;
+    width: 100%;
+    font-size: 0.6rem;
+    text-align: left;
+  }
+
+  /* Esconder ícone principal no mobile muito pequeno */
+  .unified-financial-card > .card-icon {
+    display: none;
+  }
+
+  /* Mostrar ícone dentro do título no mobile muito pequeno */
+  .unified-financial-card .card-title .card-icon {
+    display: flex;
+    margin: 0;
+  }
+
+  .unified-financial-card .card-value {
+    font-size: 1rem;
+    text-align: left;
+    word-break: break-word;
+    width: 100%;
+  }
+}
+
+/* Botão de Adicionar */
+.unified-financial-card .add-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  border: none;
+  border-radius: 8px;
+  color: #121212;
+  padding: 0.5rem 0.75rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+}
+
+.unified-financial-card .add-button:hover {
+  background: linear-gradient(135deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.unified-financial-card .add-button:active {
+  transform: translateY(0);
+}
+
+.unified-financial-card .add-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.unified-financial-card .add-text {
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Responsividade do botão adicionar */
+@media (max-width: 768px) {
+  .unified-financial-card .add-button {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .unified-financial-card .add-text {
+    font-size: 0.7rem;
+  }
+
+  .unified-financial-card .add-icon {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .unified-financial-card .add-button {
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .unified-financial-card .add-text {
+    display: none; /* Mostrar apenas ícone no mobile muito pequeno */
+  }
+}
