@@ -21,7 +21,7 @@ const Dashboard: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
 
   // Acessar dados do contexto
-  const { incomes, expenses, payables, budgets } = useTransaction();
+  const { incomes, expenses, payables, receivables, budgets } = useTransaction();
 
   // Função para filtrar dados por mês/ano
   const filterByMonthYear = (
@@ -41,7 +41,59 @@ const Dashboard: React.FC = () => {
     });
   };
 
-  // Calcular totais dinâmicos usando useMemo
+  // Calcular totais considerando apenas valores até a data atual
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // Filtrar receitas até hoje (incomes)
+  const pastIncomes = useMemo(() => {
+    return incomes.filter((income) => {
+      const [year, month, day] = income.date.split("-").map(Number);
+      const incomeDate = new Date(year, month - 1, day);
+      return incomeDate <= today;
+    });
+  }, [incomes]);
+
+  // Filtrar despesas até hoje (expenses)
+  const pastExpenses = useMemo(() => {
+    return expenses.filter((expense) => {
+      const [year, month, day] = expense.date.split("-").map(Number);
+      const expenseDate = new Date(year, month - 1, day);
+      return expenseDate <= today;
+    });
+  }, [expenses]);
+
+  // Total de receitas até hoje
+  const totalPastIncome = useMemo(
+    () => pastIncomes.reduce((sum, income) => sum + income.value, 0),
+    [pastIncomes]
+  );
+
+  // Total de despesas até hoje
+  const totalPastExpense = useMemo(
+    () => pastExpenses.reduce((sum, expense) => sum + expense.value, 0),
+    [pastExpenses]
+  );
+
+  // Saldo atual: receitas até hoje - despesas até hoje
+  const currentBalance = useMemo(
+    () => totalPastIncome - totalPastExpense,
+    [totalPastIncome, totalPastExpense]
+  );
+
+  // Valores a receber: apenas receivables (contas a receber futuras)
+  const totalReceivables = useMemo(
+    () => receivables.reduce((sum, receivable) => sum + receivable.value, 0),
+    [receivables]
+  );
+
+  // Contas a pagar: apenas payables (contas a pagar futuras)
+  const totalPayables = useMemo(
+    () => payables.reduce((sum, payable) => sum + payable.value, 0),
+    [payables]
+  );
+
+  // Filtros para o mês/ano selecionado (para gráficos e tabelas)
   const filteredIncomes = useMemo(
     () => filterByMonthYear(incomes, selectedMonth, selectedYear),
     [incomes, selectedMonth, selectedYear]
@@ -52,19 +104,10 @@ const Dashboard: React.FC = () => {
     [expenses, selectedMonth, selectedYear]
   );
 
-  const totalIncome = useMemo(
-    () => filteredIncomes.reduce((sum, income) => sum + income.value, 0),
-    [filteredIncomes]
-  );
-
-  const totalExpense = useMemo(
+  // Total de despesas do mês selecionado (para o gráfico de pizza)
+  const totalMonthExpenses = useMemo(
     () => filteredExpenses.reduce((sum, expense) => sum + expense.value, 0),
     [filteredExpenses]
-  );
-
-  const currentBalance = useMemo(
-    () => totalIncome - totalExpense,
-    [totalIncome, totalExpense]
   );
 
   // Combinar transações de receitas e despesas para a tabela
@@ -318,7 +361,7 @@ const Dashboard: React.FC = () => {
       key: "receita",
       label: "A Receber",
       title: "Valores a Receber",
-      value: formatValue(`R$ ${totalIncome.toFixed(2).replace(".", ",")}`),
+      value: formatValue(`R$ ${totalReceivables.toFixed(2).replace(".", ",")}`),
       icon: sacoDeDinheiro,
       type: "positive" as const,
     },
@@ -326,7 +369,7 @@ const Dashboard: React.FC = () => {
       key: "despesa",
       label: "A Pagar",
       title: "Contas a Pagar",
-      value: formatValue(`R$ ${totalExpense.toFixed(2).replace(".", ",")}`),
+      value: formatValue(`R$ ${totalPayables.toFixed(2).replace(".", ",")}`),
       icon: setaParaBaixo,
       type: "negative" as const,
     },
@@ -360,7 +403,7 @@ const Dashboard: React.FC = () => {
         />
         <UnifiedFinancialCard
           title="Valores a Receber"
-          value={formatValue(`R$ ${totalIncome.toFixed(2).replace(".", ",")}`)}
+          value={formatValue(`R$ ${totalReceivables.toFixed(2).replace(".", ",")}`)}
           icon={sacoDeDinheiro}
           type="positive"
           showToggle={true}
@@ -369,7 +412,7 @@ const Dashboard: React.FC = () => {
         />
         <UnifiedFinancialCard
           title="Contas a Pagar"
-          value={formatValue(`R$ ${totalExpense.toFixed(2).replace(".", ",")}`)}
+          value={formatValue(`R$ ${totalPayables.toFixed(2).replace(".", ",")}`)}
           icon={setaParaBaixo}
           type="negative"
           showToggle={true}
@@ -421,7 +464,7 @@ const Dashboard: React.FC = () => {
           <ExpensesPieChart
             title="Despesas por categoria"
             totalLabel="TOTAL DESPESAS"
-            totalValue={`R$ ${totalExpense.toFixed(2).replace(".", ",")}`}
+            totalValue={`R$ ${totalMonthExpenses.toFixed(2).replace(".", ",")}`}
             categories={categoryData}
             className="expenses-chart-card"
           />
