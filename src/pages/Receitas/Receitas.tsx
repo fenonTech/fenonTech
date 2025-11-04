@@ -92,39 +92,73 @@ const Receitas: React.FC = () => {
         : incomeData.value;
     const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
 
-    const incomeDate = new Date(incomeData.date);
+    // Corrigir problema da data - usar a data local sem conversão de timezone
+    const [year, month, day] = incomeData.date.split("-").map(Number);
+    const incomeDate = new Date(year, month - 1, day);
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Zerar horas para comparação correta
     const isContaAReceber = incomeDate > today;
 
     if (isEditMode && editingIncome) {
-      // Modo edição - atualizar receita existente
+      // Modo edição - verificar se mudou de tipo (income <-> receivable)
+      // Detectar tipo original pela data do item
+      const originalDate = editingIncome.date || editingIncome.dueDate;
+      const [origYear, origMonth, origDay] = originalDate
+        .split("-")
+        .map(Number);
+      const originalItemDate = new Date(origYear, origMonth - 1, origDay);
+      const todayForComparison = new Date();
+      todayForComparison.setHours(0, 0, 0, 0);
+      const wasReceivable = originalItemDate > todayForComparison;
+      const changedType = wasReceivable !== isContaAReceber;
+
       const baseData = {
+        id: editingIncome.id, // Usar o ID existente
         date: incomeData.date,
         description: incomeData.category,
         category: incomeData.category,
         value: amount,
         formattedValue,
-        createdAt: new Date(),
+        createdAt: editingIncome.createdAt || new Date(),
         updatedAt: new Date(),
       };
 
-      if (isContaAReceber) {
-        // Atualizar conta a receber
-        const receivable = {
-          ...baseData,
-          id: `receivable-${Date.now()}`,
-          dueDate: incomeData.date,
-          status: "pending" as const,
-          type: "receivable" as const,
-        };
-        updateReceivable(receivable);
+      if (changedType) {
+        // Mudou de tipo: deletar do antigo e adicionar no novo
+        if (wasReceivable) {
+          deleteReceivable(editingIncome.id);
+          const income = {
+            ...baseData,
+            type: "income" as const,
+          };
+          addIncome(income);
+        } else {
+          deleteIncome(editingIncome.id);
+          const receivable = {
+            ...baseData,
+            dueDate: incomeData.date,
+            status: "pending" as const,
+            type: "receivable" as const,
+          };
+          addReceivable(receivable);
+        }
       } else {
-        const income = {
-          ...baseData,
-          id: `income-${Date.now()}`,
-          type: "income" as const,
-        };
-        updateIncome(income);
+        // Mantém o mesmo tipo: apenas atualizar
+        if (isContaAReceber) {
+          const receivable = {
+            ...baseData,
+            dueDate: incomeData.date,
+            status: editingIncome.status || ("pending" as const),
+            type: "receivable" as const,
+          };
+          updateReceivable(receivable);
+        } else {
+          const income = {
+            ...baseData,
+            type: "income" as const,
+          };
+          updateIncome(income);
+        }
       }
     } else {
       // Modo criação - adicionar nova receita
@@ -160,37 +194,49 @@ const Receitas: React.FC = () => {
 
   // Converter dados do contexto para formato das tabelas
   const formatIncomeData = (incomes: any[]) => {
-    return incomes.map((income) => ({
-      id: income.id,
-      date: new Date(income.date).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-      }),
-      category: income.category,
-      type: income.description || "Variável",
-      value: income.formattedValue,
-      // Manter dados originais para edição
-      originalDate: income.date,
-      originalValue: income.value,
-      originalData: income,
-    }));
+    return incomes.map((income) => {
+      // Parse correto da data para evitar problema de timezone
+      const [year, month, day] = income.date.split("-").map(Number);
+      const incomeDate = new Date(year, month - 1, day);
+
+      return {
+        id: income.id,
+        date: incomeDate.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        category: income.category,
+        type: income.description || "Variável",
+        value: income.formattedValue,
+        // Manter dados originais para edição
+        originalDate: income.date,
+        originalValue: income.value,
+        originalData: income,
+      };
+    });
   };
 
   const formatReceivableData = (receivables: any[]) => {
-    return receivables.map((receivable) => ({
-      id: receivable.id,
-      date: new Date(receivable.dueDate).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-      }),
-      category: receivable.category,
-      type: receivable.status === "pending" ? "Pendente" : "Pago",
-      value: receivable.formattedValue,
-      // Manter dados originais para edição
-      originalDate: receivable.dueDate,
-      originalValue: receivable.value,
-      originalData: receivable,
-    }));
+    return receivables.map((receivable) => {
+      // Parse correto da data para evitar problema de timezone
+      const [year, month, day] = receivable.dueDate.split("-").map(Number);
+      const dueDate = new Date(year, month - 1, day);
+
+      return {
+        id: receivable.id,
+        date: dueDate.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        category: receivable.category,
+        type: receivable.status === "pending" ? "Pendente" : "Pago",
+        value: receivable.formattedValue,
+        // Manter dados originais para edição
+        originalDate: receivable.dueDate,
+        originalValue: receivable.value,
+        originalData: receivable,
+      };
+    });
   };
 
   // Calcular totais
@@ -399,13 +445,22 @@ const Receitas: React.FC = () => {
             <div className="bar-chart">
               {monthlyData.map((item, index) => (
                 <div key={index} className="bar-item">
-                  <div
-                    className="bar"
-                    style={{
-                      height: `${(item.value / maxValue) * 100}%`,
-                      opacity: item.value === 0 ? 0.3 : 1,
-                    }}
-                  ></div>
+                  <div className="bar-wrapper">
+                    <div
+                      className="bar"
+                      style={{
+                        height: `${(item.value / maxValue) * 100}%`,
+                        opacity: item.value === 0 ? 0.3 : 1,
+                      }}
+                      title={`${item.month}: R$ ${item.value
+                        .toFixed(2)
+                        .replace(".", ",")}`}
+                    >
+                      <span className="bar-tooltip">
+                        R$ {item.value.toFixed(2).replace(".", ",")}
+                      </span>
+                    </div>
+                  </div>
                   <span className="bar-label">{item.month}</span>
                 </div>
               ))}

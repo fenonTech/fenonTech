@@ -21,7 +21,7 @@ const Dashboard: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
 
   // Acessar dados do contexto
-  const { incomes, expenses, payables } = useTransaction();
+  const { incomes, expenses, payables, budgets } = useTransaction();
 
   // Função para filtrar dados por mês/ano
   const filterByMonthYear = (
@@ -30,7 +30,10 @@ const Dashboard: React.FC = () => {
     selectedYear: number
   ) => {
     return data.filter((item) => {
-      const itemDate = new Date(item.date || item.dueDate);
+      // Parse correto da data para evitar problema de timezone
+      const dateString = item.date || item.dueDate;
+      const [year, month, day] = dateString.split("-").map(Number);
+      const itemDate = new Date(year, month - 1, day);
       return (
         itemDate.getMonth() === selectedMonth &&
         itemDate.getFullYear() === selectedYear
@@ -66,29 +69,41 @@ const Dashboard: React.FC = () => {
 
   // Combinar transações de receitas e despesas para a tabela
   const allTransactions = useMemo(() => {
-    const incomeTransactions = filteredIncomes.map((income) => ({
-      id: income.id,
-      date: new Date(income.date).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-      }),
-      description: income.description || income.category,
-      category: income.category,
-      value: income.formattedValue,
-      type: "income" as const,
-    }));
+    const incomeTransactions = filteredIncomes.map((income) => {
+      // Parse correto da data para evitar problema de timezone
+      const [year, month, day] = income.date.split("-").map(Number);
+      const incomeDate = new Date(year, month - 1, day);
 
-    const expenseTransactions = filteredExpenses.map((expense) => ({
-      id: expense.id,
-      date: new Date(expense.date).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-      }),
-      description: expense.description || expense.category,
-      category: expense.category,
-      value: expense.formattedValue,
-      type: "expense" as const,
-    }));
+      return {
+        id: income.id,
+        date: incomeDate.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        description: income.description || income.category,
+        category: income.category,
+        value: income.formattedValue,
+        type: "income" as const,
+      };
+    });
+
+    const expenseTransactions = filteredExpenses.map((expense) => {
+      // Parse correto da data para evitar problema de timezone
+      const [year, month, day] = expense.date.split("-").map(Number);
+      const expenseDate = new Date(year, month - 1, day);
+
+      return {
+        id: expense.id,
+        date: expenseDate.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        description: expense.description || expense.category,
+        category: expense.category,
+        value: expense.formattedValue,
+        type: "expense" as const,
+      };
+    });
 
     // Combinar e ordenar por data (mais recente primeiro)
     return [...incomeTransactions, ...expenseTransactions]
@@ -113,15 +128,21 @@ const Dashboard: React.FC = () => {
   const bills = useMemo(
     () =>
       filteredPayables
-        .map((payable) => ({
-          date: new Date(payable.dueDate).toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-          }),
-          description: payable.description || payable.category,
-          category: payable.category,
-          value: payable.formattedValue,
-        }))
+        .map((payable) => {
+          // Parse correto da data para evitar problema de timezone
+          const [year, month, day] = payable.dueDate.split("-").map(Number);
+          const dueDate = new Date(year, month - 1, day);
+
+          return {
+            date: dueDate.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+            }),
+            description: payable.description || payable.category,
+            category: payable.category,
+            value: payable.formattedValue,
+          };
+        })
         .slice(0, 8), // Limitar a 8 contas para não sobrecarregar a tabela
     [filteredPayables]
   );
@@ -174,6 +195,59 @@ const Dashboard: React.FC = () => {
       })
       .filter((cat) => cat.percentage > 0 || filteredExpenses.length === 0); // Mostrar categorias com dados ou todas se não houver dados
   }, [filteredExpenses]);
+
+  // Dados para Visão por categoria com comparação entre gasto e previsto
+  const categoryComparisonData = useMemo(() => {
+    // Categorias pré-cadastradas com cores fixas
+    const predefinedCategories = [
+      { name: "Alimentação", color: "#FF6B6B" },
+      { name: "Transporte", color: "#4ECDC4" },
+      { name: "Moradia", color: "#45B7D1" },
+      { name: "Lazer", color: "#96CEB4" },
+      { name: "Saúde", color: "#FFEAA7" },
+      { name: "Educação", color: "#DDA0DD" },
+      { name: "Outros", color: "#98D8C8" },
+    ];
+
+    // Agrupar despesas por categoria
+    const categoryTotals: { [key: string]: number } = {};
+    filteredExpenses.forEach((expense) => {
+      const category = expense.category || "Outros";
+      categoryTotals[category] =
+        (categoryTotals[category] || 0) + expense.value;
+    });
+
+    // Agrupar budgets por categoria para o mês/ano selecionado
+    const categoryBudgets: { [key: string]: number } = {};
+    budgets
+      .filter(
+        (budget) =>
+          budget.month === selectedMonth &&
+          budget.year === selectedYear &&
+          budget.type === "expense"
+      )
+      .forEach((budget) => {
+        categoryBudgets[budget.category] = budget.plannedAmount;
+      });
+
+    // Mapear categorias com dados reais e previstos
+    return predefinedCategories
+      .map((predefCategory) => {
+        const spent = categoryTotals[predefCategory.name] || 0;
+        const planned = categoryBudgets[predefCategory.name] || 0;
+        const percentage =
+          planned > 0 ? Math.min((spent / planned) * 100, 100) : 0;
+
+        return {
+          name: predefCategory.name,
+          spent: spent,
+          planned: planned,
+          percentage: percentage,
+          color: predefCategory.color,
+        };
+      })
+      .filter((cat) => cat.planned > 0 || cat.spent > 0); // Mostrar apenas categorias com dados
+  }, [filteredExpenses, budgets, selectedMonth, selectedYear]);
 
   const transactionColumns: TableColumn[] = [
     {
@@ -242,16 +316,16 @@ const Dashboard: React.FC = () => {
     },
     {
       key: "receita",
-      label: "Receita",
-      title: "Receita Atual",
+      label: "A Receber",
+      title: "Valores a Receber",
       value: formatValue(`R$ ${totalIncome.toFixed(2).replace(".", ",")}`),
       icon: sacoDeDinheiro,
       type: "positive" as const,
     },
     {
       key: "despesa",
-      label: "Despesa",
-      title: "DESPESA ATUAL",
+      label: "A Pagar",
+      title: "Contas a Pagar",
       value: formatValue(`R$ ${totalExpense.toFixed(2).replace(".", ",")}`),
       icon: setaParaBaixo,
       type: "negative" as const,
@@ -285,7 +359,7 @@ const Dashboard: React.FC = () => {
           onToggleVisibility={toggleBalanceVisibility}
         />
         <UnifiedFinancialCard
-          title="Receita Atual"
+          title="Valores a Receber"
           value={formatValue(`R$ ${totalIncome.toFixed(2).replace(".", ",")}`)}
           icon={sacoDeDinheiro}
           type="positive"
@@ -294,7 +368,7 @@ const Dashboard: React.FC = () => {
           onToggleVisibility={toggleBalanceVisibility}
         />
         <UnifiedFinancialCard
-          title="DESPESA ATUAL"
+          title="Contas a Pagar"
           value={formatValue(`R$ ${totalExpense.toFixed(2).replace(".", ",")}`)}
           icon={setaParaBaixo}
           type="negative"
@@ -373,25 +447,38 @@ const Dashboard: React.FC = () => {
           <div className="dashboard-card">
             <h3 className="card-header">Visão por categoria</h3>
             <div className="category-bars">
-              {categoryData.map((item, index) => (
-                <div key={index} className="category-bar-item">
-                  <div className="category-info">
-                    <span className="category-name">{item.name}</span>
-                    <span className="category-amount">
-                      (R$ {(item.percentage * 67.49).toFixed(2)} de R$ 100,00)
-                    </span>
+              {categoryComparisonData.length > 0 ? (
+                categoryComparisonData.map((item, index) => (
+                  <div key={index} className="category-bar-item">
+                    <div className="category-info">
+                      <span className="category-name">{item.name}</span>
+                      <span className="category-amount">
+                        (R$ {item.spent.toFixed(2).replace(".", ",")} de R${" "}
+                        {item.planned.toFixed(2).replace(".", ",")})
+                      </span>
+                    </div>
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${item.percentage}%`,
+                          backgroundColor: item.color,
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width: `${item.percentage}%`,
-                        backgroundColor: item.color,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#999",
+                    padding: "20px",
+                  }}
+                >
+                  Nenhum orçamento planejado para este mês
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -430,25 +517,38 @@ const Dashboard: React.FC = () => {
           <div className="dashboard-card">
             <h3 className="card-header">Visão por categoria</h3>
             <div className="category-bars">
-              {categoryData.map((item, index) => (
-                <div key={index} className="category-bar-item">
-                  <div className="category-info">
-                    <span className="category-name">{item.name}</span>
-                    <span className="category-amount">
-                      (R$ {(item.percentage * 67.49).toFixed(2)} de R$ 100,00)
-                    </span>
+              {categoryComparisonData.length > 0 ? (
+                categoryComparisonData.map((item, index) => (
+                  <div key={index} className="category-bar-item">
+                    <div className="category-info">
+                      <span className="category-name">{item.name}</span>
+                      <span className="category-amount">
+                        (R$ {item.spent.toFixed(2).replace(".", ",")} de R${" "}
+                        {item.planned.toFixed(2).replace(".", ",")})
+                      </span>
+                    </div>
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${item.percentage}%`,
+                          backgroundColor: item.color,
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width: `${item.percentage}%`,
-                        backgroundColor: item.color,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#999",
+                    padding: "20px",
+                  }}
+                >
+                  Nenhum orçamento planejado para este mês
+                </p>
+              )}
             </div>
           </div>
         </div>

@@ -1,0 +1,429 @@
+.mensal-tab {
+  width: 100%;
+}
+
+.mensal-header {
+  margin-bottom: 1.5rem;
+}
+
+.mensal-header h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  color: #ffd700;
+  font-weight: 600;
+}
+
+.filters-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group label {
+  font-size: 0.8125rem;
+  color: #999;
+  font-weight: 500;
+}
+
+.type-select,
+.month-select,
+.year-select {
+  padding: 6px 12px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #fff;
+  background: #0d0d0d;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Poppins", sans-serif;
+}
+
+.type-select:hover,
+.month-select:hover,
+.year-select:hover {
+  border-color: #ffd700;
+}
+
+.type-select:focus,
+.month-select:focus,
+.year-select:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
+}
+
+/* Summary Cards - Minimalista */
+.summary-cards {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  padding: 16px;
+  background: #1a1a1a;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.summary-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.summary-card:not(:last-child) {
+  border-right: 1px solid #333;
+  padding-right: 12px;
+}
+
+.card-icon {
+  font-size: 1.25rem;
+  margin-bottom: 4px;
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-label {
+  font-size: 0.6875rem;
+  color: #999;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #ffd700;
+}
+
+.summary-card.actual .card-value {
+  color: #9c27b0;
+}
+
+.summary-card.difference.positive .card-value {
+  color: #4caf50;
+}
+
+.summary-card.difference.negative .card-value {
+  color: #f44336;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.125rem;
+  color: #999;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 0 0 8px 0;
+  font-size: 0.9375rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.empty-hint {
+  margin-top: 16px !important;
+  padding: 12px 16px;
+  background: rgba(255, 215, 0, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  color: #ffd700 !important;
+  font-size: 0.875rem !important;
+}
+
+.empty-state p {
+  margin: 0 0 8px 0;
+  font-size: 0.9375rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.empty-hint {
+  margin-top: 16px !important;
+  padding: 12px 16px;
+  background: rgba(255, 215, 0, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  color: #ffd700 !important;
+  font-size: 0.875rem !important;
+}
+
+/* Comparison Table - Compacta */
+.comparison-table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.comparison-table thead {
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+}
+
+.comparison-table th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.comparison-table tbody tr {
+  border-bottom: 1px solid #222;
+  transition: background 0.2s ease;
+}
+
+.comparison-table tbody tr:hover {
+  background: #1a1a1a;
+}
+
+.comparison-table td {
+  padding: 12px;
+  color: #ccc;
+}
+
+.category-cell {
+  font-weight: 600;
+  color: #fff;
+}
+
+.planned-cell {
+  color: #ffd700;
+}
+
+.actual-cell {
+  color: #9c27b0;
+}
+
+.difference-cell {
+  font-weight: 600;
+}
+
+.difference-cell.positive {
+  color: #4caf50;
+}
+
+.difference-cell.negative {
+  color: #f44336;
+}
+
+/* Editable Value */
+.editable-value {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.editable-value:hover {
+  background: rgba(255, 215, 0, 0.1);
+}
+
+.edit-icon {
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.editable-value:hover .edit-icon {
+  opacity: 1;
+}
+
+.edit-input-container {
+  display: inline-block;
+}
+
+.edit-input {
+  padding: 4px 8px;
+  border: 1px solid #ffd700;
+  border-radius: 4px;
+  background: #0d0d0d;
+  color: #ffd700;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  width: 100px;
+}
+
+.edit-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+}
+
+/* Percent Cell */
+.percent-cell {
+  min-width: 120px;
+}
+
+.percent-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.percent-bar-bg {
+  flex: 1;
+  height: 6px;
+  background: #222;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.percent-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.percent-bar.success {
+  background: #4caf50;
+}
+
+.percent-bar.warning {
+  background: #ff9800;
+}
+
+.percent-bar.danger {
+  background: #f44336;
+}
+
+.percent-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 35px;
+  text-align: right;
+}
+
+.percent-text.success {
+  color: #4caf50;
+}
+
+.percent-text.warning {
+  color: #ff9800;
+}
+
+.percent-text.danger {
+  color: #f44336;
+}
+
+/* Total Row */
+.total-row {
+  background: #1a1a1a !important;
+  border-top: 2px solid #333 !important;
+}
+
+.total-row td {
+  padding: 12px !important;
+  font-weight: 700 !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .mensal-header h2 {
+    font-size: 1.125rem;
+  }
+
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .type-select,
+  .month-select,
+  .year-select {
+    flex: 1;
+    min-width: auto;
+  }
+
+  .summary-cards {
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .summary-card:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid #333;
+    padding-right: 0;
+    padding-bottom: 12px;
+  }
+
+  .card-value {
+    font-size: 1rem;
+  }
+
+  .comparison-table {
+    font-size: 0.75rem;
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: 8px 6px;
+  }
+
+  .percent-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .percent-bar-bg {
+    width: 100%;
+  }
+
+  .percent-text {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .comparison-table th:nth-child(4),
+  .comparison-table td:nth-child(4) {
+    display: none;
+  }
+}

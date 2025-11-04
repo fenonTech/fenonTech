@@ -1,310 +1,48 @@
-/* Página Planejamento */
 .planejamento {
-  min-height: 100vh;
-  background: #0d0d0d;
-  color: #e0e0e0;
-  font-family: "Poppins", sans-serif;
-  padding: 1.5rem;
+  padding: 2rem;
+  margin: 1%;
+  border-radius: 16px;
+  background: #0b0b0b;
+  min-height: calc(100vh - 100px);
+  color: white;
 }
 
-/* Header */
 .planejamento-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
   border-bottom: 2px solid #333;
 }
 
 .planejamento-title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: #ffd700;
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 }
 
-/* Cards Financeiros */
-.planejamento-financial-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+.planejamento-subtitle {
+  font-size: 1.125rem;
+  color: #ccc;
+  margin: 0;
+  font-weight: 400;
 }
 
-/* Sistema de Tabs */
-.planejamento-tabs {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  border-bottom: 2px solid #333;
-}
-
-.tab-button {
-  background: transparent;
-  border: none;
-  color: #999;
-  padding: 1rem 1.5rem;
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  border-bottom: 3px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.tab-button:hover {
-  color: #ffd700;
-}
-
-.tab-button.active {
-  color: #ffd700;
-  border-bottom-color: #ffd700;
-  background: rgba(255, 215, 0, 0.1);
-}
-
-/* Tab Content */
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-/* Grid de Planejamento */
-.planejamento-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.visao-geral-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
-}
-
-/* Cards */
-.planejamento-card {
-  background: #121212;
-  border-radius: 16px;
-  padding: 1.5rem;
-  border: 1px solid #333;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-}
-
-.planejamento-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(135, 131, 131, 0.3);
-  border-color: #ffd900;
-}
-
-.planejamento-card .card-header {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 1.5rem 0;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid #333;
-  color: #ffd700;
-  font-family: "Poppins", sans-serif;
-}
-
-/* Formulários */
-.planejamento-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-group label {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #e0e0e0;
-  font-family: "Poppins", sans-serif;
-}
-
-.form-input,
-.form-select {
-  background: #1a1a1a;
-  border: 2px solid #333;
-  border-radius: 8px;
-  color: #e0e0e0;
-  padding: 0.75rem 1rem;
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-}
-
-.form-input:focus,
-.form-select:focus {
-  outline: none;
-  border-color: #ffd700;
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
-  background: #252525;
-}
-
-.form-input::placeholder {
-  color: #666;
-}
-
-.form-button {
-  background: linear-gradient(135deg, #ffd700, #ffed4e);
-  border: none;
-  border-radius: 8px;
-  color: #121212;
-  padding: 0.75rem 1.5rem;
-  font-family: "Poppins", sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 0.5rem;
-}
-
-.form-button:hover {
-  background: linear-gradient(135deg, #ffed4e, #ffd700);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-}
-
-.form-button:active {
-  transform: translateY(0);
-}
-
-/* Estilos das categorias */
-.category.fixa {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4caf50;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.category.variavel {
-  background: rgba(255, 193, 7, 0.2);
-  color: #ffc107;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.category.expense {
-  background: rgba(244, 67, 54, 0.2);
-  color: #f44336;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-/* Valores */
-.value.income {
-  color: #4caf50;
-  font-weight: 600;
-}
-
-.value.expense {
-  color: #f44336;
-  font-weight: 600;
-}
-
-/* Tabelas */
-.receitas-table,
-.despesas-table {
-  background: #121212;
-  border-radius: 16px;
-  border: 1px solid #333;
-  overflow: hidden;
-}
-
-/* Responsividade */
-@media (max-width: 1200px) {
-  .planejamento-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* Mobile Responsive */
 @media (max-width: 768px) {
   .planejamento {
     padding: 1rem;
   }
 
   .planejamento-header {
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
+    margin-bottom: 1.5rem;
   }
 
   .planejamento-title {
-    font-size: 1.5rem;
-    text-align: center;
+    font-size: 1.75rem;
   }
 
-  .planejamento-financial-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .planejamento-tabs {
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .tab-button {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid #333;
-    border-radius: 0;
-  }
-
-  .tab-button.active {
-    border-bottom-color: #ffd700;
-    background: rgba(255, 215, 0, 0.1);
-  }
-
-  .planejamento-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .planejamento {
-    padding: 0.75rem;
-  }
-
-  .planejamento-title {
-    font-size: 1.25rem;
-  }
-
-  .planejamento-card {
-    padding: 1rem;
-    border-radius: 12px;
-  }
-
-  .planejamento-card .card-header {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-  }
-
-  .form-input,
-  .form-select {
-    padding: 0.625rem 0.875rem;
-    font-size: 0.9rem;
-  }
-
-  .form-button {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.9rem;
+  .planejamento-subtitle {
+    font-size: 1rem;
   }
 }

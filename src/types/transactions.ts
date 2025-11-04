@@ -47,3 +47,24 @@ export type BillFormData = {
   dueDate: string;
   status: "pending" | "paid" | "overdue";
 };
+
+// Budget/Planejamento Types
+export interface Budget {
+  id: string;
+  category: string;
+  plannedAmount: number;
+  month: number; // 0-11 (Janeiro = 0, Dezembro = 11)
+  year: number;
+  type: "expense" | "income";
+  formattedValue: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type BudgetFormData = {
+  category: string;
+  plannedAmount: string;
+  month: number;
+  year: number;
+  type: "expense" | "income";
+};

@@ -58,6 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: "dashboard", label: "Dashboard", icon: "dashboard-svg" },
     { id: "receitas", label: "Receitas", icon: simboloReceita },
     { id: "despesas", label: "Despesas", icon: simboloDespesas },
+    { id: "planejamento", label: "Planejamento", icon: "planejamento-svg" },
   ];
 
   const systemItems = [

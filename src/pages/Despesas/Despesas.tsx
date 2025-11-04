@@ -30,6 +30,7 @@ const Despesas: React.FC = () => {
   const {
     expenses,
     payables,
+    budgets,
     addExpense,
     updateExpense,
     deleteExpense,
@@ -97,39 +98,73 @@ const Despesas: React.FC = () => {
         : expenseData.value;
     const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
 
-    const expenseDate = new Date(expenseData.date);
+    // Corrigir problema da data - usar a data local sem conversão de timezone
+    const [year, month, day] = expenseData.date.split("-").map(Number);
+    const expenseDate = new Date(year, month - 1, day);
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Zerar horas para comparação correta
     const isContaAPagar = expenseDate > today;
 
     if (isEditMode && editingExpense) {
-      // Modo edição - atualizar despesa existente
+      // Modo edição - verificar se mudou de tipo (expense <-> payable)
+      // Detectar tipo original pela data do item
+      const originalDate = editingExpense.date || editingExpense.dueDate;
+      const [origYear, origMonth, origDay] = originalDate
+        .split("-")
+        .map(Number);
+      const originalItemDate = new Date(origYear, origMonth - 1, origDay);
+      const todayForComparison = new Date();
+      todayForComparison.setHours(0, 0, 0, 0);
+      const wasPayable = originalItemDate > todayForComparison;
+      const changedType = wasPayable !== isContaAPagar;
+
       const baseData = {
+        id: editingExpense.id, // Usar o ID existente
         date: expenseData.date,
         description: expenseData.category,
         category: expenseData.category,
         value: amount,
         formattedValue,
-        createdAt: new Date(),
+        createdAt: editingExpense.createdAt || new Date(),
         updatedAt: new Date(),
       };
 
-      if (isContaAPagar) {
-        // Atualizar conta a pagar
-        const payable = {
-          ...baseData,
-          id: `payable-${Date.now()}`,
-          dueDate: expenseData.date,
-          status: "pending" as const,
-          type: "payable" as const,
-        };
-        updatePayable(payable);
+      if (changedType) {
+        // Mudou de tipo: deletar do antigo e adicionar no novo
+        if (wasPayable) {
+          deletePayable(editingExpense.id);
+          const expense = {
+            ...baseData,
+            type: "expense" as const,
+          };
+          addExpense(expense);
+        } else {
+          deleteExpense(editingExpense.id);
+          const payable = {
+            ...baseData,
+            dueDate: expenseData.date,
+            status: "pending" as const,
+            type: "payable" as const,
+          };
+          addPayable(payable);
+        }
       } else {
-        const expense = {
-          ...baseData,
-          id: `expense-${Date.now()}`,
-          type: "expense" as const,
-        };
-        updateExpense(expense);
+        // Mantém o mesmo tipo: apenas atualizar
+        if (isContaAPagar) {
+          const payable = {
+            ...baseData,
+            dueDate: expenseData.date,
+            status: editingExpense.status || ("pending" as const),
+            type: "payable" as const,
+          };
+          updatePayable(payable);
+        } else {
+          const expense = {
+            ...baseData,
+            type: "expense" as const,
+          };
+          updateExpense(expense);
+        }
       }
     } else {
       // Modo criação - adicionar nova despesa
@@ -165,37 +200,49 @@ const Despesas: React.FC = () => {
 
   // Converter dados do contexto para formato das tabelas
   const formatExpenseData = (expenses: any[]) => {
-    return expenses.map((expense) => ({
-      id: expense.id,
-      date: new Date(expense.date).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-      }),
-      category: expense.category,
-      type: expense.description || "Variável",
-      value: expense.formattedValue,
-      // Manter dados originais para edição
-      originalDate: expense.date,
-      originalValue: expense.value,
-      originalData: expense,
-    }));
+    return expenses.map((expense) => {
+      // Parse correto da data para evitar problema de timezone
+      const [year, month, day] = expense.date.split("-").map(Number);
+      const expenseDate = new Date(year, month - 1, day);
+
+      return {
+        id: expense.id,
+        date: expenseDate.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        category: expense.category,
+        type: expense.description || "Variável",
+        value: expense.formattedValue,
+        // Manter dados originais para edição
+        originalDate: expense.date,
+        originalValue: expense.value,
+        originalData: expense,
+      };
+    });
   };
 
   const formatPayableData = (payables: any[]) => {
-    return payables.map((payable) => ({
-      id: payable.id,
-      date: new Date(payable.dueDate).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-      }),
-      category: payable.category,
-      type: payable.status === "pending" ? "Pendente" : "Pago",
-      value: payable.formattedValue,
-      // Manter dados originais para edição
-      originalDate: payable.dueDate,
-      originalValue: payable.value,
-      originalData: payable,
-    }));
+    return payables.map((payable) => {
+      // Parse correto da data para evitar problema de timezone
+      const [year, month, day] = payable.dueDate.split("-").map(Number);
+      const dueDate = new Date(year, month - 1, day);
+
+      return {
+        id: payable.id,
+        date: dueDate.toLocaleDateString("pt-BR", {
+          day: "2-digit",
+          month: "2-digit",
+        }),
+        category: payable.category,
+        type: payable.status === "pending" ? "Pendente" : "Pago",
+        value: payable.formattedValue,
+        // Manter dados originais para edição
+        originalDate: payable.dueDate,
+        originalValue: payable.value,
+        originalData: payable,
+      };
+    });
   };
 
   // Calcular totais
@@ -284,13 +331,13 @@ const Despesas: React.FC = () => {
   // Dados dinâmicos para barras de visão por categoria
   const categoryBarsData = useMemo(() => {
     const predefinedCategories = [
-      { name: "Alimentação", color: "#FF6B6B", budget: 500.0 },
-      { name: "Transporte", color: "#4ECDC4", budget: 300.0 },
-      { name: "Moradia", color: "#45B7D1", budget: 800.0 },
-      { name: "Lazer", color: "#96CEB4", budget: 200.0 },
-      { name: "Saúde", color: "#FFEAA7", budget: 250.0 },
-      { name: "Educação", color: "#DDA0DD", budget: 150.0 },
-      { name: "Outros", color: "#98D8C8", budget: 100.0 },
+      { name: "Alimentação", color: "#FF6B6B" },
+      { name: "Transporte", color: "#4ECDC4" },
+      { name: "Moradia", color: "#45B7D1" },
+      { name: "Lazer", color: "#96CEB4" },
+      { name: "Saúde", color: "#FFEAA7" },
+      { name: "Educação", color: "#DDA0DD" },
+      { name: "Outros", color: "#98D8C8" },
     ];
 
     // Agrupar despesas por categoria
@@ -301,15 +348,28 @@ const Despesas: React.FC = () => {
         (categoryTotals[category] || 0) + expense.value;
     });
 
+    // Agrupar budgets por categoria para o mês/ano selecionado
+    const categoryBudgets: { [key: string]: number } = {};
+    budgets
+      .filter(
+        (budget) =>
+          budget.month === selectedMonth &&
+          budget.year === selectedYear &&
+          budget.type === "expense"
+      )
+      .forEach((budget) => {
+        categoryBudgets[budget.category] = budget.plannedAmount;
+      });
+
     return predefinedCategories
       .map((category) => ({
         name: category.name,
         spent: categoryTotals[category.name] || 0,
-        total: category.budget,
+        total: categoryBudgets[category.name] || 0,
         color: category.color,
       }))
-      .filter((cat) => cat.spent > 0 || expenses.length === 0);
-  }, [expenses]);
+      .filter((cat) => cat.total > 0 || cat.spent > 0); // Mostrar apenas categorias com dados
+  }, [expenses, budgets, selectedMonth, selectedYear]);
 
   // Definir colunas para a tabela de despesas
   const despesasColumns: TableColumn[] = [
@@ -463,7 +523,7 @@ const Despesas: React.FC = () => {
           <ExpensesPieChart
             title="Despesas por categoria"
             totalLabel="TOTAL DESPESAS"
-            totalValue="R$ 1.915,60"
+            totalValue={`R$ ${totalExpenses.toFixed(2).replace(".", ",")}`}
             categories={pieChartData}
             className="despesas-card chart-card"
           />
@@ -509,7 +569,7 @@ const Despesas: React.FC = () => {
           <ExpensesPieChart
             title="Despesas por categoria"
             totalLabel="TOTAL DESPESAS"
-            totalValue="R$ 1.915,60"
+            totalValue={`R$ ${totalExpenses.toFixed(2).replace(".", ",")}`}
             categories={pieChartData}
             className="despesas-card chart-card"
           />
@@ -518,25 +578,42 @@ const Despesas: React.FC = () => {
           <div className="despesas-card category-bars-card">
             <h3 className="card-header">Visão por categoria</h3>
             <div className="category-bars">
-              {categoryBarsData.map((item, index) => (
-                <div key={index} className="category-bar-item">
-                  <div className="category-info">
-                    <span className="category-name">{item.name}</span>
-                    <span className="category-amount">
-                      (R$ {item.spent.toFixed(2)} de R$ {item.total.toFixed(2)})
-                    </span>
+              {categoryBarsData.length > 0 ? (
+                categoryBarsData.map((item, index) => (
+                  <div key={index} className="category-bar-item">
+                    <div className="category-info">
+                      <span className="category-name">{item.name}</span>
+                      <span className="category-amount">
+                        (R$ {item.spent.toFixed(2).replace(".", ",")} de R${" "}
+                        {item.total.toFixed(2).replace(".", ",")})
+                      </span>
+                    </div>
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{
+                          width: `${
+                            item.total > 0
+                              ? Math.min((item.spent / item.total) * 100, 100)
+                              : 0
+                          }%`,
+                          backgroundColor: item.color,
+                        }}
+                      ></div>
+                    </div>
                   </div>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{
-                        width: `${(item.spent / item.total) * 100}%`,
-                        backgroundColor: item.color,
-                      }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p
+                  style={{
+                    textAlign: "center",
+                    color: "#999",
+                    padding: "20px",
+                  }}
+                >
+                  Nenhum orçamento planejado para este mês
+                </p>
+              )}
             </div>
           </div>
         </div>

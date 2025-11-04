@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useReducer } from "react";
-import type { Income, Expense, Bill } from "../types/transactions";
+import type { Income, Expense, Bill, Budget } from "../types/transactions";
 
 interface TransactionState {
   incomes: Income[];
   expenses: Expense[];
   receivables: Bill[];
   payables: Bill[];
+  budgets: Budget[];
 }
 
 type TransactionAction =
@@ -21,6 +22,9 @@ type TransactionAction =
   | { type: "ADD_PAYABLE"; payload: Bill }
   | { type: "UPDATE_PAYABLE"; payload: Bill }
   | { type: "DELETE_PAYABLE"; payload: string }
+  | { type: "ADD_BUDGET"; payload: Budget }
+  | { type: "UPDATE_BUDGET"; payload: Budget }
+  | { type: "DELETE_BUDGET"; payload: string }
   | { type: "LOAD_DATA"; payload: TransactionState };
 
 interface TransactionContextType extends TransactionState {
@@ -40,6 +44,9 @@ interface TransactionContextType extends TransactionState {
   addPayable: (payable: Omit<Bill, "id" | "createdAt" | "updatedAt">) => void;
   updatePayable: (payable: Bill) => void;
   deletePayable: (id: string) => void;
+  addBudget: (budget: Omit<Budget, "id" | "createdAt" | "updatedAt">) => void;
+  updateBudget: (budget: Budget) => void;
+  deleteBudget: (id: string) => void;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(
@@ -51,6 +58,7 @@ const initialState: TransactionState = {
   expenses: [],
   receivables: [],
   payables: [],
+  budgets: [],
 };
 
 function transactionReducer(
@@ -119,6 +127,20 @@ function transactionReducer(
         payables: state.payables.filter(
           (payable) => payable.id !== action.payload
         ),
+      };
+    case "ADD_BUDGET":
+      return { ...state, budgets: [...state.budgets, action.payload] };
+    case "UPDATE_BUDGET":
+      return {
+        ...state,
+        budgets: state.budgets.map((budget) =>
+          budget.id === action.payload.id ? action.payload : budget
+        ),
+      };
+    case "DELETE_BUDGET":
+      return {
+        ...state,
+        budgets: state.budgets.filter((budget) => budget.id !== action.payload),
       };
     case "LOAD_DATA":
       return action.payload;
@@ -265,6 +287,32 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "DELETE_PAYABLE", payload: id });
   };
 
+  const addBudget = (
+    budgetData: Omit<Budget, "id" | "createdAt" | "updatedAt">
+  ) => {
+    const budget: Budget = {
+      ...budgetData,
+      id: generateId(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      formattedValue: formatCurrency(budgetData.plannedAmount),
+    };
+    dispatch({ type: "ADD_BUDGET", payload: budget });
+  };
+
+  const updateBudget = (budget: Budget) => {
+    const updatedBudget = {
+      ...budget,
+      updatedAt: new Date(),
+      formattedValue: formatCurrency(budget.plannedAmount),
+    };
+    dispatch({ type: "UPDATE_BUDGET", payload: updatedBudget });
+  };
+
+  const deleteBudget = (id: string) => {
+    dispatch({ type: "DELETE_BUDGET", payload: id });
+  };
+
   const value: TransactionContextType = {
     ...state,
     addIncome,
@@ -279,6 +327,9 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     addPayable,
     updatePayable,
     deletePayable,
+    addBudget,
+    updateBudget,
+    deleteBudget,
   };
 
   return (
