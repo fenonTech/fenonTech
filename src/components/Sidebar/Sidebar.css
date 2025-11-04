@@ -26,12 +26,20 @@
   gap: 1rem;
   border-bottom: 1px solid #333;
   position: relative;
+  min-height: 70px;
+}
+
+/* Header quando colapsado no desktop */
+.sidebar.collapsed .sidebar-header {
+  padding: 1rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .logo {
   width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  flex-shrink: 0;
 }
 
 .app-name {
@@ -51,6 +59,17 @@
   border-radius: 4px;
   transition: background-color 0.2s;
   margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+/* Centralizar hambúrguer quando colapsado no desktop */
+.sidebar.collapsed .menu-toggle {
+  margin-left: 0;
 }
 
 .menu-toggle:hover {
@@ -62,6 +81,7 @@
   height: 20px;
   filter: brightness(0) saturate(100%) invert(85%) sepia(79%) saturate(2476%)
     hue-rotate(7deg) brightness(118%) contrast(109%);
+  flex-shrink: 0;
 }
 
 .sidebar-nav {
