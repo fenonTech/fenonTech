@@ -21,7 +21,8 @@ const Dashboard: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
 
   // Acessar dados do contexto
-  const { incomes, expenses, payables, receivables, budgets } = useTransaction();
+  const { incomes, expenses, payables, receivables, budgets } =
+    useTransaction();
 
   // Função para filtrar dados por mês/ano
   const filterByMonthYear = (
@@ -403,7 +404,9 @@ const Dashboard: React.FC = () => {
         />
         <UnifiedFinancialCard
           title="Valores a Receber"
-          value={formatValue(`R$ ${totalReceivables.toFixed(2).replace(".", ",")}`)}
+          value={formatValue(
+            `R$ ${totalReceivables.toFixed(2).replace(".", ",")}`
+          )}
           icon={sacoDeDinheiro}
           type="positive"
           showToggle={true}
@@ -412,7 +415,9 @@ const Dashboard: React.FC = () => {
         />
         <UnifiedFinancialCard
           title="Contas a Pagar"
-          value={formatValue(`R$ ${totalPayables.toFixed(2).replace(".", ",")}`)}
+          value={formatValue(
+            `R$ ${totalPayables.toFixed(2).replace(".", ",")}`
+          )}
           icon={setaParaBaixo}
           type="negative"
           showToggle={true}
