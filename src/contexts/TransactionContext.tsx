@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useEffect, useReducer } from "react";
+import React, { createContext, useContext, useReducer } from "react";
 import type { Income, Expense, Bill, Budget } from "../types/transactions";
+import { transactionApiService } from "../services";
 
 interface TransactionState {
   incomes: Income[];
@@ -11,39 +12,54 @@ interface TransactionState {
 
 type TransactionAction =
   | { type: "ADD_INCOME"; payload: Income }
+  | { type: "ADD_INCOME_COMPLETE"; payload: Income } // Para transações da API com id
   | { type: "UPDATE_INCOME"; payload: Income }
   | { type: "DELETE_INCOME"; payload: string }
+  | { type: "CLEAR_INCOMES" }
   | { type: "ADD_EXPENSE"; payload: Expense }
+  | { type: "ADD_EXPENSE_COMPLETE"; payload: Expense } // Para transações da API com id
   | { type: "UPDATE_EXPENSE"; payload: Expense }
   | { type: "DELETE_EXPENSE"; payload: string }
+  | { type: "CLEAR_EXPENSES" }
   | { type: "ADD_RECEIVABLE"; payload: Bill }
+  | { type: "ADD_RECEIVABLE_COMPLETE"; payload: Bill } // Para transações da API com id
   | { type: "UPDATE_RECEIVABLE"; payload: Bill }
   | { type: "DELETE_RECEIVABLE"; payload: string }
+  | { type: "CLEAR_RECEIVABLES" }
   | { type: "ADD_PAYABLE"; payload: Bill }
+  | { type: "ADD_PAYABLE_COMPLETE"; payload: Bill } // Para transações da API com id
   | { type: "UPDATE_PAYABLE"; payload: Bill }
   | { type: "DELETE_PAYABLE"; payload: string }
+  | { type: "CLEAR_PAYABLES" }
   | { type: "ADD_BUDGET"; payload: Budget }
   | { type: "UPDATE_BUDGET"; payload: Budget }
-  | { type: "DELETE_BUDGET"; payload: string }
-  | { type: "LOAD_DATA"; payload: TransactionState };
+  | { type: "DELETE_BUDGET"; payload: string };
 
 interface TransactionContextType extends TransactionState {
   addIncome: (income: Omit<Income, "id" | "createdAt" | "updatedAt">) => void;
+  addIncomeComplete: (income: Income) => void; // Para transações da API com id
   updateIncome: (income: Income) => void;
   deleteIncome: (id: string) => void;
+  clearIncomes: () => void;
   addExpense: (
     expense: Omit<Expense, "id" | "createdAt" | "updatedAt">
   ) => void;
+  addExpenseComplete: (expense: Expense) => void; // Para transações da API com id
   updateExpense: (expense: Expense) => void;
   deleteExpense: (id: string) => void;
+  clearExpenses: () => void;
   addReceivable: (
     receivable: Omit<Bill, "id" | "createdAt" | "updatedAt">
   ) => void;
+  addReceivableComplete: (receivable: Bill) => void; // Para transações da API com id
   updateReceivable: (receivable: Bill) => void;
   deleteReceivable: (id: string) => void;
+  clearReceivables: () => void;
   addPayable: (payable: Omit<Bill, "id" | "createdAt" | "updatedAt">) => void;
+  addPayableComplete: (payable: Bill) => void; // Para transações da API com id
   updatePayable: (payable: Bill) => void;
   deletePayable: (id: string) => void;
+  clearPayables: () => void;
   addBudget: (budget: Omit<Budget, "id" | "createdAt" | "updatedAt">) => void;
   updateBudget: (budget: Budget) => void;
   deleteBudget: (id: string) => void;
@@ -68,6 +84,8 @@ function transactionReducer(
   switch (action.type) {
     case "ADD_INCOME":
       return { ...state, incomes: [...state.incomes, action.payload] };
+    case "ADD_INCOME_COMPLETE":
+      return { ...state, incomes: [...state.incomes, action.payload] };
     case "UPDATE_INCOME":
       return {
         ...state,
@@ -80,7 +98,11 @@ function transactionReducer(
         ...state,
         incomes: state.incomes.filter((income) => income.id !== action.payload),
       };
+    case "CLEAR_INCOMES":
+      return { ...state, incomes: [] };
     case "ADD_EXPENSE":
+      return { ...state, expenses: [...state.expenses, action.payload] };
+    case "ADD_EXPENSE_COMPLETE":
       return { ...state, expenses: [...state.expenses, action.payload] };
     case "UPDATE_EXPENSE":
       return {
@@ -96,7 +118,11 @@ function transactionReducer(
           (expense) => expense.id !== action.payload
         ),
       };
+    case "CLEAR_EXPENSES":
+      return { ...state, expenses: [] };
     case "ADD_RECEIVABLE":
+      return { ...state, receivables: [...state.receivables, action.payload] };
+    case "ADD_RECEIVABLE_COMPLETE":
       return { ...state, receivables: [...state.receivables, action.payload] };
     case "UPDATE_RECEIVABLE":
       return {
@@ -112,7 +138,11 @@ function transactionReducer(
           (receivable) => receivable.id !== action.payload
         ),
       };
+    case "CLEAR_RECEIVABLES":
+      return { ...state, receivables: [] };
     case "ADD_PAYABLE":
+      return { ...state, payables: [...state.payables, action.payload] };
+    case "ADD_PAYABLE_COMPLETE":
       return { ...state, payables: [...state.payables, action.payload] };
     case "UPDATE_PAYABLE":
       return {
@@ -128,6 +158,8 @@ function transactionReducer(
           (payable) => payable.id !== action.payload
         ),
       };
+    case "CLEAR_PAYABLES":
+      return { ...state, payables: [] };
     case "ADD_BUDGET":
       return { ...state, budgets: [...state.budgets, action.payload] };
     case "UPDATE_BUDGET":
@@ -142,8 +174,6 @@ function transactionReducer(
         ...state,
         budgets: state.budgets.filter((budget) => budget.id !== action.payload),
       };
-    case "LOAD_DATA":
-      return action.payload;
     default:
       return state;
   }
@@ -165,24 +195,6 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [state, dispatch] = useReducer(transactionReducer, initialState);
 
-  // Carregar dados do localStorage na inicialização
-  useEffect(() => {
-    const storedData = localStorage.getItem("fenontech-transactions");
-    if (storedData) {
-      try {
-        const parsedData = JSON.parse(storedData);
-        dispatch({ type: "LOAD_DATA", payload: parsedData });
-      } catch (error) {
-        console.error("Erro ao carregar dados do localStorage:", error);
-      }
-    }
-  }, []);
-
-  // Salvar dados no localStorage sempre que o estado mudar
-  useEffect(() => {
-    localStorage.setItem("fenontech-transactions", JSON.stringify(state));
-  }, [state]);
-
   const addIncome = (
     incomeData: Omit<Income, "id" | "createdAt" | "updatedAt">
   ) => {
@@ -196,6 +208,10 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "ADD_INCOME", payload: income });
   };
 
+  const addIncomeComplete = (income: Income) => {
+    dispatch({ type: "ADD_INCOME_COMPLETE", payload: income });
+  };
+
   const updateIncome = (income: Income) => {
     const updatedIncome = {
       ...income,
@@ -205,8 +221,23 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "UPDATE_INCOME", payload: updatedIncome });
   };
 
-  const deleteIncome = (id: string) => {
-    dispatch({ type: "DELETE_INCOME", payload: id });
+  const deleteIncome = async (id: string) => {
+    try {
+      // Chamar API para deletar no backend
+      const transactionCode = parseInt(id, 10);
+      await transactionApiService.deleteIncome(transactionCode);
+
+      // Deletar localmente após sucesso na API
+      dispatch({ type: "DELETE_INCOME", payload: id });
+    } catch (error) {
+      console.error("❌ Erro ao deletar receita:", error);
+      // Mesmo com erro na API, deletar localmente para não travar a UI
+      dispatch({ type: "DELETE_INCOME", payload: id });
+    }
+  };
+
+  const clearIncomes = () => {
+    dispatch({ type: "CLEAR_INCOMES" });
   };
 
   const addExpense = (
@@ -222,6 +253,10 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "ADD_EXPENSE", payload: expense });
   };
 
+  const addExpenseComplete = (expense: Expense) => {
+    dispatch({ type: "ADD_EXPENSE_COMPLETE", payload: expense });
+  };
+
   const updateExpense = (expense: Expense) => {
     const updatedExpense = {
       ...expense,
@@ -231,8 +266,23 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "UPDATE_EXPENSE", payload: updatedExpense });
   };
 
-  const deleteExpense = (id: string) => {
-    dispatch({ type: "DELETE_EXPENSE", payload: id });
+  const deleteExpense = async (id: string) => {
+    try {
+      // Chamar API para deletar no backend
+      const transactionCode = parseInt(id, 10);
+      await transactionApiService.deleteExpense(transactionCode);
+
+      // Deletar localmente após sucesso na API
+      dispatch({ type: "DELETE_EXPENSE", payload: id });
+    } catch (error) {
+      console.error("❌ Erro ao deletar despesa:", error);
+      // Mesmo com erro na API, deletar localmente para não travar a UI
+      dispatch({ type: "DELETE_EXPENSE", payload: id });
+    }
+  };
+
+  const clearExpenses = () => {
+    dispatch({ type: "CLEAR_EXPENSES" });
   };
 
   const addReceivable = (
@@ -248,6 +298,10 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "ADD_RECEIVABLE", payload: receivable });
   };
 
+  const addReceivableComplete = (receivable: Bill) => {
+    dispatch({ type: "ADD_RECEIVABLE_COMPLETE", payload: receivable });
+  };
+
   const updateReceivable = (receivable: Bill) => {
     const updatedReceivable = {
       ...receivable,
@@ -257,8 +311,24 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "UPDATE_RECEIVABLE", payload: updatedReceivable });
   };
 
-  const deleteReceivable = (id: string) => {
-    dispatch({ type: "DELETE_RECEIVABLE", payload: id });
+  const deleteReceivable = async (id: string) => {
+    try {
+      // Chamar API para deletar no backend (receivable é uma receita futura)
+      const transactionCode = parseInt(id, 10);
+      await transactionApiService.deleteIncome(transactionCode);
+      console.log("✅ Conta a receber deletada na API com sucesso!");
+
+      // Deletar localmente após sucesso na API
+      dispatch({ type: "DELETE_RECEIVABLE", payload: id });
+    } catch (error) {
+      console.error("❌ Erro ao deletar conta a receber:", error);
+      // Mesmo com erro na API, deletar localmente para não travar a UI
+      dispatch({ type: "DELETE_RECEIVABLE", payload: id });
+    }
+  };
+
+  const clearReceivables = () => {
+    dispatch({ type: "CLEAR_RECEIVABLES" });
   };
 
   const addPayable = (
@@ -274,6 +344,10 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "ADD_PAYABLE", payload: payable });
   };
 
+  const addPayableComplete = (payable: Bill) => {
+    dispatch({ type: "ADD_PAYABLE_COMPLETE", payload: payable });
+  };
+
   const updatePayable = (payable: Bill) => {
     const updatedPayable = {
       ...payable,
@@ -283,8 +357,24 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
     dispatch({ type: "UPDATE_PAYABLE", payload: updatedPayable });
   };
 
-  const deletePayable = (id: string) => {
-    dispatch({ type: "DELETE_PAYABLE", payload: id });
+  const deletePayable = async (id: string) => {
+    try {
+      // Chamar API para deletar no backend (payable é uma despesa futura)
+      const transactionCode = parseInt(id, 10);
+      await transactionApiService.deleteExpense(transactionCode);
+      console.log("✅ Conta a pagar deletada na API com sucesso!");
+
+      // Deletar localmente após sucesso na API
+      dispatch({ type: "DELETE_PAYABLE", payload: id });
+    } catch (error) {
+      console.error("❌ Erro ao deletar conta a pagar:", error);
+      // Mesmo com erro na API, deletar localmente para não travar a UI
+      dispatch({ type: "DELETE_PAYABLE", payload: id });
+    }
+  };
+
+  const clearPayables = () => {
+    dispatch({ type: "CLEAR_PAYABLES" });
   };
 
   const addBudget = (
@@ -316,17 +406,25 @@ export const TransactionProvider: React.FC<{ children: React.ReactNode }> = ({
   const value: TransactionContextType = {
     ...state,
     addIncome,
+    addIncomeComplete,
     updateIncome,
     deleteIncome,
+    clearIncomes,
     addExpense,
+    addExpenseComplete,
     updateExpense,
     deleteExpense,
+    clearExpenses,
     addReceivable,
+    addReceivableComplete,
     updateReceivable,
     deleteReceivable,
+    clearReceivables,
     addPayable,
+    addPayableComplete,
     updatePayable,
     deletePayable,
+    clearPayables,
     addBudget,
     updateBudget,
     deleteBudget,

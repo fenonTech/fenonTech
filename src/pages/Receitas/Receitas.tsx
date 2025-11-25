@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import "./Receitas.css";
 import { UnifiedFinancialCard } from "../../components/Cards";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
@@ -10,6 +10,11 @@ import { IncomeModal } from "../../components/Modals";
 import { useTransaction } from "../../contexts/TransactionContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import useReceitasNavigation from "../../hooks/useReceitasNavigation";
+import {
+  transactionApiService,
+  parseMoneyValue,
+  convertApiTransactionToLocal,
+} from "../../services";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import simboloMeuBolsoContasAReceberCard from "../../assets/simboloMeuBolsoContasAReceberCard.png";
 
@@ -28,12 +33,83 @@ const Receitas: React.FC = () => {
     incomes,
     receivables,
     addIncome,
+    addIncomeComplete,
     updateIncome,
     deleteIncome,
     addReceivable,
+    addReceivableComplete,
     updateReceivable,
     deleteReceivable,
+    clearIncomes,
+    clearReceivables,
   } = useTransaction();
+
+  // Ref para controlar se já carregou inicialmente
+  const initialLoadDone = useRef(false);
+
+  // Função para carregar/recarregar receitas da API
+  const recarregarDados = async () => {
+    clearIncomes();
+    clearReceivables();
+
+    try {
+      const apiIncomes = await transactionApiService.getIncomes();
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      apiIncomes.forEach((apiIncome) => {
+        const converted = convertApiTransactionToLocal(apiIncome);
+
+        if (!converted || converted.type !== "income") {
+          return;
+        }
+
+        const incomeDate = new Date(apiIncome.data_pagamento!);
+        incomeDate.setHours(0, 0, 0, 0); // Zerar horas para comparar apenas a data
+        const isFuture = incomeDate > today;
+
+        if (isFuture) {
+          addReceivableComplete({
+            id: converted.id,
+            date: converted.date,
+            dueDate: converted.date,
+            category: converted.category,
+            description: converted.description,
+            value: converted.value,
+            formattedValue: converted.formattedValue,
+            status: "pending" as const,
+            type: "receivable" as const,
+            createdAt: new Date(converted.createdAt),
+            updatedAt: new Date(converted.createdAt),
+          });
+        } else {
+          addIncomeComplete({
+            id: converted.id,
+            date: converted.date,
+            category: converted.category,
+            description: converted.description,
+            value: converted.value,
+            formattedValue: converted.formattedValue,
+            type: "income" as const,
+            createdAt: new Date(converted.createdAt),
+            updatedAt: new Date(converted.createdAt),
+          });
+        }
+      });
+    } catch (error) {
+      console.error("❌ Erro ao carregar receitas:", error);
+    }
+  };
+
+  // Carregar receitas ao montar o componente
+  useEffect(() => {
+    // Prevenir dupla execução (React StrictMode em dev executa useEffect 2x)
+    if (initialLoadDone.current) {
+      return;
+    }
+    initialLoadDone.current = true;
+    recarregarDados();
+  }, []); // Executa apenas ao montar
 
   // Função para adicionar nova receita/conta a receber
   const handleAddReceita = () => {
@@ -52,7 +128,7 @@ const Receitas: React.FC = () => {
   };
 
   // Função para excluir receita
-  const handleDeleteIncome = (income: any) => {
+  const handleDeleteIncome = async (income: any) => {
     // Usar os dados originais se disponíveis
     const incomeToDelete = income.originalData || income;
     const confirmDelete = window.confirm(
@@ -62,17 +138,18 @@ const Receitas: React.FC = () => {
     );
 
     if (confirmDelete) {
-      // Verificar se é receita ou conta a receber pelo ID ou data
-      const incomeDate = new Date(
-        incomeToDelete.date || incomeToDelete.dueDate
-      );
-      const today = new Date();
-      const isReceivable = incomeDate > today;
+      try {
+        console.log("🗑️ Deletando receita ID:", incomeToDelete.id);
+        // Chamar API para deletar
+        await transactionApiService.deleteIncome(incomeToDelete.id);
 
-      if (isReceivable) {
-        deleteReceivable(incomeToDelete.id);
-      } else {
-        deleteIncome(incomeToDelete.id);
+        console.log("✅ Receita deletada! Recarregando...");
+        initialLoadDone.current = false;
+        await recarregarDados();
+        initialLoadDone.current = true;
+      } catch (error) {
+        console.error("❌ Erro ao deletar receita:", error);
+        alert("Erro ao deletar receita. Tente novamente.");
       }
     }
   };
@@ -85,10 +162,10 @@ const Receitas: React.FC = () => {
   };
 
   // Função para salvar receita
-  const handleSaveIncome = (incomeData: any) => {
+  const handleSaveIncome = async (incomeData: any) => {
     const amount =
       typeof incomeData.value === "string"
-        ? parseFloat(incomeData.value.replace(/[^\d,]/g, "").replace(",", "."))
+        ? parseMoneyValue(incomeData.value)
         : incomeData.value;
     const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
 
@@ -162,35 +239,76 @@ const Receitas: React.FC = () => {
       }
     } else {
       // Modo criação - adicionar nova receita
-      const baseData = {
-        date: incomeData.date,
-        description: incomeData.category,
-        category: incomeData.category,
-        value: amount,
-        formattedValue,
-      };
+      try {
+        // Chamar a API para criar a receita
+        await transactionApiService.createIncome({
+          date: incomeData.date,
+          category: incomeData.category,
+          value: amount,
+        });
 
-      if (isContaAReceber) {
-        // Adicionar conta a receber
-        const receivable = {
-          ...baseData,
-          dueDate: incomeData.date,
-          status: "pending" as const,
-          type: "receivable" as const,
+        console.log("✅ Receita criada! Recarregando...");
+        initialLoadDone.current = false; // Permitir recarregar
+        await recarregarDados();
+        initialLoadDone.current = true; // Bloquear novamente
+      } catch (error) {
+        console.error("❌ Erro ao criar receita na API:", error);
+        // Se falhar, adicionar localmente para não bloquear o usuário
+        const baseData = {
+          date: incomeData.date,
+          description: incomeData.category,
+          category: incomeData.category,
+          value: amount,
+          formattedValue,
         };
-        addReceivable(receivable);
-      } else {
-        const income = {
-          ...baseData,
-          type: "income" as const,
-        };
-        addIncome(income);
+
+        if (isContaAReceber) {
+          addReceivable({
+            ...baseData,
+            dueDate: incomeData.date,
+            status: "pending" as const,
+            type: "receivable" as const,
+          });
+        } else {
+          addIncome({
+            ...baseData,
+            type: "income" as const,
+          });
+        }
       }
     }
 
     // Fechar o modal após salvar
     handleCloseIncomeModal();
   };
+
+  // Função para filtrar dados por mês/ano
+  const filterByMonthYear = (
+    data: any[],
+    selectedMonth: number,
+    selectedYear: number
+  ) => {
+    return data.filter((item) => {
+      const dateString = item.date || item.dueDate;
+      const [year, month, day] = dateString.split("-").map(Number);
+      const itemDate = new Date(year, month - 1, day);
+      return (
+        itemDate.getMonth() === selectedMonth &&
+        itemDate.getFullYear() === selectedYear
+      );
+    });
+  };
+
+  // Filtrar receitas e contas a receber pelo mês/ano selecionado
+  const filteredIncomes = useMemo(
+    () => filterByMonthYear(incomes, selectedMonth, selectedYear),
+    [incomes, selectedMonth, selectedYear]
+  );
+
+  const filteredReceivables = useMemo(
+    () => filterByMonthYear(receivables, selectedMonth, selectedYear),
+    [receivables, selectedMonth, selectedYear]
+  );
 
   // Converter dados do contexto para formato das tabelas
   const formatIncomeData = (incomes: any[]) => {
@@ -239,9 +357,12 @@ const Receitas: React.FC = () => {
     });
   };
 
-  // Calcular totais
-  const totalIncomes = incomes.reduce((sum, income) => sum + income.value, 0);
-  const totalReceivables = receivables.reduce(
+  // Calcular totais usando dados filtrados
+  const totalIncomes = filteredIncomes.reduce(
+    (sum, income) => sum + income.value,
+    0
+  );
+  const totalReceivables = filteredReceivables.reduce(
     (sum, receivable) => sum + receivable.value,
     0
   );
@@ -266,9 +387,9 @@ const Receitas: React.FC = () => {
     },
   ];
 
-  // Dados dinâmicos das tabelas
-  const receitasData = formatIncomeData(incomes);
-  const contasAReceberData = formatReceivableData(receivables);
+  // Dados dinâmicos das tabelas (usando dados filtrados)
+  const receitasData = formatIncomeData(filteredIncomes);
+  const contasAReceberData = formatReceivableData(filteredReceivables);
 
   // Dados para o gráfico de barras (simulando os valores mensais)
   const monthlyData = [

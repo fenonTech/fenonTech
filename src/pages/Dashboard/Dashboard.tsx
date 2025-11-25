@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import "./Dashboard.css";
 import { UnifiedFinancialCard } from "../../components/Cards";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
@@ -10,6 +10,10 @@ import { useTransaction } from "../../contexts/TransactionContext";
 import useTabs from "../../hooks/useTabs";
 import useFinancialCardNavigation from "../../hooks/useFinancialCardNavigation";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
+import {
+  transactionApiService,
+  convertApiTransactionToLocal,
+} from "../../services";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import setaParaBaixo from "../../assets/setaParaBaixo.png";
@@ -20,9 +24,141 @@ const Dashboard: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
 
+  // Ref para controlar se já carregou inicialmente
+  const initialLoadDone = useRef(false);
+
   // Acessar dados do contexto
-  const { incomes, expenses, payables, receivables, budgets } =
-    useTransaction();
+  const {
+    incomes,
+    expenses,
+    payables,
+    receivables,
+    budgets,
+    clearIncomes,
+    clearExpenses,
+    clearPayables,
+    clearReceivables,
+    addIncomeComplete,
+    addExpenseComplete,
+    addPayableComplete,
+    addReceivableComplete,
+  } = useTransaction();
+
+  // Carregar dados do dashboard ao montar o componente
+  useEffect(() => {
+    // Prevenir dupla execução (React StrictMode em dev executa useEffect 2x)
+    if (initialLoadDone.current) {
+      return;
+    }
+    initialLoadDone.current = true;
+
+    const loadDashboardData = async () => {
+      try {
+        console.log("🔄 Carregando dados do dashboard...");
+
+        // Limpar dados existentes
+        clearIncomes();
+        clearExpenses();
+        clearPayables();
+        clearReceivables();
+
+        const apiData = await transactionApiService.getDashboardData();
+        console.log(`📦 Recebido ${apiData.length} transações da API`);
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        let incomesCount = 0;
+        let expensesCount = 0;
+        let receivablesCount = 0;
+        let payablesCount = 0;
+
+        apiData.forEach((apiTransaction: any) => {
+          // Usar a mesma lógica de conversão das outras telas
+          const converted = convertApiTransactionToLocal(apiTransaction);
+
+          if (!converted) {
+            return;
+          }
+
+          const transactionDate = new Date(apiTransaction.data_pagamento);
+          transactionDate.setHours(0, 0, 0, 0);
+          const isFuture = transactionDate > today;
+
+          // Separar por tipo (receita ou despesa)
+          if (converted.type === "income") {
+            if (isFuture) {
+              receivablesCount++;
+              addReceivableComplete({
+                id: converted.id,
+                date: converted.date,
+                dueDate: converted.date,
+                category: converted.category,
+                description: converted.description,
+                value: converted.value,
+                formattedValue: converted.formattedValue,
+                status: "pending" as const,
+                type: "receivable" as const,
+                createdAt: new Date(converted.createdAt),
+                updatedAt: new Date(converted.createdAt),
+              });
+            } else {
+              incomesCount++;
+              addIncomeComplete({
+                id: converted.id,
+                date: converted.date,
+                category: converted.category,
+                description: converted.description,
+                value: converted.value,
+                formattedValue: converted.formattedValue,
+                type: "income" as const,
+                createdAt: new Date(converted.createdAt),
+                updatedAt: new Date(converted.createdAt),
+              });
+            }
+          } else if (converted.type === "expense") {
+            if (isFuture) {
+              payablesCount++;
+              addPayableComplete({
+                id: converted.id,
+                date: converted.date,
+                dueDate: converted.date,
+                category: converted.category,
+                description: converted.description,
+                value: converted.value,
+                formattedValue: converted.formattedValue,
+                status: "pending" as const,
+                type: "payable" as const,
+                createdAt: new Date(converted.createdAt),
+                updatedAt: new Date(converted.createdAt),
+              });
+            } else {
+              expensesCount++;
+              addExpenseComplete({
+                id: converted.id,
+                date: converted.date,
+                category: converted.category,
+                description: converted.description,
+                value: converted.value,
+                formattedValue: converted.formattedValue,
+                type: "expense" as const,
+                createdAt: new Date(converted.createdAt),
+                updatedAt: new Date(converted.createdAt),
+              });
+            }
+          }
+        });
+
+        console.log(
+          `✅ Dashboard carregado: ${incomesCount} receitas, ${expensesCount} despesas, ${receivablesCount} a receber, ${payablesCount} a pagar`
+        );
+      } catch (error) {
+        console.error("❌ Erro ao carregar dashboard:", error);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
 
   // Função para filtrar dados por mês/ano
   const filterByMonthYear = (

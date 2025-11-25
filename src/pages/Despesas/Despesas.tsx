@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import "./Despesas.css";
 import { UnifiedFinancialCard } from "../../components/Cards";
 import MobileFinancialCard from "../../components/MobileFinancialCard";
@@ -12,6 +12,11 @@ import { useTransaction } from "../../contexts/TransactionContext";
 import useDespesasNavigation from "../../hooks/useDespesasNavigation";
 import useTabs from "../../hooks/useTabs";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
+import {
+  transactionApiService,
+  parseMoneyValue,
+  convertApiTransactionToLocal,
+} from "../../services";
 import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
@@ -32,12 +37,94 @@ const Despesas: React.FC = () => {
     payables,
     budgets,
     addExpense,
+    addExpenseComplete,
     updateExpense,
     deleteExpense,
     addPayable,
+    addPayableComplete,
     updatePayable,
     deletePayable,
+    clearExpenses,
+    clearPayables,
   } = useTransaction();
+
+  // Ref para controlar se já carregou inicialmente
+  const initialLoadDone = useRef(false);
+
+  // Função para carregar/recarregar despesas da API
+  const recarregarDados = async () => {
+    console.log("🔄 Recarregando dados...");
+    clearExpenses();
+    clearPayables();
+
+    try {
+      const apiExpenses = await transactionApiService.getExpenses();
+      console.log(`📦 Recebido ${apiExpenses.length} registros da API`);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      let despesasCount = 0;
+      let payablesCount = 0;
+
+      apiExpenses.forEach((apiExpense) => {
+        const converted = convertApiTransactionToLocal(apiExpense);
+
+        if (!converted || converted.type !== "expense") {
+          return;
+        }
+
+        const expenseDate = new Date(apiExpense.data_pagamento!);
+        expenseDate.setHours(0, 0, 0, 0); // Zerar horas para comparar apenas a data
+        const isFuture = expenseDate > today;
+
+        if (isFuture) {
+          payablesCount++;
+          addPayableComplete({
+            id: converted.id,
+            date: converted.date,
+            dueDate: converted.date,
+            category: converted.category,
+            description: converted.description,
+            value: converted.value,
+            formattedValue: converted.formattedValue,
+            status: "pending" as const,
+            type: "payable" as const,
+            createdAt: new Date(converted.createdAt),
+            updatedAt: new Date(converted.createdAt),
+          });
+        } else {
+          despesasCount++;
+          addExpenseComplete({
+            id: converted.id,
+            date: converted.date,
+            category: converted.category,
+            description: converted.description,
+            value: converted.value,
+            formattedValue: converted.formattedValue,
+            type: "expense" as const,
+            createdAt: new Date(converted.createdAt),
+            updatedAt: new Date(converted.createdAt),
+          });
+        }
+      });
+
+      console.log(
+        `✅ Adicionados: ${despesasCount} despesas pagas, ${payablesCount} contas a pagar`
+      );
+    } catch (error) {
+      console.error("❌ Erro ao carregar despesas:", error);
+    }
+  };
+
+  // Carregar despesas ao montar o componente
+  useEffect(() => {
+    // Prevenir dupla execução (React StrictMode em dev executa useEffect 2x)
+    if (initialLoadDone.current) {
+      return;
+    }
+    initialLoadDone.current = true;
+    recarregarDados();
+  }, []); // Executa apenas ao montar
 
   // Função para adicionar nova despesa/conta a pagar
   const handleAddDespesa = () => {
@@ -56,7 +143,7 @@ const Despesas: React.FC = () => {
   };
 
   // Função para excluir despesa
-  const handleDeleteExpense = (expense: any) => {
+  const handleDeleteExpense = async (expense: any) => {
     // Usar os dados originais se disponíveis
     const expenseToDelete = expense.originalData || expense;
     const confirmDelete = window.confirm(
@@ -68,17 +155,18 @@ const Despesas: React.FC = () => {
     );
 
     if (confirmDelete) {
-      // Verificar se é despesa ou conta a pagar pelo ID ou data
-      const expenseDate = new Date(
-        expenseToDelete.date || expenseToDelete.dueDate
-      );
-      const today = new Date();
-      const isPayable = expenseDate > today;
+      try {
+        console.log("🗑️ Deletando despesa ID:", expenseToDelete.id);
+        // Chamar API para deletar
+        await transactionApiService.deleteExpense(expenseToDelete.id);
 
-      if (isPayable) {
-        deletePayable(expenseToDelete.id);
-      } else {
-        deleteExpense(expenseToDelete.id);
+        console.log("✅ Despesa deletada! Recarregando...");
+        initialLoadDone.current = false;
+        await recarregarDados();
+        initialLoadDone.current = true;
+      } catch (error) {
+        console.error("❌ Erro ao deletar despesa:", error);
+        alert("Erro ao deletar despesa. Tente novamente.");
       }
     }
   };
@@ -91,10 +179,10 @@ const Despesas: React.FC = () => {
   };
 
   // Função para salvar despesa
-  const handleSaveExpense = (expenseData: any) => {
+  const handleSaveExpense = async (expenseData: any) => {
     const amount =
       typeof expenseData.value === "string"
-        ? parseFloat(expenseData.value.replace(/[^\d,]/g, "").replace(",", "."))
+        ? parseMoneyValue(expenseData.value)
         : expenseData.value;
     const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
 
@@ -168,35 +256,75 @@ const Despesas: React.FC = () => {
       }
     } else {
       // Modo criação - adicionar nova despesa
-      const baseData = {
-        date: expenseData.date,
-        description: expenseData.category,
-        category: expenseData.category,
-        value: amount,
-        formattedValue,
-      };
+      try {
+        await transactionApiService.createExpense({
+          date: expenseData.date,
+          category: expenseData.category,
+          value: amount,
+        });
 
-      if (isContaAPagar) {
-        // Adicionar conta a pagar
-        const payable = {
-          ...baseData,
-          dueDate: expenseData.date,
-          status: "pending" as const,
-          type: "payable" as const,
+        console.log("✅ Despesa criada! Recarregando...");
+        initialLoadDone.current = false; // Permitir recarregar
+        await recarregarDados();
+        initialLoadDone.current = true; // Bloquear novamente
+      } catch (error) {
+        console.error("❌ Erro ao criar despesa na API:", error);
+        // Se falhar, adicionar localmente para não bloquear o usuário
+        const baseData = {
+          date: expenseData.date,
+          description: expenseData.category,
+          category: expenseData.category,
+          value: amount,
+          formattedValue,
         };
-        addPayable(payable);
-      } else {
-        const expense = {
-          ...baseData,
-          type: "expense" as const,
-        };
-        addExpense(expense);
+
+        if (isContaAPagar) {
+          addPayable({
+            ...baseData,
+            dueDate: expenseData.date,
+            status: "pending" as const,
+            type: "payable" as const,
+          });
+        } else {
+          addExpense({
+            ...baseData,
+            type: "expense" as const,
+          });
+        }
       }
     }
 
     // Fechar o modal após salvar
     handleCloseExpenseModal();
   };
+
+  // Função para filtrar dados por mês/ano
+  const filterByMonthYear = (
+    data: any[],
+    selectedMonth: number,
+    selectedYear: number
+  ) => {
+    return data.filter((item) => {
+      const dateString = item.date || item.dueDate;
+      const [year, month, day] = dateString.split("-").map(Number);
+      const itemDate = new Date(year, month - 1, day);
+      return (
+        itemDate.getMonth() === selectedMonth &&
+        itemDate.getFullYear() === selectedYear
+      );
+    });
+  };
+
+  // Filtrar despesas e contas a pagar pelo mês/ano selecionado
+  const filteredExpenses = useMemo(
+    () => filterByMonthYear(expenses, selectedMonth, selectedYear),
+    [expenses, selectedMonth, selectedYear]
+  );
+
+  const filteredPayables = useMemo(
+    () => filterByMonthYear(payables, selectedMonth, selectedYear),
+    [payables, selectedMonth, selectedYear]
+  );
 
   // Converter dados do contexto para formato das tabelas
   const formatExpenseData = (expenses: any[]) => {
@@ -245,12 +373,12 @@ const Despesas: React.FC = () => {
     });
   };
 
-  // Calcular totais
-  const totalExpenses = expenses.reduce(
+  // Calcular totais usando dados filtrados
+  const totalExpenses = filteredExpenses.reduce(
     (sum, expense) => sum + expense.value,
     0
   );
-  const totalPayables = payables.reduce(
+  const totalPayables = filteredPayables.reduce(
     (sum, payable) => sum + payable.value,
     0
   );
@@ -275,9 +403,9 @@ const Despesas: React.FC = () => {
     },
   ];
 
-  // Dados dinâmicos das tabelas
-  const despesasData = formatExpenseData(expenses);
-  const contasAPagarData = formatPayableData(payables);
+  // Dados dinâmicos das tabelas (usando dados filtrados)
+  const despesasData = formatExpenseData(filteredExpenses);
+  const contasAPagarData = formatPayableData(filteredPayables);
 
   // Dados dinâmicos para o gráfico de pizza
   const pieChartData = useMemo(() => {
@@ -292,7 +420,7 @@ const Despesas: React.FC = () => {
       { name: "Outros", color: "#98D8C8" },
     ];
 
-    if (expenses.length === 0) {
+    if (filteredExpenses.length === 0) {
       return predefinedCategories.map((cat) => ({
         ...cat,
         percentage: 0,
@@ -325,8 +453,8 @@ const Despesas: React.FC = () => {
           color: predefCategory.color,
         };
       })
-      .filter((cat) => cat.percentage > 0 || expenses.length === 0);
-  }, [expenses]);
+      .filter((cat) => cat.percentage > 0 || filteredExpenses.length === 0);
+  }, [filteredExpenses]);
 
   // Dados dinâmicos para barras de visão por categoria
   const categoryBarsData = useMemo(() => {
@@ -342,7 +470,7 @@ const Despesas: React.FC = () => {
 
     // Agrupar despesas por categoria
     const categoryTotals: { [key: string]: number } = {};
-    expenses.forEach((expense) => {
+    filteredExpenses.forEach((expense) => {
       const category = expense.category || "Outros";
       categoryTotals[category] =
         (categoryTotals[category] || 0) + expense.value;
@@ -369,7 +497,7 @@ const Despesas: React.FC = () => {
         color: category.color,
       }))
       .filter((cat) => cat.total > 0 || cat.spent > 0); // Mostrar apenas categorias com dados
-  }, [expenses, budgets, selectedMonth, selectedYear]);
+  }, [filteredExpenses, budgets, selectedMonth, selectedYear]);
 
   // Definir colunas para a tabela de despesas
   const despesasColumns: TableColumn[] = [
