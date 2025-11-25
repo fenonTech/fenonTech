@@ -43,7 +43,7 @@ URL: http://localhost:5173/
 
 1. `AuthGuard` verifica o localStorage
 2. Se encontrar as credenciais, libera acesso
-3. Se não encontrar, redireciona para: `https://landing-page-gbprzvx9a-fenontechs-projects.vercel.app/login`
+3. Se não encontrar, redireciona para: `https://www.fenontech.com.br/login`
 
 ### 3. Sem Credenciais
 

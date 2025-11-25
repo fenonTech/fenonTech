@@ -62,8 +62,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       // Não tem credenciais válidas - redirecionar para login
       console.log("❌ Credenciais não encontradas - redirecionando para login");
-      window.location.href =
-        "https://landing-page-gbprzvx9a-fenontechs-projects.vercel.app/login";
+      window.location.href = "https://www.fenontech.com.br/login";
     };
 
     authenticateUser();

@@ -8,25 +8,24 @@ const SessionExpired: React.FC = () => {
     localStorage.removeItem("fenontech-codigoTemp");
 
     // Redirecionar para login
-    window.location.href =
-      "https://landing-page-gbprzvx9a-fenontechs-projects.vercel.app/login";
+    window.location.href = "https://www.fenontech.com.br/login";
   };
 
   return (
-    <div className="session-expired-container">
-      <div className="session-expired-card">
+    <div className="session-expired-page">
+      <div className="session-expired-content">
         <div className="session-expired-icon">
           <svg
-            width="80"
-            height="80"
+            width="120"
+            height="120"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
           >
-            <circle cx="12" cy="12" r="10" stroke="#FF6B6B" strokeWidth="2" />
+            <circle cx="12" cy="12" r="10" stroke="#ffd700" strokeWidth="1.5" />
             <path
-              d="M12 7v5M12 16h.01"
-              stroke="#FF6B6B"
+              d="M12 8v4M12 16h.01"
+              stroke="#ffd700"
               strokeWidth="2"
               strokeLinecap="round"
             />
@@ -42,12 +41,8 @@ const SessionExpired: React.FC = () => {
         </p>
 
         <button className="session-expired-button" onClick={handleNewSession}>
-          Gerar Nova Sessão
+          Fazer Login
         </button>
-
-        <p className="session-expired-info">
-          Você será redirecionado para a página de login
-        </p>
       </div>
     </div>
   );
