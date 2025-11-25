@@ -1,0 +1,113 @@
+.session-expired-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.session-expired-card {
+  background: white;
+  border-radius: 20px;
+  padding: 60px 40px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.session-expired-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.session-expired-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 20px;
+  letter-spacing: -0.5px;
+}
+
+.session-expired-message {
+  font-size: 16px;
+  color: #718096;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.session-expired-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  width: 100%;
+  max-width: 300px;
+}
+
+.session-expired-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.session-expired-button:active {
+  transform: translateY(0);
+}
+
+.session-expired-info {
+  margin-top: 25px;
+  font-size: 14px;
+  color: #a0aec0;
+  font-style: italic;
+}
+
+/* Mobile responsivo */
+@media (max-width: 600px) {
+  .session-expired-card {
+    padding: 40px 30px;
+  }
+
+  .session-expired-title {
+    font-size: 26px;
+  }
+
+  .session-expired-message {
+    font-size: 15px;
+  }
+
+  .session-expired-button {
+    padding: 14px 30px;
+    font-size: 15px;
+  }
+}

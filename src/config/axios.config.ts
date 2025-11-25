@@ -75,8 +75,12 @@ apiClient.interceptors.response.use(
         console.error(
           "🔒 Não autorizado - Credenciais inválidas ou sessão expirada"
         );
-        // Adicione lógica de logout/redirect se necessário
-        // window.location.href = '/login';
+
+        // Marcar sessão como expirada
+        localStorage.setItem("fenontech-session-expired", "true");
+
+        // Recarregar página para mostrar tela de sessão expirada
+        window.location.reload();
       } else {
         console.error("⚠️ Status inesperado:", error.response.status);
       }

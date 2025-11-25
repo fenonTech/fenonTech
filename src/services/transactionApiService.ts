@@ -5,10 +5,19 @@
 import { api } from "../config";
 
 // ========================================
-// 🔒 DADOS FIXOS - Usados em todas as requisições
+// 🔒 DADOS DO USUÁRIO - Obtidos do localStorage
 // ========================================
-const TELEFONE_FIXO = "+5511911451180";
-const CODIGO_TEMP_FIXO = "0vr84e";
+const getUserCredentials = () => {
+  const telefone = localStorage.getItem("fenontech-telefone");
+  const codigoTemp = localStorage.getItem("fenontech-codigoTemp");
+
+  if (!telefone || !codigoTemp) {
+    console.error("❌ Credenciais não encontradas no localStorage!");
+    throw new Error("Credenciais não encontradas. Faça login novamente.");
+  }
+
+  return { telefone, codigoTemp };
+};
 
 // Tipos para a estrutura da API
 export interface DadosRequisicao {
@@ -72,10 +81,13 @@ export const transactionApiService = {
       // Determinar a tela baseada no tipo (receita ou despesa)
       const tela = data.isIncome ? "receita" : "despesa";
 
+      // Obter credenciais do localStorage
+      const { telefone, codigoTemp } = getUserCredentials();
+
       // Montar o payload conforme o novo formato da API
       const payload: ApiPayload = {
-        telefone: TELEFONE_FIXO,
-        codigoTemp: CODIGO_TEMP_FIXO,
+        telefone,
+        codigoTemp,
         dadosRequisicao: {
           tela: tela,
           tipoMetodo: "post",
@@ -148,9 +160,12 @@ export const transactionApiService = {
    */
   async getIncomes(): Promise<TransactionFromApi[]> {
     try {
+      // Obter credenciais do localStorage
+      const { telefone, codigoTemp } = getUserCredentials();
+
       const payload = {
-        telefone: TELEFONE_FIXO,
-        codigoTemp: CODIGO_TEMP_FIXO,
+        telefone,
+        codigoTemp,
         dadosRequisicao: {
           tela: "receita" as const,
           tipoMetodo: "get" as const,
@@ -177,9 +192,12 @@ export const transactionApiService = {
    */
   async getExpenses(): Promise<TransactionFromApi[]> {
     try {
+      // Obter credenciais do localStorage
+      const { telefone, codigoTemp } = getUserCredentials();
+
       const payload = {
-        telefone: TELEFONE_FIXO,
-        codigoTemp: CODIGO_TEMP_FIXO,
+        telefone,
+        codigoTemp,
         dadosRequisicao: {
           tela: "despesa" as const,
           tipoMetodo: "get" as const,
@@ -214,10 +232,13 @@ export const transactionApiService = {
       // Determinar a tela baseada no tipo (receita ou despesa)
       const tela = data.isIncome ? "receita" : "despesa";
 
+      // Obter credenciais do localStorage
+      const { telefone, codigoTemp } = getUserCredentials();
+
       // Montar o payload conforme o formato da API
       const payload: ApiPayload = {
-        telefone: TELEFONE_FIXO,
-        codigoTemp: CODIGO_TEMP_FIXO,
+        telefone,
+        codigoTemp,
         dadosRequisicao: {
           tela: tela,
           tipoMetodo: "update",
@@ -289,13 +310,16 @@ export const transactionApiService = {
     isIncome: boolean
   ): Promise<any> {
     try {
+      // Obter credenciais do localStorage
+      const { telefone, codigoTemp } = getUserCredentials();
+
       // Determinar a tela baseada no tipo (receita ou despesa)
       const tela = isIncome ? "receita" : "despesa";
 
       // Montar o payload conforme o formato da API
       const payload = {
-        telefone: TELEFONE_FIXO,
-        codigoTemp: CODIGO_TEMP_FIXO,
+        telefone,
+        codigoTemp,
         dadosRequisicao: {
           tela: tela,
           tipoMetodo: "delete" as const,
@@ -349,9 +373,12 @@ export const transactionApiService = {
    */
   async getDashboardData(): Promise<any> {
     try {
+      // Obter credenciais do localStorage
+      const { telefone, codigoTemp } = getUserCredentials();
+
       const payload = {
-        telefone: TELEFONE_FIXO,
-        codigoTemp: CODIGO_TEMP_FIXO,
+        telefone,
+        codigoTemp,
         dadosRequisicao: {
           tela: "dashboard",
           tipoMetodo: "get",
