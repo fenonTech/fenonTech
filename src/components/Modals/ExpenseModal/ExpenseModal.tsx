@@ -239,7 +239,7 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
               Cancelar
             </button>
             <button type="submit" className="btn-save">
-              {isEditMode ? "Salvar Alterações" : "Adicionar Despesa"}
+              {isEditMode ? "Salvar Alterações" : "Adicionar"}
             </button>
           </div>
         </form>

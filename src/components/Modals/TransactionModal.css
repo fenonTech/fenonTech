@@ -281,8 +281,8 @@
   }
 
   .modal-container {
-    border-radius: 0;
-    height: 100vh;
+    border-radius: 8;
+    height: 70vh;
     max-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -294,9 +294,15 @@
     flex-direction: column;
   }
 
+  #date {
+    padding: 0;
+    height: 5vh;
+  }
+
   .form-group input,
   .form-group select {
-    padding: 1rem;
-    font-size: 1rem; /* Evitar zoom no iOS */
+    padding: 0.8rem;
+    font-size: 0.8rem; /* Evitar zoom no iOS */
+    width: 100%;
   }
 }

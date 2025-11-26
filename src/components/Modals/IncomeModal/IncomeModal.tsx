@@ -161,7 +161,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
     <div className="modal-overlay">
       <div className="modal-container">
         <div className="modal-header">
-          <h2>{isEditMode ? "Editar Receita" : "Adicionar Receita"}</h2>
+          <h2>{isEditMode ? "Editar Receita" : "Adicionar"}</h2>
           <button className="modal-close-btn" onClick={handleClose}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path
@@ -238,7 +238,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
               Cancelar
             </button>
             <button type="submit" className="btn-save income-btn">
-              {isEditMode ? "Salvar Alterações" : "Adicionar Receita"}
+              {isEditMode ? "Salvar Alterações" : "Adicionar"}
             </button>
           </div>
         </form>

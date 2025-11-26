@@ -124,6 +124,18 @@
   box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
 }
 
+.form-input.disabled {
+  background: #222;
+  border-color: #333;
+  color: #888;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.form-input.disabled:hover {
+  border-color: #333;
+}
+
 .save-button {
   background: linear-gradient(135deg, #ffd700, #ffa500);
   border: none;
@@ -145,6 +157,17 @@
 
 .save-button:active {
   transform: translateY(0);
+}
+
+.save-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.save-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Notificações */

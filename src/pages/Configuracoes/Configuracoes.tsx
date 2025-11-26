@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Configuracoes.css";
-import MonthYearSelector from "../../components/MonthYearSelector";
 import simboloMeuBolsoUsadoNoCardDePerfilDoUsuario from "../../assets/simboloMeuBolsoUsadoNoCardDePerfilDoUsuario.png";
 import simboloMeuBolsoUtilizadoNoCardDeNotificacoes from "../../assets/simboloMeuBolsoUtilizadoNoCardDeNotificacoes.png";
 import SimboloMeuBolsoUtilizadoNoCardDeBancosConectados from "../../assets/SimboloMeuBolsoUtilizadoNoCardDeBancosConectados.png";
@@ -8,6 +7,7 @@ import nubankLogo from "../../assets/nubankLogoBancoRoxaBancosConectados.png";
 import itauLogo from "../../assets/itauLogoBancoLaranjaBancosConectados.png";
 import picpayLogo from "../../assets/picpayLogoBancoVerdeBancosConectados.png";
 import simboloMaisBancosConectados from "../../assets/simboloMaisBancosConectados.png";
+import { api } from "../../config";
 
 interface NotificationSetting {
   id: string;
@@ -17,15 +17,108 @@ interface NotificationSetting {
 }
 
 const Configuracoes: React.FC = () => {
-  const currentDate = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-
   const [userProfile, setUserProfile] = useState({
-    nomeCompleto: "Rafael",
-    email: "rael@gmail.com",
-    entradaMensal: "R$2000",
+    nomeCompleto: "",
+    email: "",
+    telefone: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const initialLoadDone = useRef(false);
+
+  // Função para formatar telefone +5511911451180 -> (11) 91145-1180
+  const formatPhone = (phone: string): string => {
+    if (!phone) return "";
+
+    // Remove tudo exceto números
+    const numbers = phone.replace(/\D/g, "");
+
+    // Se tem código do país +55, remove
+    const localNumbers = numbers.startsWith("55") ? numbers.slice(2) : numbers;
+
+    // Formato: (XX) XXXXX-XXXX ou (XX) XXXX-XXXX
+    if (localNumbers.length === 11) {
+      // Celular com 9 dígitos
+      return `(${localNumbers.slice(0, 2)}) ${localNumbers.slice(
+        2,
+        7
+      )}-${localNumbers.slice(7)}`;
+    } else if (localNumbers.length === 10) {
+      // Fixo com 8 dígitos
+      return `(${localNumbers.slice(0, 2)}) ${localNumbers.slice(
+        2,
+        6
+      )}-${localNumbers.slice(6)}`;
+    }
+
+    return phone; // Retorna original se não conseguir formatar
+  };
+
+  // Debug: monitorar mudanças no userProfile
+  useEffect(() => {
+    console.log("🔍 Estado userProfile atualizado:", userProfile);
+  }, [userProfile]);
+
+  // Carregar dados do usuário ao montar o componente
+  useEffect(() => {
+    // Prevenir dupla execução (React StrictMode)
+    if (initialLoadDone.current) {
+      return;
+    }
+    initialLoadDone.current = true;
+
+    const loadUserProfile = async () => {
+      try {
+        setIsLoading(true);
+        console.log("🔄 Carregando dados do perfil...");
+
+        // Obter credenciais do localStorage
+        const telefone = localStorage.getItem("fenontech-telefone");
+        const codigoTemp = localStorage.getItem("fenontech-codigoTemp");
+
+        if (!telefone || !codigoTemp) {
+          console.error("❌ Credenciais não encontradas");
+          return;
+        }
+
+        const payload = {
+          telefone,
+          codigoTemp,
+          dadosRequisicao: {
+            tela: "configuracao",
+            tipoMetodo: "get",
+          },
+        };
+
+        const response = await api.post("", payload);
+        console.log("✅ Dados do perfil recebidos:", response.data);
+
+        // A API retorna um ARRAY com um objeto dentro
+        const apiData = response.data as any;
+
+        // Pegar o primeiro item do array
+        const userData = Array.isArray(apiData) ? apiData[0] : apiData;
+
+        console.log("📋 Dados do usuário:", userData);
+
+        if (userData) {
+          const novosPerfil = {
+            nomeCompleto: userData.usuarioNome || "",
+            email: userData.email || "",
+            telefone: userData.telefone || "",
+          };
+          console.log("🔄 Atualizando estado com:", novosPerfil);
+          setUserProfile(novosPerfil);
+        }
+      } catch (error) {
+        console.error("❌ Erro ao carregar perfil:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUserProfile();
+  }, []);
 
   const [notifications, setNotifications] = useState<NotificationSetting[]>([
     {
@@ -95,24 +188,53 @@ const Configuracoes: React.FC = () => {
     );
   };
 
-  const handleSaveChanges = () => {
-    console.log("Salvando alterações...", userProfile);
-    // Aqui você pode implementar a lógica para salvar as alterações
+  const handleSaveChanges = async () => {
+    try {
+      setIsSaving(true);
+      console.log("💾 Salvando alterações...", userProfile);
+
+      // Obter credenciais do localStorage
+      const telefone = localStorage.getItem("fenontech-telefone");
+      const codigoTemp = localStorage.getItem("fenontech-codigoTemp");
+
+      if (!telefone || !codigoTemp) {
+        console.error("❌ Credenciais não encontradas");
+        alert("Erro: Credenciais não encontradas. Faça login novamente.");
+        return;
+      }
+
+      const payload = {
+        telefone,
+        codigoTemp,
+        dadosRequisicao: {
+          tela: "configuracao",
+          tipoMetodo: "update",
+          usuarioNome: userProfile.nomeCompleto,
+          usuarioEmail: userProfile.email,
+        },
+      };
+
+      console.log("📤 Enviando atualização:", payload);
+
+      const response = await api.post("", payload);
+      console.log("✅ Perfil atualizado com sucesso:", response.data);
+
+      // Atualizar nome no localStorage se foi alterado
+      localStorage.setItem("fenontech-userName", userProfile.nomeCompleto);
+    } catch (error: any) {
+      console.error("❌ Erro ao salvar perfil:", error);
+      alert(
+        `Erro ao salvar alterações: ${
+          error.response?.data?.message || error.message
+        }`
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
     <div className="configuracoes-page">
-      {/* Filtro de Mês e Ano */}
-      <div className="configuracoes-header">
-        <MonthYearSelector
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onMonthChange={setSelectedMonth}
-          onYearChange={setSelectedYear}
-          className="header-style"
-        />
-      </div>
-
       <div className="configuracoes-content">
         {/* Perfil do Usuário */}
         <div className="config-card">
@@ -126,43 +248,56 @@ const Configuracoes: React.FC = () => {
           </div>
 
           <div className="profile-form">
-            <div className="form-group">
-              <label>Nome Completo</label>
-              <input
-                type="text"
-                value={userProfile.nomeCompleto}
-                onChange={(e) =>
-                  handleProfileChange("nomeCompleto", e.target.value)
-                }
-                className="form-input"
-              />
-            </div>
+            {isLoading ? (
+              <p style={{ textAlign: "center", color: "#ccc" }}>
+                Carregando...
+              </p>
+            ) : (
+              <>
+                <div className="form-group">
+                  <label>Nome Completo</label>
+                  <input
+                    type="text"
+                    value={userProfile.nomeCompleto}
+                    onChange={(e) =>
+                      handleProfileChange("nomeCompleto", e.target.value)
+                    }
+                    className="form-input"
+                  />
+                </div>
 
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                value={userProfile.email}
-                onChange={(e) => handleProfileChange("email", e.target.value)}
-                className="form-input"
-              />
-            </div>
+                <div className="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    value={userProfile.email}
+                    onChange={(e) =>
+                      handleProfileChange("email", e.target.value)
+                    }
+                    className="form-input"
+                  />
+                </div>
 
-            <div className="form-group">
-              <label>Entrada Mensal</label>
-              <input
-                type="text"
-                value={userProfile.entradaMensal}
-                onChange={(e) =>
-                  handleProfileChange("entradaMensal", e.target.value)
-                }
-                className="form-input"
-              />
-            </div>
+                <div className="form-group">
+                  <label>Telefone</label>
+                  <input
+                    type="tel"
+                    value={formatPhone(userProfile.telefone)}
+                    disabled
+                    className="form-input disabled"
+                    title="O telefone não pode ser alterado"
+                  />
+                </div>
 
-            <button className="save-button" onClick={handleSaveChanges}>
-              Salvar Alterações
-            </button>
+                <button
+                  className="save-button"
+                  onClick={handleSaveChanges}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Salvando..." : "Salvar Alterações"}
+                </button>
+              </>
+            )}
           </div>
         </div>
 
@@ -202,7 +337,7 @@ const Configuracoes: React.FC = () => {
         </div>
 
         {/* Bancos Conectados */}
-        <div className="config-card bancos-card">
+        <div className="config-card bancos-card" style={{ display: "none" }}>
           <div className="card-header">
             <img
               src={SimboloMeuBolsoUtilizadoNoCardDeBancosConectados}

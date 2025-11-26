@@ -92,9 +92,9 @@ const Header: React.FC<HeaderProps> = ({
             </svg>
           </div>
 
-          {/* Dropdown Menu - Apenas Mobile */}
+          {/* Dropdown Menu - Mobile e Desktop */}
           {isDropdownOpen && (
-            <div className="user-dropdown mobile-only">
+            <div className="user-dropdown">
               <button className="dropdown-item" onClick={handleConfigClick}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path

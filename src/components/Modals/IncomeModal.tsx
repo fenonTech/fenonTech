@@ -243,7 +243,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
                 Cancelar
               </button>
               <button type="submit" className="btn-save">
-                {mode === "edit" ? "Salvar Alterações" : "Adicionar Receita"}
+                {mode === "edit" ? "Salvar Alterações" : "Adicionar"}
               </button>
             </div>
           </div>

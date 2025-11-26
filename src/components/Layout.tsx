@@ -15,6 +15,7 @@ const Layout: React.FC = () => {
     // Inicializar como fechado no mobile
     return window.innerWidth <= 600;
   });
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleItemClick = (item: string) => {
     setActiveItem(item);
@@ -40,10 +41,21 @@ const Layout: React.FC = () => {
   };
 
   const handleLogoutClick = () => {
-    if (window.confirm("Deseja realmente sair?")) {
-      console.log("Usuário saiu da aplicação");
-      // Aqui você pode adicionar a lógica de logout real
-    }
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = () => {
+    // Limpar localStorage
+    localStorage.removeItem("fenontech-telefone");
+    localStorage.removeItem("fenontech-codigoTemp");
+    localStorage.removeItem("fenontech-session-expired");
+    localStorage.removeItem("fenontech-userName");
+
+    // Redirecionar para página de login
+    window.location.href = "https://www.fenontech.com.br/login";
+  };
+  const handleCancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   // Gerenciar estado do sidebar baseado no tamanho da tela
@@ -128,7 +140,7 @@ const Layout: React.FC = () => {
         }`}
       >
         <Header
-          userName="Gustavo Nascimento"
+          userName={localStorage.getItem("fenontech-userName") || "Usuário"}
           pageTitle={pageInfo.title}
           pageDescription={pageInfo.description}
           onConfigClick={handleConfigClick}
@@ -137,6 +149,24 @@ const Layout: React.FC = () => {
         <main className="content">{renderContent()}</main>
       </div>
       <BottomNavigation activeTab={activeItem} onTabChange={handleItemClick} />
+
+      {/* Modal de Confirmação de Logout */}
+      {showLogoutModal && (
+        <div className="logout-modal-overlay" onClick={handleCancelLogout}>
+          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirmar Saída</h3>
+            <p>Tem certeza que deseja sair?</p>
+            <div className="logout-modal-buttons">
+              <button className="cancel-button" onClick={handleCancelLogout}>
+                Cancelar
+              </button>
+              <button className="confirm-button" onClick={handleConfirmLogout}>
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

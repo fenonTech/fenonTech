@@ -3,8 +3,6 @@ import "./Sidebar.css";
 import logo from "../../assets/logo.png";
 import simboloReceita from "../../assets/simboloMenuReceita.png";
 import simboloDespesas from "../../assets/simboloMenuDespesas.png";
-import simboloConfiguracao from "../../assets/simboloConfiguracao.png";
-import simboloSaida from "../../assets/simboloSaida.png";
 import simboloMenuBurguer from "../../assets/simboloMenuBurguer.png";
 
 interface SidebarProps {
@@ -58,12 +56,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     { id: "dashboard", label: "Dashboard", icon: "dashboard-svg" },
     { id: "receitas", label: "Receitas", icon: simboloReceita },
     { id: "despesas", label: "Despesas", icon: simboloDespesas },
-    { id: "planejamento", label: "Planejamento", icon: "planejamento-svg" },
-  ];
-
-  const systemItems = [
-    { id: "configuracao", label: "Configurações", icon: simboloConfiguracao },
-    { id: "sair", label: "Sair", icon: simboloSaida },
   ];
 
   const renderIcon = (item: { id: string; icon: string; label: string }) => {
@@ -78,22 +70,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         >
           <path
             d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"
-            fill="white"
-          />
-        </svg>
-      );
-    }
-    if (item.id === "planejamento") {
-      return (
-        <svg
-          className="nav-icon planejamento-icon"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <path
-            d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
             fill="white"
           />
         </svg>
@@ -126,25 +102,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               {!isCollapsed && <span className="nav-title">Navegação</span>}
               <ul className="nav-list">
                 {menuItems.map((item) => (
-                  <li key={item.id}>
-                    <button
-                      className={`nav-item ${
-                        activeItem === item.id ? "active" : ""
-                      }`}
-                      onClick={() => onItemClick(item.id)}
-                    >
-                      {renderIcon(item)}
-                      {!isCollapsed && <span>{item.label}</span>}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="nav-section">
-              {!isCollapsed && <span className="nav-title">Sistema</span>}
-              <ul className="nav-list">
-                {systemItems.map((item) => (
                   <li key={item.id}>
                     <button
                       className={`nav-item ${

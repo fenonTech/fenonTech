@@ -49,6 +49,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  position: relative;
 }
 
 .user-avatar {
@@ -329,41 +330,8 @@
   flex-shrink: 0;
 }
 
-/* Desktop - Esconder dropdown */
-@media (min-width: 769px) {
-  .user-dropdown {
-    display: none !important;
-  }
-
-  .dropdown-arrow {
-    display: none !important;
-  }
-
-  .user-profile {
-    cursor: default !important;
-    pointer-events: none !important;
-  }
-
-  .user-profile:hover {
-    background: transparent !important;
-  }
-}
-
-/* Mobile - Mostrar dropdown e esconder título */
+/* Mobile - Esconder título */
 @media (max-width: 768px) {
-  .user-profile {
-    cursor: pointer !important;
-    pointer-events: auto !important;
-  }
-
-  .dropdown-arrow {
-    display: block !important;
-  }
-
-  .user-dropdown.mobile-only {
-    display: block !important;
-  }
-
   .header-title {
     display: none;
   }

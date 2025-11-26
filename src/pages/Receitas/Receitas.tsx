@@ -391,23 +391,42 @@ const Receitas: React.FC = () => {
   const receitasData = formatIncomeData(filteredIncomes);
   const contasAReceberData = formatReceivableData(filteredReceivables);
 
-  // Dados para o gráfico de barras (simulando os valores mensais)
-  const monthlyData = [
-    { month: "Jan", value: 85 },
-    { month: "Fev", value: 75 },
-    { month: "Mar", value: 95 },
-    { month: "Abr", value: 80 },
-    { month: "Mai", value: 85 },
-    { month: "Jun", value: 100 },
-    { month: "Jul", value: 90 },
-    { month: "Ago", value: 95 },
-    { month: "Set", value: 85 },
-    { month: "Out", value: 100 },
-    { month: "Nov", value: 0 },
-    { month: "Dez", value: 0 },
-  ];
+  // Dados para o gráfico de barras - Calculado com base nas receitas reais
+  const monthlyData = useMemo(() => {
+    const months = [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ];
 
-  const maxValue = Math.max(...monthlyData.map((item) => item.value));
+    // Inicializar array com 0 para cada mês
+    const monthlyTotals = Array(12).fill(0);
+
+    // Somar todas as receitas (pagas) do ano selecionado
+    incomes.forEach((income) => {
+      const [year, month] = income.date.split("-").map(Number);
+      if (year === selectedYear) {
+        monthlyTotals[month - 1] += income.value;
+      }
+    });
+
+    // Criar array de objetos para o gráfico
+    return months.map((month, index) => ({
+      month,
+      value: monthlyTotals[index],
+    }));
+  }, [incomes, selectedYear]);
+
+  const maxValue = Math.max(...monthlyData.map((item) => item.value), 1); // Mínimo 1 para evitar divisão por zero
 
   // Definir colunas para a tabela de receitas
   const receitasColumns: TableColumn[] = [

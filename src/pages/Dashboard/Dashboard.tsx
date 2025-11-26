@@ -23,6 +23,7 @@ const Dashboard: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [userName, setUserName] = useState<string>("");
 
   // Ref para controlar se já carregou inicialmente
   const initialLoadDone = useRef(false);
@@ -65,6 +66,13 @@ const Dashboard: React.FC = () => {
         const apiData = await transactionApiService.getDashboardData();
         console.log(`📦 Recebido ${apiData.length} transações da API`);
 
+        // Extrair nome do usuário do primeiro item (todos têm o mesmo usuário)
+        if (apiData.length > 0 && apiData[0].nomeUsuario) {
+          setUserName(apiData[0].nomeUsuario);
+          // Salvar nome no localStorage para uso no Layout
+          localStorage.setItem("fenontech-userName", apiData[0].nomeUsuario);
+        }
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -73,7 +81,10 @@ const Dashboard: React.FC = () => {
         let receivablesCount = 0;
         let payablesCount = 0;
 
-        apiData.forEach((apiTransaction: any) => {
+        apiData.forEach((item: any) => {
+          // Nova estrutura: dados está dentro de cada item
+          const apiTransaction = item.dados;
+
           // Usar a mesma lógica de conversão das outras telas
           const converted = convertApiTransactionToLocal(apiTransaction);
 

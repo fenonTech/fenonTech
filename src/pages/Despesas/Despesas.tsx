@@ -456,6 +456,43 @@ const Despesas: React.FC = () => {
       .filter((cat) => cat.percentage > 0 || filteredExpenses.length === 0);
   }, [filteredExpenses]);
 
+  // Dados para o gráfico de barras - Calculado com base nas despesas reais
+  const monthlyData = useMemo(() => {
+    const months = [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ];
+
+    // Inicializar array com 0 para cada mês
+    const monthlyTotals = Array(12).fill(0);
+
+    // Somar todas as despesas (pagas) do ano selecionado
+    expenses.forEach((expense) => {
+      const [year, month] = expense.date.split("-").map(Number);
+      if (year === selectedYear) {
+        monthlyTotals[month - 1] += expense.value;
+      }
+    });
+
+    // Criar array de objetos para o gráfico
+    return months.map((month, index) => ({
+      month,
+      value: monthlyTotals[index],
+    }));
+  }, [expenses, selectedYear]);
+
+  const maxValue = Math.max(...monthlyData.map((item) => item.value), 1); // Mínimo 1 para evitar divisão por zero
+
   // Dados dinâmicos para barras de visão por categoria
   const categoryBarsData = useMemo(() => {
     const predefinedCategories = [
@@ -742,6 +779,36 @@ const Despesas: React.FC = () => {
                   Nenhum orçamento planejado para este mês
                 </p>
               )}
+            </div>
+          </div>
+        </div>
+
+        {/* Gráfico de Despesas Mensais */}
+        <div className="despesas-card chart-card">
+          <h3 className="card-header">Despesas por Mês</h3>
+          <div className="chart-container">
+            <div className="bar-chart">
+              {monthlyData.map((item, index) => (
+                <div key={index} className="bar-item">
+                  <div className="bar-wrapper">
+                    <div
+                      className="bar"
+                      style={{
+                        height: `${(item.value / maxValue) * 100}%`,
+                        opacity: item.value === 0 ? 0.3 : 1,
+                      }}
+                      title={`${item.month}: R$ ${item.value
+                        .toFixed(2)
+                        .replace(".", ",")}`}
+                    >
+                      <span className="bar-tooltip">
+                        R$ {item.value.toFixed(2).replace(".", ",")}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="bar-label">{item.month}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
