@@ -18,7 +18,7 @@ const SessionExpired: React.FC = () => {
         <img src={logo} alt="Meu Bolso" className="session-expired-logo" />
         <span className="session-expired-brand">Meu Bolso</span>
       </header>
-      
+
       <div className="session-expired-content">
         <div className="session-expired-icon">
           <svg

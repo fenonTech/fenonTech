@@ -23,7 +23,6 @@ const Dashboard: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-  const [userName, setUserName] = useState<string>("");
 
   // Ref para controlar se já carregou inicialmente
   const initialLoadDone = useRef(false);
@@ -68,7 +67,6 @@ const Dashboard: React.FC = () => {
 
         // Extrair nome do usuário do primeiro item (todos têm o mesmo usuário)
         if (apiData.length > 0 && apiData[0].nomeUsuario) {
-          setUserName(apiData[0].nomeUsuario);
           // Salvar nome no localStorage para uso no Layout
           localStorage.setItem("fenontech-userName", apiData[0].nomeUsuario);
         }
