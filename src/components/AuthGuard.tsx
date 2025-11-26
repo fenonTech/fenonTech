@@ -8,34 +8,26 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     const authenticateUser = () => {
-      // 🔒 PRIORIDADE 1: Verificar se a sessão expirou
-      const sessionExpiredFlag = localStorage.getItem(
-        "fenontech-session-expired"
-      );
-      if (sessionExpiredFlag === "true") {
-        console.log("🔒 Sessão expirada detectada");
-        setSessionExpired(true);
-        setIsLoading(false);
-        return;
-      }
-
       // Capturar parâmetros da URL no formato: /+5511911451180/3r50di
       const pathSegments = window.location.pathname.split("/").filter(Boolean);
 
       let telefone = null;
       let codigoTemp = null;
 
-      // Verificar se há parâmetros na URL
+      // 🔑 PRIORIDADE 1: Verificar se há novos parâmetros na URL (nova sessão)
       if (pathSegments.length >= 2) {
         telefone = pathSegments[0];
         codigoTemp = pathSegments[1];
 
         // Validar formato do telefone (deve começar com +)
         if (telefone.startsWith("+") && codigoTemp) {
-          console.log("✅ Parâmetros capturados da URL:", {
+          console.log("✅ Novos parâmetros capturados da URL:", {
             telefone,
             codigoTemp,
           });
+
+          // Limpar flag de sessão expirada (nova sessão iniciando)
+          localStorage.removeItem("fenontech-session-expired");
 
           // Salvar no localStorage
           localStorage.setItem("fenontech-telefone", telefone);
@@ -47,6 +39,17 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           setIsLoading(false);
           return;
         }
+      }
+
+      // 🔒 PRIORIDADE 2: Verificar se a sessão expirou (sem novos parâmetros)
+      const sessionExpiredFlag = localStorage.getItem(
+        "fenontech-session-expired"
+      );
+      if (sessionExpiredFlag === "true") {
+        console.log("🔒 Sessão expirada detectada");
+        setSessionExpired(true);
+        setIsLoading(false);
+        return;
       }
 
       // Verificar se já existe no localStorage
