@@ -1,5 +1,6 @@
 import React from "react";
 import "./SessionExpired.css";
+import logo from "../../assets/logo.png";
 
 const SessionExpired: React.FC = () => {
   const handleNewSession = () => {
@@ -13,6 +14,11 @@ const SessionExpired: React.FC = () => {
 
   return (
     <div className="session-expired-page">
+      <header className="session-expired-header">
+        <img src={logo} alt="Meu Bolso" className="session-expired-logo" />
+        <span className="session-expired-brand">Meu Bolso</span>
+      </header>
+      
       <div className="session-expired-content">
         <div className="session-expired-icon">
           <svg
