@@ -8,34 +8,29 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     const authenticateUser = () => {
-      // Capturar parâmetros da URL no formato: /#/+5511911451180/3r50di (hash routing para S3)
-      const hash = window.location.hash;
-      const hashSegments = hash.replace("#/", "").split("/").filter(Boolean);
-
-      let telefone = null;
-      let codigoTemp = null;
+      // Capturar parâmetros como query string: ?telefone=+5511911451180&codigo=x76elj
+      const urlParams = new URLSearchParams(window.location.search);
+      const telefoneParam = urlParams.get("telefone");
+      const codigoParam = urlParams.get("codigo");
 
       // 🔑 PRIORIDADE 1: Verificar se há novos parâmetros na URL (nova sessão)
-      if (hashSegments.length >= 2) {
-        telefone = hashSegments[0];
-        codigoTemp = hashSegments[1];
-
+      if (telefoneParam && codigoParam) {
         // Validar formato do telefone (deve começar com +)
-        if (telefone.startsWith("+") && codigoTemp) {
+        if (telefoneParam.startsWith("+")) {
           console.log("✅ Novos parâmetros capturados da URL:", {
-            telefone,
-            codigoTemp,
+            telefone: telefoneParam,
+            codigoTemp: codigoParam,
           });
 
           // Limpar flag de sessão expirada (nova sessão iniciando)
           localStorage.removeItem("fenontech-session-expired");
 
           // Salvar no localStorage
-          localStorage.setItem("fenontech-telefone", telefone);
-          localStorage.setItem("fenontech-codigoTemp", codigoTemp);
+          localStorage.setItem("fenontech-telefone", telefoneParam);
+          localStorage.setItem("fenontech-codigoTemp", codigoParam);
 
-          // Redirecionar para URL limpa (raiz com hash)
-          window.location.hash = "#/";
+          // Redirecionar para URL limpa (sem query params)
+          window.history.replaceState({}, "", window.location.pathname);
           setIsAuthenticated(true);
           setIsLoading(false);
           return;
