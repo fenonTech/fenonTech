@@ -9,7 +9,8 @@ const SessionExpired: React.FC = () => {
     localStorage.removeItem("fenontech-codigoTemp");
 
     // Redirecionar para login
-    window.location.href = "https://www.fenontech.com.br/login";
+    window.location.href =
+      "https://www.fenontech.com.br/landingpage/index.html#/login";
   };
 
   return (

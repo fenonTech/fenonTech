@@ -7,48 +7,64 @@ O sistema captura as credenciais do usuário através da URL e as armazena no `l
 ## Formato da URL
 
 ```
-http://localhost:5173/+5511911451180/3r50di
+https://www.fenontech.com.br/dashboard/index.html/#/{numerotelefone}/{codigotemp}
 ```
 
-**Parâmetros:**
+**Exemplo real:**
 
-- **Telefone**: `+5511911451180` (deve começar com `+`)
-- **Código Temporário**: `3r50di`
+```
+https://www.fenontech.com.br/dashboard/index.html/#/+5511911451180/x76elj
+```
+
+**Parâmetros (após o `#/`):**
+
+- **{numerotelefone}**: Número com código do país (ex: `+5511911451180`) - deve começar com `+`
+- **{codigotemp}**: Código temporário de autenticação (ex: `x76elj`)
+
+**Por que usar `#/` (hash routing)?**
+
+Como estamos hospedados no S3 (sem servidor backend), não podemos usar rotas normais (`/path`). O hash routing (`#/path`) funciona no lado do cliente e não requer configuração de servidor.
+
+**⚠️ IMPORTANTE:**
+
+- ✅ O código **NÃO possui credenciais fixas**
+- ✅ Todas as credenciais vêm da URL ou do localStorage
+- ✅ Cada usuário tem suas próprias credenciais dinâmicas
 
 ## Fluxo de Autenticação
 
 ### 1. Primeira Visita (com parâmetros na URL)
 
 ```
-URL: http://localhost:5173/+5511911451180/3r50di
+URL: https://www.fenontech.com.br/dashboard/index.html/#/+5511911451180/3r50di
 ```
 
 **O que acontece:**
 
-1. `AuthGuard` captura os parâmetros da URL
+1. `AuthGuard` captura os parâmetros do hash (`#/`)
 2. Valida se o telefone começa com `+`
 3. Salva no localStorage:
    - `fenontech-telefone`: `+5511911451180`
    - `fenontech-codigoTemp`: `3r50di`
-4. Redireciona para a URL limpa: `http://localhost:5173/`
+4. Redireciona para a URL limpa: `https://www.fenontech.com.br/dashboard/index.html/#/`
 5. Libera acesso à aplicação
 
 ### 2. Visitas Subsequentes (sem parâmetros)
 
 ```
-URL: http://localhost:5173/
+URL: https://www.fenontech.com.br/dashboard/index.html/#/
 ```
 
 **O que acontece:**
 
 1. `AuthGuard` verifica o localStorage
 2. Se encontrar as credenciais, libera acesso
-3. Se não encontrar, redireciona para: `https://www.fenontech.com.br/login`
+3. Se não encontrar, redireciona para: `https://www.fenontech.com.br/landingpage/index.html#/login`
 
 ### 3. Sem Credenciais
 
 ```
-URL: http://localhost:5173/
+URL: https://www.fenontech.com.br/dashboard/index.html/#/
 (localStorage vazio)
 ```
 
@@ -89,24 +105,40 @@ const { telefone, codigoTemp } = getUserCredentials();
 ### Teste 1: Primeira Visita
 
 1. Limpe o localStorage: `localStorage.clear()`
-2. Acesse: `http://localhost:5173/+5511911451180/3r50di`
+2. Acesse: `http://localhost:5173/#/+5511911451180/3r50di`
 3. Verifique no console: `✅ Parâmetros capturados da URL`
-4. Veja a URL mudar para: `http://localhost:5173/`
+4. Veja a URL mudar para: `http://localhost:5173/#/`
 5. A aplicação deve carregar normalmente
 
 ### Teste 2: Retornar ao Site
 
 1. Feche e reabra a aba
-2. Acesse: `http://localhost:5173/`
+2. Acesse: `http://localhost:5173/#/`
 3. Verifique no console: `✅ Credenciais encontradas no localStorage`
 4. A aplicação deve carregar normalmente
 
 ### Teste 3: Sem Credenciais
 
 1. Limpe o localStorage: `localStorage.clear()`
-2. Acesse: `http://localhost:5173/`
+2. Acesse: `http://localhost:5173/#/`
 3. Verifique no console: `❌ Credenciais não encontradas`
 4. Deve redirecionar para a página de login
+
+## Testando em Produção (S3)
+
+### URL de Acesso com Credenciais:
+
+```
+https://www.fenontech.com.br/dashboard/index.html/#/+5511911451180/x76elj
+```
+
+### URL Normal (após autenticação):
+
+```
+https://www.fenontech.com.br/dashboard/index.html/#/
+```
+
+**Nota**: O `index.html` é necessário na URL do S3, diferente do localhost onde o Vite serve automaticamente.
 
 ## Comandos de Debug no Console
 

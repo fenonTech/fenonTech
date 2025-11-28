@@ -52,7 +52,8 @@ const Layout: React.FC = () => {
     localStorage.removeItem("fenontech-userName");
 
     // Redirecionar para página de login
-    window.location.href = "https://www.fenontech.com.br/login";
+    window.location.href =
+      "https://www.fenontech.com.br/landingpage/index.html#/login";
   };
   const handleCancelLogout = () => {
     setShowLogoutModal(false);

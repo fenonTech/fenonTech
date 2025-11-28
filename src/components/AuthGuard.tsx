@@ -8,16 +8,17 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   useEffect(() => {
     const authenticateUser = () => {
-      // Capturar parâmetros da URL no formato: /+5511911451180/3r50di
-      const pathSegments = window.location.pathname.split("/").filter(Boolean);
+      // Capturar parâmetros da URL no formato: /#/+5511911451180/3r50di (hash routing para S3)
+      const hash = window.location.hash;
+      const hashSegments = hash.replace("#/", "").split("/").filter(Boolean);
 
       let telefone = null;
       let codigoTemp = null;
 
       // 🔑 PRIORIDADE 1: Verificar se há novos parâmetros na URL (nova sessão)
-      if (pathSegments.length >= 2) {
-        telefone = pathSegments[0];
-        codigoTemp = pathSegments[1];
+      if (hashSegments.length >= 2) {
+        telefone = hashSegments[0];
+        codigoTemp = hashSegments[1];
 
         // Validar formato do telefone (deve começar com +)
         if (telefone.startsWith("+") && codigoTemp) {
@@ -33,8 +34,8 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           localStorage.setItem("fenontech-telefone", telefone);
           localStorage.setItem("fenontech-codigoTemp", codigoTemp);
 
-          // Redirecionar para URL limpa (raiz)
-          window.history.replaceState(null, "", "/");
+          // Redirecionar para URL limpa (raiz com hash)
+          window.location.hash = "#/";
           setIsAuthenticated(true);
           setIsLoading(false);
           return;
@@ -65,7 +66,8 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       // Não tem credenciais válidas - redirecionar para login
       console.log("❌ Credenciais não encontradas - redirecionando para login");
-      window.location.href = "https://www.fenontech.com.br/login";
+      window.location.href =
+        "https://www.fenontech.com.br/landingpage/index.html#/login";
     };
 
     authenticateUser();
