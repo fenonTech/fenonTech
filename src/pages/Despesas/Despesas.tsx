@@ -259,9 +259,9 @@ const Despesas: React.FC = () => {
               category: expenseData.category,
               value: amount,
             });
-            
+
             console.log("✅ Despesa atualizada na API! Recarregando...");
-            
+
             // Recarregar dados para sincronizar
             initialLoadDone.current = false;
             await recarregarDados();

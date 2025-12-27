@@ -242,9 +242,9 @@ const Receitas: React.FC = () => {
               category: incomeData.category,
               value: amount,
             });
-            
+
             console.log("✅ Receita atualizada na API! Recarregando...");
-            
+
             // Recarregar dados para sincronizar
             initialLoadDone.current = false;
             await recarregarDados();
