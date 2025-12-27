@@ -242,6 +242,93 @@
   transform: translateX(24px);
 }
 
+/* Informações do Plano */
+.plan-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: none !important;
+}
+
+.plan-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.plan-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.plan-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+.plan-label {
+  color: #ccc;
+  font-weight: 500;
+}
+
+.plan-value {
+  color: #fff;
+  font-weight: 600;
+}
+
+.plan-value.days-remaining.active {
+  color: #4caf50;
+}
+
+.plan-value.days-remaining.warning {
+  color: #ff9800;
+}
+
+.plan-value.days-remaining.expired {
+  color: #f44336;
+}
+
+.plan-warning {
+  background: rgba(255, 152, 0, 0.1);
+  border: 1px solid rgba(255, 152, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.plan-warning p {
+  color: #ff9800;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.renew-button {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.renew-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
 /* Bancos Conectados */
 .bancos-grid {
   display: grid;

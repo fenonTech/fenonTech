@@ -1,0 +1,71 @@
+/* ===== DAY SELECTOR COMPONENT ===== */
+
+.day-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.day-selector-label {
+  color: #ccc;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.day-selector-select {
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.875rem;
+  min-width: 120px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.day-selector-select:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+}
+
+.day-selector-select:hover {
+  border-color: #555;
+}
+
+.day-selector-select option {
+  background: #1a1a1a;
+  color: white;
+  padding: 0.5rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .day-selector {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .day-selector-label {
+    font-size: 0.8rem;
+  }
+
+  .day-selector-select {
+    width: 100%;
+    min-width: auto;
+    font-size: 0.8rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .day-selector-select {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.5rem;
+  }
+}

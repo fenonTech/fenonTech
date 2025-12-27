@@ -3,6 +3,7 @@
  */
 
 import { api } from "../config";
+import { formatCurrency } from "../utils";
 
 // ========================================
 // 🔒 DADOS DO USUÁRIO - Obtidos do localStorage
@@ -464,7 +465,7 @@ export const convertApiTransactionToLocal = (
   today.setHours(0, 0, 0, 0);
   const isFuture = transactionDate > today;
 
-  const formattedValue = `R$ ${transaction.valor.toFixed(2).replace(".", ",")}`;
+  const formattedValue = formatCurrency(transaction.valor);
 
   return {
     id: transaction.codigo.toString(),

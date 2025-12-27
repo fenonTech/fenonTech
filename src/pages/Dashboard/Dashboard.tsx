@@ -6,6 +6,7 @@ import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
 import MonthYearSelector from "../../components/MonthYearSelector";
+import DaySelector from "../../components/DaySelector";
 import { useTransaction } from "../../contexts/TransactionContext";
 import useTabs from "../../hooks/useTabs";
 import useFinancialCardNavigation from "../../hooks/useFinancialCardNavigation";
@@ -23,6 +24,7 @@ const Dashboard: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   // Ref para controlar se já carregou inicialmente
   const initialLoadDone = useRef(false);
@@ -169,21 +171,31 @@ const Dashboard: React.FC = () => {
     loadDashboardData();
   }, []);
 
-  // Função para filtrar dados por mês/ano
-  const filterByMonthYear = (
+  // Função para filtrar dados por mês/ano e dia
+  const filterByMonthYearDay = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number
+    selectedYear: number,
+    selectedDay: number | null
   ) => {
     return data.filter((item) => {
       // Parse correto da data para evitar problema de timezone
       const dateString = item.date || item.dueDate;
       const [year, month, day] = dateString.split("-").map(Number);
       const itemDate = new Date(year, month - 1, day);
-      return (
+
+      const matchesMonthYear =
         itemDate.getMonth() === selectedMonth &&
-        itemDate.getFullYear() === selectedYear
-      );
+        itemDate.getFullYear() === selectedYear;
+
+      if (!matchesMonthYear) return false;
+
+      // Se um dia específico foi selecionado, filtrar por ele também
+      if (selectedDay !== null) {
+        return itemDate.getDate() === selectedDay;
+      }
+
+      return true;
     });
   };
 
@@ -239,15 +251,17 @@ const Dashboard: React.FC = () => {
     [payables]
   );
 
-  // Filtros para o mês/ano selecionado (para gráficos e tabelas)
+  // Filtros para o mês/ano/dia selecionado (para gráficos e tabelas)
   const filteredIncomes = useMemo(
-    () => filterByMonthYear(incomes, selectedMonth, selectedYear),
-    [incomes, selectedMonth, selectedYear]
+    () =>
+      filterByMonthYearDay(incomes, selectedMonth, selectedYear, selectedDay),
+    [incomes, selectedMonth, selectedYear, selectedDay]
   );
 
   const filteredExpenses = useMemo(
-    () => filterByMonthYear(expenses, selectedMonth, selectedYear),
-    [expenses, selectedMonth, selectedYear]
+    () =>
+      filterByMonthYearDay(expenses, selectedMonth, selectedYear, selectedDay),
+    [expenses, selectedMonth, selectedYear, selectedDay]
   );
 
   // Total de despesas do mês selecionado (para o gráfico de pizza)
@@ -310,8 +324,9 @@ const Dashboard: React.FC = () => {
 
   // Contas a pagar dinâmicas (payables)
   const filteredPayables = useMemo(
-    () => filterByMonthYear(payables, selectedMonth, selectedYear),
-    [payables, selectedMonth, selectedYear]
+    () =>
+      filterByMonthYearDay(payables, selectedMonth, selectedYear, selectedDay),
+    [payables, selectedMonth, selectedYear, selectedDay]
   );
 
   const bills = useMemo(
@@ -499,7 +514,7 @@ const Dashboard: React.FC = () => {
       key: "saldo",
       label: "Saldo",
       title: "Saldo Atual",
-      value: formatValue(`R$ ${currentBalance.toFixed(2).replace(".", ",")}`),
+      value: formatValue(currentBalance),
       icon: dinheiroSaldo,
       type: "neutral" as const,
     },
@@ -507,7 +522,7 @@ const Dashboard: React.FC = () => {
       key: "receita",
       label: "A Receber",
       title: "Valores a Receber",
-      value: formatValue(`R$ ${totalReceivables.toFixed(2).replace(".", ",")}`),
+      value: formatValue(totalReceivables),
       icon: sacoDeDinheiro,
       type: "positive" as const,
     },
@@ -515,7 +530,7 @@ const Dashboard: React.FC = () => {
       key: "despesa",
       label: "A Pagar",
       title: "Contas a Pagar",
-      value: formatValue(`R$ ${totalPayables.toFixed(2).replace(".", ",")}`),
+      value: formatValue(totalPayables),
       icon: setaParaBaixo,
       type: "negative" as const,
     },
@@ -525,22 +540,29 @@ const Dashboard: React.FC = () => {
     <div className="dashboard">
       {/* Filtro de Mês e Ano */}
       <div className="dashboard-header">
-        <MonthYearSelector
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onMonthChange={setSelectedMonth}
-          onYearChange={setSelectedYear}
-          className="header-style"
-        />
+        <div className="dashboard-filters">
+          <MonthYearSelector
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+            className="header-style"
+          />
+          <DaySelector
+            selectedDay={selectedDay}
+            onDayChange={setSelectedDay}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            className="day-filter"
+          />
+        </div>
       </div>
 
       {/* Cards Originais - DESKTOP */}
       <div className="financial-cards">
         <UnifiedFinancialCard
           title="Saldo Atual"
-          value={formatValue(
-            `R$ ${currentBalance.toFixed(2).replace(".", ",")}`
-          )}
+          value={formatValue(currentBalance)}
           icon={dinheiroSaldo}
           type="neutral"
           showToggle={true}
@@ -549,9 +571,7 @@ const Dashboard: React.FC = () => {
         />
         <UnifiedFinancialCard
           title="Valores a Receber"
-          value={formatValue(
-            `R$ ${totalReceivables.toFixed(2).replace(".", ",")}`
-          )}
+          value={formatValue(totalReceivables)}
           icon={sacoDeDinheiro}
           type="positive"
           showToggle={true}
@@ -560,9 +580,7 @@ const Dashboard: React.FC = () => {
         />
         <UnifiedFinancialCard
           title="Contas a Pagar"
-          value={formatValue(
-            `R$ ${totalPayables.toFixed(2).replace(".", ",")}`
-          )}
+          value={formatValue(totalPayables)}
           icon={setaParaBaixo}
           type="negative"
           showToggle={true}

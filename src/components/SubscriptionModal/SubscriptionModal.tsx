@@ -1,4 +1,5 @@
 import React from "react";
+import { APP_URLS } from "../../config";
 import "./SubscriptionModal.css";
 import logo from "../../assets/logo.png";
 
@@ -9,8 +10,7 @@ interface SubscriptionModalProps {
 const SubscriptionModal: React.FC<SubscriptionModalProps> = ({ isOpen }) => {
   const handleRenewSubscription = () => {
     // Redirecionar para página de planos
-    window.location.href =
-      "https://www.fenontech.com.br/landingpage/index.html#/planos";
+    window.location.href = APP_URLS.PLANOS;
   };
 
   if (!isOpen) return null;

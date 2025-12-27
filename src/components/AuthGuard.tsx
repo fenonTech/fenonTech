@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import SessionExpired from "../pages/SessionExpired";
 import SubscriptionModal from "./SubscriptionModal";
+import { APP_URLS } from "../config";
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -73,8 +74,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       // Não tem credenciais válidas - redirecionar para login
       console.log("❌ Credenciais não encontradas - redirecionando para login");
-      window.location.href =
-        "https://www.fenontech.com.br/landingpage/index.html#/login";
+      window.location.href = APP_URLS.LOGIN;
     };
 
     authenticateUser();

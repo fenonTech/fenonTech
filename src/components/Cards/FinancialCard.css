@@ -8,7 +8,9 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  width: 100%;
+  min-width: 280px;
+  flex: 1;
+  max-width: 400px;
 }
 
 .financial-card::before {
@@ -80,8 +82,25 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
-  word-break: break-all;
   font-family: "Poppins", sans-serif;
+  line-height: 1.2;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Reduzir fonte automaticamente para valores muito grandes */
+.card-value[data-large-value="true"] {
+  font-size: 1.25rem;
+}
+
+/* Para valores extremamente grandes */
+.card-value[data-xl-value="true"] {
+  font-size: 1.1rem;
+}
+
+/* Para valores gigantes */
+.card-value[data-xxl-value="true"] {
+  font-size: 0.95rem;
 }
 
 .financial-card.positive .card-value {
@@ -213,7 +232,21 @@
     font-size: 1.1rem;
     text-align: left;
     line-height: 1.2;
-    word-break: break-word; /* Quebra palavras longas */
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  /* Ajustar fonte para valores grandes no mobile */
+  .card-value[data-large-value="true"] {
+    font-size: 0.95rem;
+  }
+
+  .card-value[data-xl-value="true"] {
+    font-size: 0.85rem;
+  }
+
+  .card-value[data-xxl-value="true"] {
+    font-size: 0.75rem;
   }
 }
 
@@ -271,8 +304,23 @@
   .card-value {
     font-size: 1rem;
     text-align: left;
-    word-break: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
     width: 100%;
+    line-height: 1.1;
+  }
+
+  /* Valores grandes em mobile muito pequeno */
+  .card-value[data-large-value="true"] {
+    font-size: 0.9rem;
+  }
+
+  .card-value[data-xl-value="true"] {
+    font-size: 0.8rem;
+  }
+
+  .card-value[data-xxl-value="true"] {
+    font-size: 0.7rem;
   }
 }
 

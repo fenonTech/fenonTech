@@ -8,6 +8,7 @@ import Receitas from "../pages/Receitas";
 import Despesas from "../pages/Despesas";
 import Planejamento from "../pages/Planejamento";
 import Configuracoes from "../pages/Configuracoes";
+import { APP_URLS } from "../config";
 
 const Layout: React.FC = () => {
   const [activeItem, setActiveItem] = useState("dashboard");
@@ -53,8 +54,7 @@ const Layout: React.FC = () => {
     localStorage.removeItem("fenontech-userName");
 
     // Redirecionar para página de login
-    window.location.href =
-      "https://www.fenontech.com.br/landingpage/index.html#/login";
+    window.location.href = APP_URLS.LOGIN;
   };
   const handleCancelLogout = () => {
     setShowLogoutModal(false);

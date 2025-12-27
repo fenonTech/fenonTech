@@ -16,12 +16,20 @@ interface NotificationSetting {
   enabled: boolean;
 }
 
+interface PlanInfo {
+  nomePlano: string;
+  dataVencimento: string;
+  diasRestantes: number;
+  status: "ativo" | "vencido" | "renovacao";
+}
+
 const Configuracoes: React.FC = () => {
   const [userProfile, setUserProfile] = useState({
     nomeCompleto: "",
     email: "",
     telefone: "",
   });
+  const [planInfo, setPlanInfo] = useState<PlanInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const initialLoadDone = useRef(false);
@@ -52,6 +60,24 @@ const Configuracoes: React.FC = () => {
     }
 
     return phone; // Retorna original se não conseguir formatar
+  };
+
+  // Função para calcular dias restantes do plano
+  const calculateDaysRemaining = (expiryDate: string): number => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const timeDiff = expiry.getTime() - today.getTime();
+    return Math.ceil(timeDiff / (1000 * 3600 * 24));
+  };
+
+  // Função para formatar data de vencimento
+  const formatExpiryDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   };
 
   // Debug: monitorar mudanças no userProfile
@@ -109,6 +135,19 @@ const Configuracoes: React.FC = () => {
           };
           console.log("🔄 Atualizando estado com:", novosPerfil);
           setUserProfile(novosPerfil);
+
+          // Processar informações do plano usando o campo "prazo"
+          if (userData.prazo) {
+            const daysRemaining = calculateDaysRemaining(userData.prazo);
+            const planInfo: PlanInfo = {
+              nomePlano: userData.nomePLano || "Plano Básico",
+              dataVencimento: userData.prazo,
+              diasRestantes: daysRemaining,
+              status: daysRemaining > 0 ? "ativo" : "vencido",
+            };
+            setPlanInfo(planInfo);
+            console.log("📋 Informações do plano carregadas:", planInfo);
+          }
         }
       } catch (error) {
         console.error("❌ Erro ao carregar perfil:", error);
@@ -377,6 +416,66 @@ const Configuracoes: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Minha Assinatura */}
+        {planInfo && (
+          <div className="config-card">
+            <div className="card-header">
+              <div className="card-icon plan-icon">💳</div>
+              <h3>Minha Assinatura</h3>
+            </div>
+
+            <div className="plan-info">
+              <div className="plan-details">
+                <div className="plan-item">
+                  <span className="plan-label">Plano:</span>
+                  <span className="plan-value">{planInfo.nomePlano}</span>
+                </div>
+
+                <div className="plan-item">
+                  <span className="plan-label">Vence em:</span>
+                  <span className="plan-value">
+                    {formatExpiryDate(planInfo.dataVencimento)}
+                  </span>
+                </div>
+
+                <div className="plan-item">
+                  <span className="plan-label">Dias restantes:</span>
+                  <span
+                    className={`plan-value days-remaining ${
+                      planInfo.diasRestantes <= 7
+                        ? "warning"
+                        : planInfo.diasRestantes <= 0
+                        ? "expired"
+                        : "active"
+                    }`}
+                  >
+                    {planInfo.diasRestantes > 0
+                      ? `${planInfo.diasRestantes} dias`
+                      : "Expirado"}
+                  </span>
+                </div>
+              </div>
+
+              {planInfo.diasRestantes <= 7 && (
+                <div className="plan-warning">
+                  <p>⚠️ Sua assinatura está próxima do vencimento!</p>
+                  <button
+                    className="renew-button"
+                    onClick={() =>
+                      window.open(
+                        "https://www.fenontech.com.br/landingpage/planos",
+                        "_blank"
+                      )
+                    }
+                  >
+                    Renovar Agora
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

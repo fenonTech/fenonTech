@@ -1,12 +1,12 @@
 import React from "react";
+import { APP_URLS } from "../../config";
 import "./SubscriptionError.css";
 import logo from "../../assets/logo.png";
 
 const SubscriptionError: React.FC = () => {
   const handleRenewSubscription = () => {
     // Redirecionar para página de renovação/pagamento
-    window.location.href =
-      "https://www.fenontech.com.br/landingpage/index.html#/renovar";
+    window.location.href = APP_URLS.RENOVAR;
   };
 
   return (

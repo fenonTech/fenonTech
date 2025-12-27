@@ -1,10 +1,11 @@
 import { useCallback } from "react";
 import { useFinancial } from "../contexts/FinancialContext";
+import { formatCardValue, parseCurrency } from "../utils";
 
 interface UseBalanceVisibilityReturn {
   isBalanceVisible: boolean;
   toggleBalanceVisibility: () => void;
-  formatValue: (value: string) => string;
+  formatValue: (value: string | number) => string;
 }
 
 export const useBalanceVisibility = (): UseBalanceVisibilityReturn => {
@@ -12,23 +13,15 @@ export const useBalanceVisibility = (): UseBalanceVisibilityReturn => {
   const { isBalanceVisible } = state;
 
   const formatValue = useCallback(
-    (value: string): string => {
-      if (isBalanceVisible) {
-        return value;
+    (value: string | number): string => {
+      // Se receber um número, formatar diretamente
+      if (typeof value === "number") {
+        return formatCardValue(value, isBalanceVisible);
       }
 
-      // Transformar valor em asteriscos mantendo a estrutura
-      const cleanValue = value.replace(/[^\d,.-]/g, ""); // Remove símbolos monetários
-      const length = cleanValue.length;
-
-      // Criar padrão de asteriscos baseado no tamanho do valor
-      if (length <= 4) {
-        return "• • •";
-      } else if (length <= 7) {
-        return "• • • •";
-      } else {
-        return "• • • • •";
-      }
+      // Se receber uma string, converter para número e formatar
+      const numericValue = parseCurrency(value);
+      return formatCardValue(numericValue, isBalanceVisible);
     },
     [isBalanceVisible]
   );

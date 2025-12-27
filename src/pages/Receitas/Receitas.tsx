@@ -5,6 +5,7 @@ import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import MonthYearSelector from "../../components/MonthYearSelector";
+import DaySelector from "../../components/DaySelector";
 import { IncomeModal } from "../../components/Modals";
 
 import { useTransaction } from "../../contexts/TransactionContext";
@@ -15,6 +16,7 @@ import {
   parseMoneyValue,
   convertApiTransactionToLocal,
 } from "../../services";
+import { formatCurrency } from "../../utils";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import simboloMeuBolsoContasAReceberCard from "../../assets/simboloMeuBolsoContasAReceberCard.png";
 
@@ -22,6 +24,7 @@ const Receitas: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<any | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -167,7 +170,7 @@ const Receitas: React.FC = () => {
       typeof incomeData.value === "string"
         ? parseMoneyValue(incomeData.value)
         : incomeData.value;
-    const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
+    const formattedValue = formatCurrency(amount);
 
     // Corrigir problema da data - usar a data local sem conversão de timezone
     const [year, month, day] = incomeData.date.split("-").map(Number);
@@ -220,21 +223,51 @@ const Receitas: React.FC = () => {
           addReceivable(receivable);
         }
       } else {
-        // Mantém o mesmo tipo: apenas atualizar
-        if (isContaAReceber) {
-          const receivable = {
-            ...baseData,
-            dueDate: incomeData.date,
-            status: editingIncome.status || ("pending" as const),
-            type: "receivable" as const,
-          };
-          updateReceivable(receivable);
-        } else {
-          const income = {
-            ...baseData,
-            type: "income" as const,
-          };
-          updateIncome(income);
+        // Mantém o mesmo tipo: chamar API para atualizar
+        try {
+          if (isContaAReceber) {
+            // Para contas a receber, apenas atualizar localmente
+            const receivable = {
+              ...baseData,
+              dueDate: incomeData.date,
+              status: editingIncome.status || ("pending" as const),
+              type: "receivable" as const,
+            };
+            updateReceivable(receivable);
+          } else {
+            // Para receitas, chamar API de atualização
+            await transactionApiService.updateIncome({
+              transactionCode: parseInt(editingIncome.id, 10),
+              date: incomeData.date,
+              category: incomeData.category,
+              value: amount,
+            });
+            
+            console.log("✅ Receita atualizada na API! Recarregando...");
+            
+            // Recarregar dados para sincronizar
+            initialLoadDone.current = false;
+            await recarregarDados();
+            initialLoadDone.current = true;
+          }
+        } catch (error) {
+          console.error("❌ Erro ao atualizar receita na API:", error);
+          // Se falhar na API, atualizar localmente para não bloquear o usuário
+          if (isContaAReceber) {
+            const receivable = {
+              ...baseData,
+              dueDate: incomeData.date,
+              status: editingIncome.status || ("pending" as const),
+              type: "receivable" as const,
+            };
+            updateReceivable(receivable);
+          } else {
+            const income = {
+              ...baseData,
+              type: "income" as const,
+            };
+            updateIncome(income);
+          }
         }
       }
     } else {
@@ -282,32 +315,49 @@ const Receitas: React.FC = () => {
     handleCloseIncomeModal();
   };
 
-  // Função para filtrar dados por mês/ano
-  const filterByMonthYear = (
+  // Função para filtrar dados por mês/ano e dia
+  const filterByMonthYearDay = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number
+    selectedYear: number,
+    selectedDay: number | null
   ) => {
     return data.filter((item) => {
       const dateString = item.date || item.dueDate;
       const [year, month, day] = dateString.split("-").map(Number);
       const itemDate = new Date(year, month - 1, day);
-      return (
+
+      const matchesMonthYear =
         itemDate.getMonth() === selectedMonth &&
-        itemDate.getFullYear() === selectedYear
-      );
+        itemDate.getFullYear() === selectedYear;
+
+      if (!matchesMonthYear) return false;
+
+      // Se um dia específico foi selecionado, filtrar por ele também
+      if (selectedDay !== null) {
+        return itemDate.getDate() === selectedDay;
+      }
+
+      return true;
     });
   };
 
-  // Filtrar receitas e contas a receber pelo mês/ano selecionado
+  // Filtrar receitas e contas a receber pelo mês/ano/dia selecionado
   const filteredIncomes = useMemo(
-    () => filterByMonthYear(incomes, selectedMonth, selectedYear),
-    [incomes, selectedMonth, selectedYear]
+    () =>
+      filterByMonthYearDay(incomes, selectedMonth, selectedYear, selectedDay),
+    [incomes, selectedMonth, selectedYear, selectedDay]
   );
 
   const filteredReceivables = useMemo(
-    () => filterByMonthYear(receivables, selectedMonth, selectedYear),
-    [receivables, selectedMonth, selectedYear]
+    () =>
+      filterByMonthYearDay(
+        receivables,
+        selectedMonth,
+        selectedYear,
+        selectedDay
+      ),
+    [receivables, selectedMonth, selectedYear, selectedDay]
   );
 
   // Converter dados do contexto para formato das tabelas
@@ -373,7 +423,7 @@ const Receitas: React.FC = () => {
       key: "receita",
       label: "Receitas",
       title: "Receitas do mês",
-      value: formatValue(`R$ ${totalIncomes.toFixed(2).replace(".", ",")}`),
+      value: formatValue(totalIncomes),
       icon: sacoDeDinheiro,
       type: "positive" as const,
     },
@@ -381,7 +431,7 @@ const Receitas: React.FC = () => {
       key: "contas",
       label: "A Receber",
       title: "Valores a Receber",
-      value: formatValue(`R$ ${totalReceivables.toFixed(2).replace(".", ",")}`),
+      value: formatValue(totalReceivables),
       icon: simboloMeuBolsoContasAReceberCard,
       type: "positive" as const,
     },
@@ -468,20 +518,29 @@ const Receitas: React.FC = () => {
     <div className="receitas-page">
       {/* Filtro de Mês e Ano */}
       <div className="receitas-header">
-        <MonthYearSelector
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onMonthChange={setSelectedMonth}
-          onYearChange={setSelectedYear}
-          className="header-style"
-        />
+        <div className="receitas-filters">
+          <MonthYearSelector
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+            className="header-style"
+          />
+          <DaySelector
+            selectedDay={selectedDay}
+            onDayChange={setSelectedDay}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            className="day-filter"
+          />
+        </div>
       </div>
 
       {/* Cards principais - DESKTOP */}
       <div className="receitas-cards">
         <UnifiedFinancialCard
           title="Receita Atual"
-          value={formatValue(`R$ ${totalIncomes.toFixed(2).replace(".", ",")}`)}
+          value={formatValue(totalIncomes)}
           icon={sacoDeDinheiro}
           type="positive"
           className="receita-card-large"
@@ -491,9 +550,7 @@ const Receitas: React.FC = () => {
         />
         <UnifiedFinancialCard
           title="Valores a Receber"
-          value={formatValue(
-            `R$ ${totalReceivables.toFixed(2).replace(".", ",")}`
-          )}
+          value={formatValue(totalReceivables)}
           icon={simboloMeuBolsoContasAReceberCard}
           type="neutral"
           className="receita-card-large"
@@ -592,12 +649,10 @@ const Receitas: React.FC = () => {
                         height: `${(item.value / maxValue) * 100}%`,
                         opacity: item.value === 0 ? 0.3 : 1,
                       }}
-                      title={`${item.month}: R$ ${item.value
-                        .toFixed(2)
-                        .replace(".", ",")}`}
+                      title={`${item.month}: ${formatCurrency(item.value)}`}
                     >
                       <span className="bar-tooltip">
-                        R$ {item.value.toFixed(2).replace(".", ",")}
+                        {formatCurrency(item.value)}
                       </span>
                     </div>
                   </div>

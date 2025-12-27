@@ -6,6 +6,7 @@ import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
 import MonthYearSelector from "../../components/MonthYearSelector";
+import DaySelector from "../../components/DaySelector";
 import { ExpenseModal } from "../../components/Modals";
 
 import { useTransaction } from "../../contexts/TransactionContext";
@@ -17,6 +18,7 @@ import {
   parseMoneyValue,
   convertApiTransactionToLocal,
 } from "../../services";
+import { formatCurrency } from "../../utils";
 import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
@@ -24,6 +26,7 @@ const Despesas: React.FC = () => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<any | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -184,7 +187,7 @@ const Despesas: React.FC = () => {
       typeof expenseData.value === "string"
         ? parseMoneyValue(expenseData.value)
         : expenseData.value;
-    const formattedValue = `R$ ${amount.toFixed(2).replace(".", ",")}`;
+    const formattedValue = formatCurrency(amount);
 
     // Corrigir problema da data - usar a data local sem conversão de timezone
     const [year, month, day] = expenseData.date.split("-").map(Number);
@@ -237,21 +240,51 @@ const Despesas: React.FC = () => {
           addPayable(payable);
         }
       } else {
-        // Mantém o mesmo tipo: apenas atualizar
-        if (isContaAPagar) {
-          const payable = {
-            ...baseData,
-            dueDate: expenseData.date,
-            status: editingExpense.status || ("pending" as const),
-            type: "payable" as const,
-          };
-          updatePayable(payable);
-        } else {
-          const expense = {
-            ...baseData,
-            type: "expense" as const,
-          };
-          updateExpense(expense);
+        // Mantém o mesmo tipo: chamar API para atualizar
+        try {
+          if (isContaAPagar) {
+            // Para contas a pagar, apenas atualizar localmente
+            const payable = {
+              ...baseData,
+              dueDate: expenseData.date,
+              status: editingExpense.status || ("pending" as const),
+              type: "payable" as const,
+            };
+            updatePayable(payable);
+          } else {
+            // Para despesas, chamar API de atualização
+            await transactionApiService.updateExpense({
+              transactionCode: parseInt(editingExpense.id, 10),
+              date: expenseData.date,
+              category: expenseData.category,
+              value: amount,
+            });
+            
+            console.log("✅ Despesa atualizada na API! Recarregando...");
+            
+            // Recarregar dados para sincronizar
+            initialLoadDone.current = false;
+            await recarregarDados();
+            initialLoadDone.current = true;
+          }
+        } catch (error) {
+          console.error("❌ Erro ao atualizar despesa na API:", error);
+          // Se falhar na API, atualizar localmente para não bloquear o usuário
+          if (isContaAPagar) {
+            const payable = {
+              ...baseData,
+              dueDate: expenseData.date,
+              status: editingExpense.status || ("pending" as const),
+              type: "payable" as const,
+            };
+            updatePayable(payable);
+          } else {
+            const expense = {
+              ...baseData,
+              type: "expense" as const,
+            };
+            updateExpense(expense);
+          }
         }
       }
     } else {
@@ -298,32 +331,45 @@ const Despesas: React.FC = () => {
     handleCloseExpenseModal();
   };
 
-  // Função para filtrar dados por mês/ano
-  const filterByMonthYear = (
+  // Função para filtrar dados por mês/ano e dia
+  const filterByMonthYearDay = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number
+    selectedYear: number,
+    selectedDay: number | null
   ) => {
     return data.filter((item) => {
+      // Parse correto da data para evitar problema de timezone
       const dateString = item.date || item.dueDate;
       const [year, month, day] = dateString.split("-").map(Number);
       const itemDate = new Date(year, month - 1, day);
-      return (
+
+      const matchesMonthYear =
         itemDate.getMonth() === selectedMonth &&
-        itemDate.getFullYear() === selectedYear
-      );
+        itemDate.getFullYear() === selectedYear;
+
+      if (!matchesMonthYear) return false;
+
+      // Se um dia específico foi selecionado, filtrar por ele também
+      if (selectedDay !== null) {
+        return itemDate.getDate() === selectedDay;
+      }
+
+      return true;
     });
   };
 
-  // Filtrar despesas e contas a pagar pelo mês/ano selecionado
+  // Filtrar despesas e contas a pagar pelo mês/ano/dia selecionado
   const filteredExpenses = useMemo(
-    () => filterByMonthYear(expenses, selectedMonth, selectedYear),
-    [expenses, selectedMonth, selectedYear]
+    () =>
+      filterByMonthYearDay(expenses, selectedMonth, selectedYear, selectedDay),
+    [expenses, selectedMonth, selectedYear, selectedDay]
   );
 
   const filteredPayables = useMemo(
-    () => filterByMonthYear(payables, selectedMonth, selectedYear),
-    [payables, selectedMonth, selectedYear]
+    () =>
+      filterByMonthYearDay(payables, selectedMonth, selectedYear, selectedDay),
+    [payables, selectedMonth, selectedYear, selectedDay]
   );
 
   // Converter dados do contexto para formato das tabelas
@@ -574,15 +620,24 @@ const Despesas: React.FC = () => {
 
   return (
     <div className="despesas-page">
-      {/* Filtro de Mês e Ano */}
+      {/* Filtro de Mês, Ano e Dia */}
       <div className="despesas-header">
-        <MonthYearSelector
-          selectedMonth={selectedMonth}
-          selectedYear={selectedYear}
-          onMonthChange={setSelectedMonth}
-          onYearChange={setSelectedYear}
-          className="header-style"
-        />
+        <div className="despesas-filters">
+          <MonthYearSelector
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+            className="header-style"
+          />
+          <DaySelector
+            selectedDay={selectedDay}
+            onDayChange={setSelectedDay}
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            className="day-filter"
+          />
+        </div>
       </div>
 
       {/* Sistema de Navegação Integrado - APENAS MOBILE */}

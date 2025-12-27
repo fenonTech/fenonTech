@@ -28,6 +28,24 @@ const UnifiedFinancialCard: React.FC<UnifiedFinancialCardProps> = ({
   onAddClick,
   addButtonText = "Adicionar",
 }) => {
+  // Função para detectar valores grandes
+  const getValueSizeAttribute = (value: string): Record<string, string> => {
+    // Remove "R$", espaços e pontos para contar apenas dígitos
+    const cleanValue = value.replace(/[^\d,]/g, "");
+    const length = cleanValue.length;
+
+    if (length >= 15) {
+      return { "data-xxl-value": "true" };
+    } else if (length >= 12) {
+      return { "data-xl-value": "true" };
+    } else if (length >= 9) {
+      return { "data-large-value": "true" };
+    }
+    return {};
+  };
+
+  const valueAttributes = getValueSizeAttribute(value);
+
   return (
     <div className={`unified-financial-card ${type} ${className}`}>
       <div className="card-icon">
@@ -43,6 +61,7 @@ const UnifiedFinancialCard: React.FC<UnifiedFinancialCardProps> = ({
         <div className="card-value-container">
           <p
             className={`card-value ${isBalanceVisible ? "visible" : "hidden"}`}
+            {...valueAttributes}
           >
             {value}
           </p>

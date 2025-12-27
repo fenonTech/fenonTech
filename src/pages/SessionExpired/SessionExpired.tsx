@@ -1,4 +1,5 @@
 import React from "react";
+import { APP_URLS } from "../../config";
 import "./SessionExpired.css";
 import logo from "../../assets/logo.png";
 
@@ -12,8 +13,7 @@ const SessionExpired: React.FC = () => {
     localStorage.removeItem("fenontech-userName");
 
     // Redirecionar para login
-    window.location.href =
-      "https://www.fenontech.com.br/landingpage/index.html#/login";
+    window.location.href = APP_URLS.LOGIN;
   };
 
   return (
