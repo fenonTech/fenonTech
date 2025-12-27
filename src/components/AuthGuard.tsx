@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import SessionExpired from "../pages/SessionExpired";
+import SubscriptionModal from "./SubscriptionModal";
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,8 +23,9 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             codigoTemp: codigoParam,
           });
 
-          // Limpar flag de sessão expirada (nova sessão iniciando)
+          // Limpar flags de sessão e assinatura expiradas (nova sessão iniciando)
           localStorage.removeItem("fenontech-session-expired");
+          localStorage.removeItem("fenontech-subscription-expired");
 
           // Salvar no localStorage
           localStorage.setItem("fenontech-telefone", telefoneParam);
@@ -37,7 +39,17 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         }
       }
 
-      // 🔒 PRIORIDADE 2: Verificar se a sessão expirou (sem novos parâmetros)
+      // 🔒 PRIORIDADE 2: Verificar se a assinatura expirou (erro 403)
+      const subscriptionExpiredFlag = localStorage.getItem(
+        "fenontech-subscription-expired"
+      );
+      if (subscriptionExpiredFlag === "true") {
+        console.log("💳 Assinatura expirada detectada - mostrando modal");
+        // Não seta subscriptionExpired aqui, apenas permite login normal
+        // O modal será mostrado depois
+      }
+
+      // 🔒 PRIORIDADE 3: Verificar se a sessão expirou (erro 401)
       const sessionExpiredFlag = localStorage.getItem(
         "fenontech-session-expired"
       );
@@ -68,7 +80,9 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     authenticateUser();
   }, []);
 
-  // 🔒 MOSTRAR PÁGINA DE SESSÃO EXPIRADA
+  // Não redireciona para página de assinatura - usa modal overlay
+
+  // �🔒 MOSTRAR PÁGINA DE SESSÃO EXPIRADA
   if (sessionExpired) {
     return <SessionExpired />;
   }
@@ -94,7 +108,16 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     return null;
   }
 
-  return <>{children}</>;
+  // ✅ USUÁRIO AUTENTICADO - Verificar se deve mostrar modal de assinatura
+  const showSubscriptionModal =
+    localStorage.getItem("fenontech-subscription-expired") === "true";
+
+  return (
+    <>
+      {children}
+      <SubscriptionModal isOpen={showSubscriptionModal} />
+    </>
+  );
 };
 
 export default AuthGuard;

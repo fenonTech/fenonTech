@@ -45,10 +45,11 @@ const Layout: React.FC = () => {
   };
 
   const handleConfirmLogout = () => {
-    // Limpar localStorage
+    // Limpar todos os dados do localStorage
     localStorage.removeItem("fenontech-telefone");
     localStorage.removeItem("fenontech-codigoTemp");
     localStorage.removeItem("fenontech-session-expired");
+    localStorage.removeItem("fenontech-subscription-expired");
     localStorage.removeItem("fenontech-userName");
 
     // Redirecionar para página de login

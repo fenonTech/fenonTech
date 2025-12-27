@@ -70,17 +70,27 @@ apiClient.interceptors.response.use(
         url: error.config?.url,
       });
 
-      // API retorna apenas 200 (sucesso) ou 401 (não autorizado)
+      // API retorna 200 (sucesso), 401 (não autorizado) ou 403 (assinatura expirada)
       if (error.response.status === 401) {
         console.error(
           "🔒 Não autorizado - Credenciais inválidas ou sessão expirada"
         );
 
-        // Marcar sessão como expirada
-        localStorage.setItem("fenontech-session-expired", "true");
+        // Marcar sessão como expirada (apenas se não estiver já marcada)
+        if (!localStorage.getItem("fenontech-session-expired")) {
+          localStorage.setItem("fenontech-session-expired", "true");
+          // Recarregar página para mostrar tela de sessão expirada
+          window.location.reload();
+        }
+      } else if (error.response.status === 403) {
+        console.error("💳 Assinatura expirada - Renovação necessária");
 
-        // Recarregar página para mostrar tela de sessão expirada
-        window.location.reload();
+        // Marcar assinatura como expirada (apenas se não estiver já marcada)
+        if (!localStorage.getItem("fenontech-subscription-expired")) {
+          localStorage.setItem("fenontech-subscription-expired", "true");
+          // Recarregar página para mostrar modal de assinatura expirada
+          window.location.reload();
+        }
       } else {
         console.error("⚠️ Status inesperado:", error.response.status);
       }

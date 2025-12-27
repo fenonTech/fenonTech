@@ -4,9 +4,12 @@ import logo from "../../assets/logo.png";
 
 const SessionExpired: React.FC = () => {
   const handleNewSession = () => {
-    // Limpar credenciais do localStorage
+    // Limpar todas as credenciais e flags do localStorage
     localStorage.removeItem("fenontech-telefone");
     localStorage.removeItem("fenontech-codigoTemp");
+    localStorage.removeItem("fenontech-session-expired");
+    localStorage.removeItem("fenontech-subscription-expired");
+    localStorage.removeItem("fenontech-userName");
 
     // Redirecionar para login
     window.location.href =
