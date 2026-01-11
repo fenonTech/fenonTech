@@ -94,7 +94,6 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   // Não redireciona para página de assinatura - usa modal overlay
 
-
   if (isLoading) {
     return (
       <div

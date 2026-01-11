@@ -151,7 +151,6 @@ const Despesas: React.FC<DespesasProps> = ({
           valorTotal={totalDespesas}
           isBalanceVisible={isBalanceVisible}
           onEditTransaction={handleEditTransaction}
-
         />
         <CategoryViewMobile
           categorias={[

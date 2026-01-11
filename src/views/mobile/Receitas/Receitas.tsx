@@ -193,7 +193,6 @@ const Receitas: React.FC<ReceitasProps> = ({
           valorTotal={totalReceitas}
           isBalanceVisible={isBalanceVisible}
           onEditTransaction={handleEditTransaction}
-
         />
         <CategoryViewMobile
           categorias={[
