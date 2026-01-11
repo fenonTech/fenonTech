@@ -1,11 +1,11 @@
 /**
  * Configuração centralizada de URLs da aplicação
- * Para facilitar mudanças entre ambientes (produção/teste)
+ * Usando variáveis de ambiente do Vite
  */
 
-// URL base da landing page (pode ser alterada para teste)
-const LANDING_PAGE_BASE_URL = "https://www.fenontech.com.br/landingpage";
-// const LANDING_PAGE_BASE_URL = "http://localhost:5174/landingpage/";
+// URLs das variáveis de ambiente
+const LANDING_PAGE_BASE_URL = import.meta.env.VITE_LANDING_PAGE_URL;
+const DASHBOARD_BASE_URL = import.meta.env.VITE_DASHBOARD_URL;
 
 // URLs específicas da aplicação
 export const APP_URLS = {
@@ -18,7 +18,7 @@ export const APP_URLS = {
   RENOVAR: `${LANDING_PAGE_BASE_URL}/index.html#/renovar`,
 
   // Dashboard (atual aplicação)
-  DASHBOARD_BASE: "https://www.fenontech.com.br/dashboard",
+  DASHBOARD_BASE: DASHBOARD_BASE_URL,
 } as const;
 
 export default APP_URLS;

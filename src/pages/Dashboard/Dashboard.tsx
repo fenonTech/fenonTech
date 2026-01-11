@@ -1,15 +1,13 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useMemo, useEffect, useRef } from "react";
 import "./Dashboard.css";
-import { UnifiedFinancialCard } from "../../components/Cards";
-import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
-import MonthYearSelector from "../../components/MonthYearSelector";
-import DaySelector from "../../components/DaySelector";
+import PageHeader from "../../components/PageHeader";
+import FinancialCardGrid from "../../components/FinancialCardGrid";
+import CategoryBudgetCard from "../../components/CategoryBudgetCard";
 import { useTransaction } from "../../contexts/TransactionContext";
-import useTabs from "../../hooks/useTabs";
-import useFinancialCardNavigation from "../../hooks/useFinancialCardNavigation";
+import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import {
   transactionApiService,
@@ -20,11 +18,13 @@ import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import setaParaBaixo from "../../assets/setaParaBaixo.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
-const Dashboard: React.FC = () => {
-  const currentDate = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+interface DashboardProps {
+  onNavigate?: (page: string) => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+  const { selectedMonth, selectedYear, setSelectedMonth, setSelectedYear } =
+    useFilter();
 
   // Ref para controlar se já carregou inicialmente
   const initialLoadDone = useRef(false);
@@ -171,12 +171,11 @@ const Dashboard: React.FC = () => {
     loadDashboardData();
   }, []);
 
-  // Função para filtrar dados por mês/ano e dia
-  const filterByMonthYearDay = (
+  // Função para filtrar dados por mês/ano
+  const filterByMonthYear = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number,
-    selectedDay: number | null
+    selectedYear: number
   ) => {
     return data.filter((item) => {
       // Parse correto da data para evitar problema de timezone
@@ -184,18 +183,10 @@ const Dashboard: React.FC = () => {
       const [year, month, day] = dateString.split("-").map(Number);
       const itemDate = new Date(year, month - 1, day);
 
-      const matchesMonthYear =
+      return (
         itemDate.getMonth() === selectedMonth &&
-        itemDate.getFullYear() === selectedYear;
-
-      if (!matchesMonthYear) return false;
-
-      // Se um dia específico foi selecionado, filtrar por ele também
-      if (selectedDay !== null) {
-        return itemDate.getDate() === selectedDay;
-      }
-
-      return true;
+        itemDate.getFullYear() === selectedYear
+      );
     });
   };
 
@@ -253,15 +244,13 @@ const Dashboard: React.FC = () => {
 
   // Filtros para o mês/ano/dia selecionado (para gráficos e tabelas)
   const filteredIncomes = useMemo(
-    () =>
-      filterByMonthYearDay(incomes, selectedMonth, selectedYear, selectedDay),
-    [incomes, selectedMonth, selectedYear, selectedDay]
+    () => filterByMonthYear(incomes, selectedMonth, selectedYear),
+    [incomes, selectedMonth, selectedYear]
   );
 
   const filteredExpenses = useMemo(
-    () =>
-      filterByMonthYearDay(expenses, selectedMonth, selectedYear, selectedDay),
-    [expenses, selectedMonth, selectedYear, selectedDay]
+    () => filterByMonthYear(expenses, selectedMonth, selectedYear),
+    [expenses, selectedMonth, selectedYear]
   );
 
   // Total de despesas do mês selecionado (para o gráfico de pizza)
@@ -324,9 +313,8 @@ const Dashboard: React.FC = () => {
 
   // Contas a pagar dinâmicas (payables)
   const filteredPayables = useMemo(
-    () =>
-      filterByMonthYearDay(payables, selectedMonth, selectedYear, selectedDay),
-    [payables, selectedMonth, selectedYear, selectedDay]
+    () => filterByMonthYear(payables, selectedMonth, selectedYear),
+    [payables, selectedMonth, selectedYear]
   );
 
   const bills = useMemo(
@@ -503,266 +491,89 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const { activeTab, switchTab } = useTabs("graficos");
-  const { activeCard, switchCard } = useFinancialCardNavigation("saldo");
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
-
-  // Configuração das opções do card mobile
-  const mobileCardOptions = [
-    {
-      key: "saldo",
-      label: "Saldo",
-      title: "Saldo Atual",
-      value: formatValue(currentBalance),
-      icon: dinheiroSaldo,
-      type: "neutral" as const,
-    },
-    {
-      key: "receita",
-      label: "A Receber",
-      title: "Valores a Receber",
-      value: formatValue(totalReceivables),
-      icon: sacoDeDinheiro,
-      type: "positive" as const,
-    },
-    {
-      key: "despesa",
-      label: "A Pagar",
-      title: "Contas a Pagar",
-      value: formatValue(totalPayables),
-      icon: setaParaBaixo,
-      type: "negative" as const,
-    },
-  ];
 
   return (
     <div className="dashboard">
       {/* Filtro de Mês e Ano */}
-      <div className="dashboard-header">
-        <div className="dashboard-filters">
-          <MonthYearSelector
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-            className="header-style"
-          />
-          <DaySelector
-            selectedDay={selectedDay}
-            onDayChange={setSelectedDay}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            className="day-filter"
-          />
-        </div>
-      </div>
-
-      {/* Cards Originais - DESKTOP */}
-      <div className="financial-cards">
-        <UnifiedFinancialCard
-          title="Saldo Atual"
-          value={formatValue(currentBalance)}
-          icon={dinheiroSaldo}
-          type="neutral"
-          showToggle={true}
-          isBalanceVisible={isBalanceVisible}
-          onToggleVisibility={toggleBalanceVisibility}
-        />
-        <UnifiedFinancialCard
-          title="Valores a Receber"
-          value={formatValue(totalReceivables)}
-          icon={sacoDeDinheiro}
-          type="positive"
-          showToggle={true}
-          isBalanceVisible={isBalanceVisible}
-          onToggleVisibility={toggleBalanceVisibility}
-        />
-        <UnifiedFinancialCard
-          title="Contas a Pagar"
-          value={formatValue(totalPayables)}
-          icon={setaParaBaixo}
-          type="negative"
-          showToggle={true}
-          isBalanceVisible={isBalanceVisible}
-          onToggleVisibility={toggleBalanceVisibility}
-        />
-      </div>
-
-      {/* Sistema de Navegação - APENAS MOBILE */}
-      <MobileFinancialCard
-        navigationOptions={mobileCardOptions}
-        activeCard={activeCard}
-        onCardSwitch={(cardKey) => switchCard(cardKey as any)}
-        className="dashboard-mobile-card"
+      <PageHeader
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        onMonthChange={setSelectedMonth}
+        onYearChange={setSelectedYear}
+        className="dashboard-header"
       />
 
-      {/* Sistema de Tabs - apenas no mobile */}
-      <div className="dashboard-tabs">
-        <button
-          className={`tab-button ${activeTab === "graficos" ? "active" : ""}`}
-          onClick={() => switchTab("graficos")}
-        >
-          Gráfico{" "}
-        </button>
-        <button
-          className={`tab-button ${activeTab === "principal" ? "active" : ""}`}
-          onClick={() => switchTab("principal")}
-        >
-          Transações
-        </button>
+      {/* Cards principais - DESKTOP */}
+      <FinancialCardGrid
+        cards={[
+          {
+            title: "Saldo Atual",
+            value: formatValue(currentBalance),
+            icon: dinheiroSaldo,
+            type: "neutral",
+          },
+          {
+            title: "Valores a Receber",
+            value: formatValue(totalReceivables),
+            icon: sacoDeDinheiro,
+            type: "positive",
+            onClick: () => onNavigate?.("receitas"),
+          },
+          {
+            title: "Contas a Pagar",
+            value: formatValue(totalPayables),
+            icon: setaParaBaixo,
+            type: "negative",
+            onClick: () => onNavigate?.("despesas"),
+          },
+        ]}
+        isBalanceVisible={isBalanceVisible}
+        onToggleVisibility={toggleBalanceVisibility}
+      />
+
+      {/* Primeira Linha - Transações + Gráfico Pizza */}
+      <div className="dashboard-first-row">
+        {/* Últimas Transações */}
+        <TransactionTable
+          title="Últimas Transações"
+          columns={transactionColumns}
+          data={allTransactions}
+          className="transactions-card"
+          showSummary={true}
+          summaryCountLabel="Transações"
+          valueKey="value"
+        />
+
+        {/* Despesas por categoria (gráfico de pizza) */}
+        <ExpensesPieChart
+          title="Despesas por categoria"
+          totalLabel="TOTAL DESPESAS"
+          totalValue={`R$ ${totalMonthExpenses.toFixed(2).replace(".", ",")}`}
+          categories={categoryData}
+          className="expenses-chart-card"
+        />
       </div>
 
-      {/* Conteúdo Desktop - Sempre Visível */}
-      <div className="desktop-content">
-        {/* Primeira Linha - Transações + Gráfico Pizza */}
-        <div className="dashboard-first-row">
-          {/* Últimas Transações */}
-          <TransactionTable
-            title="Últimas Transações"
-            columns={transactionColumns}
-            data={allTransactions}
-            className="transactions-card"
-            showSummary={true}
-            summaryCountLabel="Transações"
-            valueKey="value"
-          />
+      {/* Segunda Linha - Contas + Visão Categoria */}
+      <div className="dashboard-second-row">
+        {/* Contas a pagar */}
+        <TransactionTable
+          title="Contas a pagar"
+          columns={billsColumns}
+          data={bills}
+          showIcon={true}
+          icon={simboloMenuBolsoContasAPagar}
+          iconPosition="left"
+          showSummary={true}
+          summaryCountLabel="Contas"
+          valueKey="value"
+          className="bills-table-orange"
+        />
 
-          {/* Despesas por categoria (gráfico de pizza) */}
-          <ExpensesPieChart
-            title="Despesas por categoria"
-            totalLabel="TOTAL DESPESAS"
-            totalValue={`R$ ${totalMonthExpenses.toFixed(2).replace(".", ",")}`}
-            categories={categoryData}
-            className="expenses-chart-card"
-          />
-        </div>
-
-        {/* Segunda Linha - Contas + Visão Categoria */}
-        <div className="dashboard-second-row">
-          {/* Contas a pagar */}
-          <TransactionTable
-            title="Contas a pagar"
-            columns={billsColumns}
-            data={bills}
-            showIcon={true}
-            icon={simboloMenuBolsoContasAPagar}
-            iconPosition="left"
-            showSummary={true}
-            summaryCountLabel="Contas"
-            valueKey="value"
-            className="bills-table-orange"
-          />
-
-          {/* Visão por categoria */}
-          <div className="dashboard-card">
-            <h3 className="card-header">Visão por categoria</h3>
-            <div className="category-bars">
-              {categoryComparisonData.length > 0 ? (
-                categoryComparisonData.map((item, index) => (
-                  <div key={index} className="category-bar-item">
-                    <div className="category-info">
-                      <span className="category-name">{item.name}</span>
-                      <span className="category-amount">
-                        (R$ {item.spent.toFixed(2).replace(".", ",")} de R${" "}
-                        {item.planned.toFixed(2).replace(".", ",")})
-                      </span>
-                    </div>
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{
-                          width: `${item.percentage}%`,
-                          backgroundColor: item.color,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p
-                  style={{
-                    textAlign: "center",
-                    color: "#999",
-                    padding: "20px",
-                  }}
-                >
-                  Nenhum orçamento planejado para este mês
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Conteúdo Tab Principal - Apenas Mobile */}
-      <div
-        className={`tab-content mobile-only tab-principal ${
-          activeTab === "principal" ? "active" : ""
-        }`}
-        style={{ display: activeTab === "principal" ? "block" : "none" }}
-      >
-        <div className="dashboard-grid">
-          {/* Últimas Transações */}
-          <TransactionTable
-            title="Últimas Transações"
-            columns={transactionColumns}
-            data={allTransactions}
-            className="transactions-card"
-            showSummary={true}
-            summaryCountLabel="Transações"
-            valueKey="value"
-          />
-        </div>
-      </div>
-
-      {/* Conteúdo Tab Análise - Apenas Mobile */}
-      <div
-        className={`tab-content mobile-only tab-analise ${
-          activeTab === "graficos" ? "active" : ""
-        }`}
-        style={{ display: activeTab === "graficos" ? "block" : "none" }}
-      >
-        <div className="dashboard-grid">
-          {/* Visão por categoria */}
-          <div className="dashboard-card">
-            <h3 className="card-header">Visão por categoria</h3>
-            <div className="category-bars">
-              {categoryComparisonData.length > 0 ? (
-                categoryComparisonData.map((item, index) => (
-                  <div key={index} className="category-bar-item">
-                    <div className="category-info">
-                      <span className="category-name">{item.name}</span>
-                      <span className="category-amount">
-                        (R$ {item.spent.toFixed(2).replace(".", ",")} de R${" "}
-                        {item.planned.toFixed(2).replace(".", ",")})
-                      </span>
-                    </div>
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{
-                          width: `${item.percentage}%`,
-                          backgroundColor: item.color,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p
-                  style={{
-                    textAlign: "center",
-                    color: "#999",
-                    padding: "20px",
-                  }}
-                >
-                  Nenhum orçamento planejado para este mês
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+        {/* Visão por categoria */}
+        <CategoryBudgetCard data={categoryComparisonData} />
       </div>
     </div>
   );

@@ -1,29 +1,22 @@
 /**
  * Configuração centralizada de URLs da API
  *
- * 🔥 INSTRUÇÕES DE USO:
- * Para trocar entre ambientes, comente/descomente as linhas abaixo:
- * - Deixe apenas UMA linha descomentada
- * - As outras linhas devem estar comentadas com //
+ * Agora usando variáveis de ambiente do Vite
+ * - Development: usa environments/.env.development
+ * - Production: usa environments/.env.production
  */
 
-// ========================================
-// 🚀 SELECIONE A URL DA API AQUI:
-// ========================================
+// Obter URL da API das variáveis de ambiente
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// ✅ Desenvolvimento (Teste) - ATIVA
-export const API_BASE_URL =
-  // "https://n8n.srv1056458.hstgr.cloud/webhook-test/meuBolso";
+// Detectar ambiente
+export const CURRENT_ENVIRONMENT = import.meta.env.MODE;
 
-  // 🚀 Produção - DESCOMENTANDO ESTA LINHA, COMENTE A DE CIMA
-  "https://n8n.srv1056458.hstgr.cloud/webhook/meuBolso";
-
-// ========================================
-
-// Detectar ambiente automaticamente baseado na URL ativa
-export const CURRENT_ENVIRONMENT = API_BASE_URL.includes("webhook-test")
-  ? "development"
-  : "production";
+// Log do ambiente atual (apenas em dev)
+if (import.meta.env.DEV) {
+  console.log("🌍 Ambiente:", CURRENT_ENVIRONMENT);
+  console.log("🔗 API URL:", API_BASE_URL);
+}
 
 // Endpoints da API (adicione conforme necessário)
 export const API_ENDPOINTS = {

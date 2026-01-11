@@ -1,17 +1,24 @@
 import "./App.css";
 import Layout from "./components/Layout";
+import LayoutMobile from "./components/LayoutMobile";
 import AuthGuard from "./components/AuthGuard";
 import { FinancialProvider } from "./contexts";
 import { TransactionProvider } from "./contexts/TransactionContext";
+import { FilterProvider } from "./contexts/FilterContext";
+import { useDeviceDetection } from "./hooks/useDeviceDetection";
 
 function App() {
+  const { isMobile } = useDeviceDetection();
+
   return (
     <AuthGuard>
-      <FinancialProvider>
-        <TransactionProvider>
-          <Layout />
-        </TransactionProvider>
-      </FinancialProvider>
+      <FilterProvider>
+        <FinancialProvider>
+          <TransactionProvider>
+            {isMobile ? <LayoutMobile /> : <Layout />}
+          </TransactionProvider>
+        </FinancialProvider>
+      </FilterProvider>
     </AuthGuard>
   );
 }

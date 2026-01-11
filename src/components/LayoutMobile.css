@@ -1,0 +1,39 @@
+.layout-mobile {
+  width: 100%;
+  min-height: 100vh;
+  background: #0b0b0b;
+  color: white;
+}
+
+/* Classe global para todas as telas mobile */
+.mobile-screen-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #000000;
+  overflow: hidden;
+}
+
+.mobile-screen-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  padding-bottom: 200px;
+  color: white;
+}
+
+.mobile-content {
+  padding: 2rem;
+  text-align: center;
+}
+
+.mobile-content h1 {
+  color: #ffd700;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.mobile-content p {
+  color: #ccc;
+  font-size: 1.125rem;
+}

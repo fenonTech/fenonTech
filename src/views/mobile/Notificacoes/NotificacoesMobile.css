@@ -1,0 +1,145 @@
+.notificacoes-mobile {
+  min-height: 100vh;
+  background: #000000;
+  font-family: "Poppins", sans-serif;
+  padding-bottom: 200px;
+}
+
+/* Header */
+.notificacoes-mobile-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  background: #000000;
+  z-index: 100;
+}
+
+.notif-back-button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.notif-back-button:active {
+  transform: scale(0.9);
+}
+
+.notificacoes-mobile-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #888888;
+  margin: 0;
+}
+
+/* Content */
+.notificacoes-mobile-content {
+  padding: 1rem 1.25rem;
+}
+
+.notificacoes-card {
+  background: #1a1a1a;
+  border-radius: 20px;
+  padding: 0.5rem 0;
+  overflow: hidden;
+}
+
+/* Notification Item */
+.notificacao-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.notificacao-item:last-child {
+  border-bottom: none;
+}
+
+.notificacao-label {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+/* Toggle Switch */
+.notificacao-toggle {
+  position: relative;
+  width: 56px;
+  height: 32px;
+  background: #4a4a4a;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.notificacao-toggle.active {
+  background: #ffd700;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  display: block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.notificacao-toggle.active .toggle-slider {
+  transform: translateX(24px);
+}
+
+.notificacao-toggle:active .toggle-slider {
+  width: 30px;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .notificacoes-mobile-header {
+    padding: 1rem;
+  }
+
+  .notificacoes-mobile-content {
+    padding: 1rem;
+  }
+
+  .notificacao-item {
+    padding: 1rem 1.25rem;
+  }
+
+  .notificacao-label {
+    font-size: 0.95rem;
+  }
+
+  .notificacao-toggle {
+    width: 52px;
+    height: 30px;
+  }
+
+  .toggle-slider {
+    width: 24px;
+    height: 24px;
+  }
+
+  .notificacao-toggle.active .toggle-slider {
+    transform: translateX(22px);
+  }
+}

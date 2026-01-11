@@ -1,80 +1,92 @@
 import { useEffect, useState } from "react";
-import SessionExpired from "../pages/SessionExpired";
 import SubscriptionModal from "./SubscriptionModal";
-import { APP_URLS } from "../config";
 
 const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [sessionExpired, setSessionExpired] = useState(false);
+
+  // Verificar se está em ambiente de desenvolvimento
+  const isDevelopment = import.meta.env.DEV;
 
   useEffect(() => {
     const authenticateUser = () => {
-      // Capturar parâmetros como query string: ?telefone=+5511911451180&codigo=x76elj
-      const urlParams = new URLSearchParams(window.location.search);
-      const telefoneParam = urlParams.get("telefone");
-      const codigoParam = urlParams.get("codigo");
+      // 🚀 MODO DESENVOLVIMENTO: Pular autenticação
+      // isDevelopment = true;
+      // if (isDevelopment) {
+      console.log("🔓 Modo DEV: Autenticação desabilitada");
+      // Limpar flags de desenvolvimento
+      localStorage.removeItem("fenontech-session-expired");
+      localStorage.removeItem("fenontech-subscription-expired");
+      setIsAuthenticated(true);
+      setIsLoading(false);
+      return;
+      // }
 
-      // 🔑 PRIORIDADE 1: Verificar se há novos parâmetros na URL (nova sessão)
-      if (telefoneParam && codigoParam) {
-        // Validar formato do telefone (deve começar com +)
-        if (telefoneParam.startsWith("+")) {
-          console.log("✅ Novos parâmetros capturados da URL:", {
-            telefone: telefoneParam,
-            codigoTemp: codigoParam,
-          });
+      // // Capturar parâmetros como query string: ?telefone=+5511911451180&codigo=x76elj
+      // const urlParams = new URLSearchParams(window.location.search);
+      // const telefoneParam = urlParams.get("telefone");
+      // const codigoParam = urlParams.get("codigo");
 
-          // Limpar flags de sessão e assinatura expiradas (nova sessão iniciando)
-          localStorage.removeItem("fenontech-session-expired");
-          localStorage.removeItem("fenontech-subscription-expired");
+      // // 🔑 PRIORIDADE 1: Verificar se há novos parâmetros na URL (nova sessão)
+      // if (telefoneParam && codigoParam) {
+      //   // Validar formato do telefone (deve começar com +)
+      //   if (telefoneParam.startsWith("+")) {
+      //     console.log("✅ Novos parâmetros capturados da URL:", {
+      //       telefone: telefoneParam,
+      //       codigoTemp: codigoParam,
+      //     });
 
-          // Salvar no localStorage
-          localStorage.setItem("fenontech-telefone", telefoneParam);
-          localStorage.setItem("fenontech-codigoTemp", codigoParam);
+      //     // Limpar flags de sessão e assinatura expiradas (nova sessão iniciando)
+      //     localStorage.removeItem("fenontech-session-expired");
+      //     localStorage.removeItem("fenontech-subscription-expired");
 
-          // Redirecionar para URL limpa (sem query params)
-          window.history.replaceState({}, "", window.location.pathname);
-          setIsAuthenticated(true);
-          setIsLoading(false);
-          return;
-        }
-      }
+      //     // Salvar no localStorage
+      //     localStorage.setItem("fenontech-telefone", telefoneParam);
+      //     localStorage.setItem("fenontech-codigoTemp", codigoParam);
 
-      // 🔒 PRIORIDADE 2: Verificar se a assinatura expirou (erro 403)
-      const subscriptionExpiredFlag = localStorage.getItem(
-        "fenontech-subscription-expired"
-      );
-      if (subscriptionExpiredFlag === "true") {
-        console.log("💳 Assinatura expirada detectada - mostrando modal");
-        // Não seta subscriptionExpired aqui, apenas permite login normal
-        // O modal será mostrado depois
-      }
+      //     // Redirecionar para URL limpa (sem query params)
+      //     window.history.replaceState({}, "", window.location.pathname);
+      //     setIsAuthenticated(true);
+      //     setIsLoading(false);
+      //     return;
+      //   }
+      // }
 
-      // 🔒 PRIORIDADE 3: Verificar se a sessão expirou (erro 401)
-      const sessionExpiredFlag = localStorage.getItem(
-        "fenontech-session-expired"
-      );
-      if (sessionExpiredFlag === "true") {
-        console.log("🔒 Sessão expirada detectada");
-        setSessionExpired(true);
-        setIsLoading(false);
-        return;
-      }
+      // // 🔒 PRIORIDADE 2: Verificar se a assinatura expirou (erro 403)
+      // const subscriptionExpiredFlag = localStorage.getItem(
+      //   "fenontech-subscription-expired"
+      // );
+      // if (subscriptionExpiredFlag === "true") {
+      //   console.log("💳 Assinatura expirada detectada - mostrando modal");
+      //   // Não seta subscriptionExpired aqui, apenas permite login normal
+      //   // O modal será mostrado depois
+      // }
 
-      // Verificar se já existe no localStorage
-      const storedTelefone = localStorage.getItem("fenontech-telefone");
-      const storedCodigoTemp = localStorage.getItem("fenontech-codigoTemp");
+      // // 🔒 PRIORIDADE 3: Verificar se a sessão expirou (erro 401)
+      // const sessionExpiredFlag = localStorage.getItem(
+      //   "fenontech-session-expired"
+      // );
+      // if (sessionExpiredFlag === "true") {
+      //   console.log("🔒 Sessão expirada detectada");
+      //   setSessionExpired(true);
+      //   setIsLoading(false);
+      //   return;
+      // }
 
-      if (storedTelefone && storedCodigoTemp) {
-        console.log("✅ Credenciais encontradas no localStorage");
-        setIsAuthenticated(true);
-        setIsLoading(false);
-        return;
-      }
+      // // Verificar se já existe no localStorage
+      // const storedTelefone = localStorage.getItem("fenontech-telefone");
+      // const storedCodigoTemp = localStorage.getItem("fenontech-codigoTemp");
 
-      // Não tem credenciais válidas - redirecionar para login
-      console.log("❌ Credenciais não encontradas - redirecionando para login");
-      window.location.href = APP_URLS.LOGIN;
+      // if (storedTelefone && storedCodigoTemp) {
+      //   console.log("✅ Credenciais encontradas no localStorage");
+      //   setIsAuthenticated(true);
+      //   setIsLoading(false);
+      //   return;
+      // }
+
+      // // Não tem credenciais válidas - redirecionar para login
+      // console.log("❌ Credenciais não encontradas - redirecionando para login");
+      // window.location.href = APP_URLS.LOGIN;
     };
 
     authenticateUser();
@@ -82,10 +94,6 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   // Não redireciona para página de assinatura - usa modal overlay
 
-  // �🔒 MOSTRAR PÁGINA DE SESSÃO EXPIRADA
-  if (sessionExpired) {
-    return <SessionExpired />;
-  }
 
   if (isLoading) {
     return (
@@ -110,6 +118,7 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   // ✅ USUÁRIO AUTENTICADO - Verificar se deve mostrar modal de assinatura
   const showSubscriptionModal =
+    !isDevelopment && // Não mostrar em desenvolvimento
     localStorage.getItem("fenontech-subscription-expired") === "true";
 
   return (

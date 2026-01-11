@@ -1,0 +1,228 @@
+.pagamentos-mobile {
+  min-height: 100vh;
+  background: #000000;
+  font-family: "Poppins", sans-serif;
+  padding-bottom: 200px;
+}
+
+/* Header */
+.pagamentos-mobile-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  background: #000000;
+  z-index: 100;
+}
+
+.pagamentos-back-button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.pagamentos-back-button:active {
+  transform: scale(0.9);
+}
+
+.pagamentos-mobile-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #888888;
+  margin: 0;
+}
+
+/* Content */
+.pagamentos-mobile-content {
+  padding: 1rem 1.25rem;
+}
+
+/* Current Plan Card */
+.current-plan-card {
+  background: #1a1a1a;
+  border-radius: 20px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 2rem;
+}
+
+.current-plan-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 1.25rem 0;
+}
+
+.current-plan-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plan-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.plan-info-label {
+  font-size: 0.875rem;
+  color: #888888;
+  font-weight: 400;
+}
+
+.plan-info-value {
+  font-size: 1.1rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.plan-info-value.highlight {
+  color: #ffd700;
+  font-weight: 700;
+}
+
+/* Payment History */
+.payment-history-section {
+  margin-top: 2rem;
+}
+
+.payment-history-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+  letter-spacing: -0.3px;
+}
+
+.payment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Payment Item */
+.payment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid #2a2a2a;
+  transition: background-color 0.2s ease;
+}
+
+.payment-item:first-child {
+  border-top: 1px solid #2a2a2a;
+}
+
+.payment-item:active {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.payment-item-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.payment-icon {
+  flex-shrink: 0;
+}
+
+.payment-plan-name {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.payment-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.payment-amount {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.payment-date {
+  color: #666666;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+/* Scrollbar */
+.payment-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.payment-list::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+.payment-list::-webkit-scrollbar-thumb {
+  background: #ffd700;
+  border-radius: 3px;
+}
+
+.payment-list::-webkit-scrollbar-thumb:hover {
+  background: #ffed4a;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .pagamentos-mobile-header {
+    padding: 1rem;
+  }
+
+  .pagamentos-mobile-content {
+    padding: 1rem;
+  }
+
+  .current-plan-card {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .current-plan-name {
+    font-size: 1.3rem;
+  }
+
+  .plan-info-label {
+    font-size: 0.8rem;
+  }
+
+  .plan-info-value {
+    font-size: 1rem;
+  }
+
+  .payment-history-title {
+    font-size: 1.2rem;
+  }
+
+  .payment-plan-name {
+    font-size: 0.95rem;
+  }
+
+  .payment-amount {
+    font-size: 0.95rem;
+  }
+
+  .payment-date {
+    font-size: 0.7rem;
+  }
+}

@@ -1,0 +1,108 @@
+.floating-action-button {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 1000;
+  font-family: "Poppins", sans-serif;
+}
+
+.floating-action-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.floating-action-button:active {
+  transform: scale(0.95);
+}
+
+/* Cores */
+.fab-primary {
+  background: linear-gradient(135deg, #ffd700 0%, #e6c200 100%);
+  color: #000;
+}
+
+.fab-primary:hover {
+  background: linear-gradient(135deg, #ffdd00 0%, #f0cc00 100%);
+}
+
+.fab-secondary {
+  background: linear-gradient(135deg, #666 0%, #444 100%);
+  color: #fff;
+}
+
+.fab-secondary:hover {
+  background: linear-gradient(135deg, #777 0%, #555 100%);
+}
+
+/* Tamanhos */
+.fab-small {
+  width: 48px;
+  height: 48px;
+}
+
+.fab-small svg {
+  width: 18px;
+  height: 18px;
+}
+
+.fab-medium {
+  width: 56px;
+  height: 56px;
+}
+
+.fab-medium svg {
+  width: 24px;
+  height: 24px;
+}
+
+.fab-large {
+  width: 64px;
+  height: 64px;
+}
+
+.fab-large svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .floating-action-button {
+    bottom: 90px;
+    right: 16px;
+  }
+
+  .fab-medium {
+    width: 52px;
+    height: 52px;
+  }
+
+  .fab-medium svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* Animação de entrada */
+.floating-action-button {
+  animation: fabSlideUp 0.3s ease-out;
+}
+
+@keyframes fabSlideUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

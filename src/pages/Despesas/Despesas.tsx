@@ -1,17 +1,17 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import "./Despesas.css";
-import { UnifiedFinancialCard } from "../../components/Cards";
-import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import ExpensesPieChart from "../../components/ExpensesPieChart";
-import MonthYearSelector from "../../components/MonthYearSelector";
-import DaySelector from "../../components/DaySelector";
+import PageHeader from "../../components/PageHeader";
+import FinancialCardGrid from "../../components/FinancialCardGrid";
+import CategoryBudgetCard from "../../components/CategoryBudgetCard";
+import MonthlyBarChart from "../../components/MonthlyBarChart";
 import { ExpenseModal } from "../../components/Modals";
 
 import { useTransaction } from "../../contexts/TransactionContext";
-import useDespesasNavigation from "../../hooks/useDespesasNavigation";
-import useTabs from "../../hooks/useTabs";
+import { useFilter } from "../../contexts/FilterContext";
+
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import {
   transactionApiService,
@@ -23,16 +23,12 @@ import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
 const Despesas: React.FC = () => {
-  const currentDate = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const { selectedMonth, selectedYear, setSelectedMonth, setSelectedYear } =
+    useFilter();
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<any | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  const { activeCard, switchCard } = useDespesasNavigation("despesas");
-  const { activeTab, switchTab } = useTabs("graficos");
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
   const {
@@ -331,12 +327,11 @@ const Despesas: React.FC = () => {
     handleCloseExpenseModal();
   };
 
-  // Função para filtrar dados por mês/ano e dia
-  const filterByMonthYearDay = (
+  // Função para filtrar dados por mês/ano
+  const filterByMonthYear = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number,
-    selectedDay: number | null
+    selectedYear: number
   ) => {
     return data.filter((item) => {
       // Parse correto da data para evitar problema de timezone
@@ -344,32 +339,22 @@ const Despesas: React.FC = () => {
       const [year, month, day] = dateString.split("-").map(Number);
       const itemDate = new Date(year, month - 1, day);
 
-      const matchesMonthYear =
+      return (
         itemDate.getMonth() === selectedMonth &&
-        itemDate.getFullYear() === selectedYear;
-
-      if (!matchesMonthYear) return false;
-
-      // Se um dia específico foi selecionado, filtrar por ele também
-      if (selectedDay !== null) {
-        return itemDate.getDate() === selectedDay;
-      }
-
-      return true;
+        itemDate.getFullYear() === selectedYear
+      );
     });
   };
 
-  // Filtrar despesas e contas a pagar pelo mês/ano/dia selecionado
+  // Filtrar despesas e contas a pagar pelo mês/ano selecionado
   const filteredExpenses = useMemo(
-    () =>
-      filterByMonthYearDay(expenses, selectedMonth, selectedYear, selectedDay),
-    [expenses, selectedMonth, selectedYear, selectedDay]
+    () => filterByMonthYear(expenses, selectedMonth, selectedYear),
+    [expenses, selectedMonth, selectedYear]
   );
 
   const filteredPayables = useMemo(
-    () =>
-      filterByMonthYearDay(payables, selectedMonth, selectedYear, selectedDay),
-    [payables, selectedMonth, selectedYear, selectedDay]
+    () => filterByMonthYear(payables, selectedMonth, selectedYear),
+    [payables, selectedMonth, selectedYear]
   );
 
   // Converter dados do contexto para formato das tabelas
@@ -428,26 +413,6 @@ const Despesas: React.FC = () => {
     (sum, payable) => sum + payable.value,
     0
   );
-
-  // Configuração das opções do card mobile
-  const mobileCardOptions = [
-    {
-      key: "despesas",
-      label: "Despesas",
-      title: "DESPESA ATUAL",
-      value: formatValue(`R$ ${totalExpenses.toFixed(2).replace(".", ",")}`),
-      icon: carteiraCardDespesasdoMês,
-      type: "negative" as const,
-    },
-    {
-      key: "contas",
-      label: "A Pagar",
-      title: "CONTAS A PAGAR",
-      value: formatValue(`R$ ${totalPayables.toFixed(2).replace(".", ",")}`),
-      icon: simboloMenuBolsoContasAPagar,
-      type: "negative" as const,
-    },
-  ];
 
   // Dados dinâmicos das tabelas (usando dados filtrados)
   const despesasData = formatExpenseData(filteredExpenses);
@@ -537,8 +502,6 @@ const Despesas: React.FC = () => {
     }));
   }, [expenses, selectedYear]);
 
-  const maxValue = Math.max(...monthlyData.map((item) => item.value), 1); // Mínimo 1 para evitar divisão por zero
-
   // Dados dinâmicos para barras de visão por categoria
   const categoryBarsData = useMemo(() => {
     const predefinedCategories = [
@@ -621,137 +584,40 @@ const Despesas: React.FC = () => {
   return (
     <div className="despesas-page">
       {/* Filtro de Mês, Ano e Dia */}
-      <div className="despesas-header">
-        <div className="despesas-filters">
-          <MonthYearSelector
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-            className="header-style"
-          />
-          <DaySelector
-            selectedDay={selectedDay}
-            onDayChange={setSelectedDay}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            className="day-filter"
-          />
-        </div>
-      </div>
-
-      {/* Sistema de Navegação Integrado - APENAS MOBILE */}
-      <MobileFinancialCard
-        navigationOptions={mobileCardOptions}
-        activeCard={activeCard}
-        onCardSwitch={(cardKey) => switchCard(cardKey as any)}
-        className="despesas-mobile-card"
+      <PageHeader
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        onMonthChange={setSelectedMonth}
+        onYearChange={setSelectedYear}
       />
 
-      {/* Cards principais - Desktop */}
-      <div className="despesas-cards desktop-content">
-        <UnifiedFinancialCard
-          title="DESPESA ATUAL"
-          value={formatValue(
-            `R$ ${totalExpenses.toFixed(2).replace(".", ",")}`
-          )}
-          icon={carteiraCardDespesasdoMês}
-          type="negative"
-          className="despesa-card-large"
-          showToggle={true}
-          isBalanceVisible={isBalanceVisible}
-          onToggleVisibility={toggleBalanceVisibility}
-        />
-        <UnifiedFinancialCard
-          title="Contas a pagar"
-          value={formatValue(
-            `R$ ${totalPayables.toFixed(2).replace(".", ",")}`
-          )}
-          icon={simboloMenuBolsoContasAPagar}
-          type="neutral"
-          className="despesa-card-large"
-          showToggle={true}
-          isBalanceVisible={isBalanceVisible}
-          onToggleVisibility={toggleBalanceVisibility}
-        />
-      </div>
+      {/* Cards principais */}
+      <FinancialCardGrid
+        cards={[
+          {
+            title: "DESPESA ATUAL",
+            value: formatValue(
+              `R$ ${totalExpenses.toFixed(2).replace(".", ",")}`
+            ),
+            icon: carteiraCardDespesasdoMês,
+            type: "negative",
+          },
+          {
+            title: "Contas a pagar",
+            value: formatValue(
+              `R$ ${totalPayables.toFixed(2).replace(".", ",")}`
+            ),
+            icon: simboloMenuBolsoContasAPagar,
+            type: "neutral",
+          },
+        ]}
+        isBalanceVisible={isBalanceVisible}
+        onToggleVisibility={toggleBalanceVisibility}
+        className="despesas-cards"
+      />
 
-      {/* Sistema de Tabs - apenas no mobile */}
-      <div className="dashboard-tabs mobile-only">
-        <button
-          className={`tab-button ${activeTab === "graficos" ? "active" : ""}`}
-          onClick={() => switchTab("graficos")}
-        >
-          Gráfico
-        </button>
-        <button
-          className={`tab-button ${activeTab === "principal" ? "active" : ""}`}
-          onClick={() => switchTab("principal")}
-        >
-          Transações
-        </button>
-      </div>
-
-      {/* Conteúdo Tab Principal - Apenas Mobile */}
-      <div
-        className={`tab-content mobile-only tab-principal ${
-          activeTab === "principal" ? "active" : ""
-        }`}
-        style={{ display: activeTab === "principal" ? "block" : "none" }}
-      >
-        <div className="dashboard-grid">
-          {/* Mostrar tabela baseada no card ativo */}
-          {activeCard === "despesas" ? (
-            <TransactionTable
-              title="Últimas Saídas"
-              columns={despesasColumns}
-              data={despesasData}
-              className="despesas-table-card"
-              showSummary={true}
-              summaryCountLabel="Saídas"
-              valueKey="value"
-              showActions={true}
-              onEdit={handleEditExpense}
-              onDelete={handleDeleteExpense}
-            />
-          ) : (
-            <TransactionTable
-              title="Contas a Pagar"
-              columns={contasAPagarColumns}
-              data={contasAPagarData}
-              className="despesas-table-card"
-              showSummary={true}
-              summaryCountLabel="Contas"
-              valueKey="value"
-              showActions={true}
-              onEdit={handleEditExpense}
-              onDelete={handleDeleteExpense}
-            />
-          )}
-        </div>
-      </div>
-
-      {/* Conteúdo Tab Análise - Apenas Mobile */}
-      <div
-        className={`tab-content mobile-only tab-analise ${
-          activeTab === "graficos" ? "active" : ""
-        }`}
-        style={{ display: activeTab === "graficos" ? "block" : "none" }}
-      >
-        <div className="dashboard-grid">
-          {/* Despesas por categoria - Gráfico de Pizza */}
-          <ExpensesPieChart
-            title="Despesas por categoria"
-            totalLabel="TOTAL DESPESAS"
-            totalValue={`R$ ${totalExpenses.toFixed(2).replace(".", ",")}`}
-            categories={pieChartData}
-            className="despesas-card chart-card"
-          />
-        </div>
-      </div>
-
-      {/* Conteúdo Desktop - Sempre Visível */}
-      <div className="despesas-content desktop-content">
+      {/* Conteúdo Principal */}
+      <div className="despesas-content">
         {/* Primeira linha com tabelas */}
         <div className="despesas-tables-row">
           {/* Últimas Saídas */}
@@ -795,78 +661,27 @@ const Despesas: React.FC = () => {
           />
 
           {/* Visão por categoria */}
-          <div className="despesas-card category-bars-card">
-            <h3 className="card-header">Visão por categoria</h3>
-            <div className="category-bars">
-              {categoryBarsData.length > 0 ? (
-                categoryBarsData.map((item, index) => (
-                  <div key={index} className="category-bar-item">
-                    <div className="category-info">
-                      <span className="category-name">{item.name}</span>
-                      <span className="category-amount">
-                        (R$ {item.spent.toFixed(2).replace(".", ",")} de R${" "}
-                        {item.total.toFixed(2).replace(".", ",")})
-                      </span>
-                    </div>
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{
-                          width: `${
-                            item.total > 0
-                              ? Math.min((item.spent / item.total) * 100, 100)
-                              : 0
-                          }%`,
-                          backgroundColor: item.color,
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p
-                  style={{
-                    textAlign: "center",
-                    color: "#999",
-                    padding: "20px",
-                  }}
-                >
-                  Nenhum orçamento planejado para este mês
-                </p>
-              )}
-            </div>
-          </div>
+          <CategoryBudgetCard
+            data={categoryBarsData.map((item) => ({
+              name: item.name,
+              spent: item.spent,
+              planned: item.total,
+              percentage:
+                item.total > 0
+                  ? Math.min((item.spent / item.total) * 100, 100)
+                  : 0,
+              color: item.color,
+            }))}
+            className="despesas-card category-bars-card"
+          />
         </div>
 
         {/* Gráfico de Despesas Mensais */}
-        <div className="despesas-card chart-card">
-          <h3 className="card-header">Despesas por Mês</h3>
-          <div className="chart-container">
-            <div className="bar-chart">
-              {monthlyData.map((item, index) => (
-                <div key={index} className="bar-item">
-                  <div className="bar-wrapper">
-                    <div
-                      className="bar"
-                      style={{
-                        height: `${(item.value / maxValue) * 100}%`,
-                        opacity: item.value === 0 ? 0.3 : 1,
-                      }}
-                      title={`${item.month}: R$ ${item.value
-                        .toFixed(2)
-                        .replace(".", ",")}`}
-                    >
-                      <span className="bar-tooltip">
-                        R$ {item.value.toFixed(2).replace(".", ",")}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="bar-label">{item.month}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <MonthlyBarChart
+          title="Despesas por Mês"
+          data={monthlyData}
+          className="despesas-card chart-card"
+        />
       </div>
 
       {/* Botão Flutuante de Adicionar */}

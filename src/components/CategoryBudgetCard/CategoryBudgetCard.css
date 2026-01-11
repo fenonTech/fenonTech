@@ -1,0 +1,74 @@
+.category-budget-card {
+  background: #121212;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #121212;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.category-budget-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(135, 131, 131, 0.3);
+  border-color: #ffd900;
+}
+
+.category-budget-card .card-header {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #333;
+  font-family: "Poppins", sans-serif;
+  color: white;
+}
+
+.category-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.category-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.category-name {
+  font-weight: 600;
+  color: white;
+}
+
+.category-amount {
+  color: #999;
+  font-size: 0.8125rem;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #2a2a2a;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.empty-message {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  margin: 0;
+}

@@ -13,6 +13,7 @@ interface UnifiedFinancialCardProps {
   showAddButton?: boolean;
   onAddClick?: () => void;
   addButtonText?: string;
+  onClick?: () => void;
 }
 
 const UnifiedFinancialCard: React.FC<UnifiedFinancialCardProps> = ({
@@ -27,6 +28,7 @@ const UnifiedFinancialCard: React.FC<UnifiedFinancialCardProps> = ({
   showAddButton = false,
   onAddClick,
   addButtonText = "Adicionar",
+  onClick,
 }) => {
   // Função para detectar valores grandes
   const getValueSizeAttribute = (value: string): Record<string, string> => {
@@ -47,7 +49,13 @@ const UnifiedFinancialCard: React.FC<UnifiedFinancialCardProps> = ({
   const valueAttributes = getValueSizeAttribute(value);
 
   return (
-    <div className={`unified-financial-card ${type} ${className}`}>
+    <div
+      className={`unified-financial-card ${type} ${className} ${
+        onClick ? "clickable" : ""
+      }`}
+      onClick={onClick}
+      style={onClick ? { cursor: "pointer" } : undefined}
+    >
       <div className="card-icon">
         <img src={icon} alt={title} />
       </div>
@@ -68,7 +76,10 @@ const UnifiedFinancialCard: React.FC<UnifiedFinancialCardProps> = ({
           {showToggle && (
             <button
               className="balance-toggle-btn"
-              onClick={onToggleVisibility}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleVisibility?.();
+              }}
               aria-label={isBalanceVisible ? "Ocultar saldo" : "Mostrar saldo"}
             >
               <svg

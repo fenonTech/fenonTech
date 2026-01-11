@@ -1,21 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./Layout.css";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import BottomNavigation from "./BottomNavigation";
-import Dashboard from "../pages/Dashboard";
-import Receitas from "../pages/Receitas";
-import Despesas from "../pages/Despesas";
-import Planejamento from "../pages/Planejamento";
+import Dashboard from "../views/desktop/Dashboard";
+import Receitas from "../views/desktop/Receitas";
+import Despesas from "../views/desktop/Despesas";
 import Configuracoes from "../pages/Configuracoes";
 import { APP_URLS } from "../config";
 
 const Layout: React.FC = () => {
   const [activeItem, setActiveItem] = useState("dashboard");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    // Inicializar como fechado no mobile
-    return window.innerWidth <= 600;
-  });
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleItemClick = (item: string) => {
@@ -36,7 +31,6 @@ const Layout: React.FC = () => {
     }
   };
 
-  // Funções específicas para o dropdown do header mobile
   const handleConfigClick = () => {
     setActiveItem("configuracao");
   };
@@ -60,19 +54,6 @@ const Layout: React.FC = () => {
     setShowLogoutModal(false);
   };
 
-  // Gerenciar estado do sidebar baseado no tamanho da tela
-  useEffect(() => {
-    const handleResize = () => {
-      const isMobile = window.innerWidth <= 600;
-      if (isMobile) {
-        setSidebarCollapsed(true); // Sempre fechado no mobile inicialmente
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   const getPageInfo = () => {
     switch (activeItem) {
       case "dashboard":
@@ -89,11 +70,6 @@ const Layout: React.FC = () => {
         return {
           title: "Despesas",
           description: "Controle seus gastos e despesas mensais",
-        };
-      case "planejamento":
-        return {
-          title: "Planejamento",
-          description: "Planeje suas receitas e despesas mensais",
         };
       case "configuracao":
         return {
@@ -112,17 +88,15 @@ const Layout: React.FC = () => {
   const renderContent = () => {
     switch (activeItem) {
       case "dashboard":
-        return <Dashboard />;
+        return <Dashboard onNavigate={setActiveItem} />;
       case "receitas":
         return <Receitas />;
       case "despesas":
         return <Despesas />;
-      case "planejamento":
-        return <Planejamento />;
       case "configuracao":
         return <Configuracoes />;
       default:
-        return <Dashboard />;
+        return <Dashboard onNavigate={setActiveItem} />;
     }
   };
 
@@ -150,7 +124,6 @@ const Layout: React.FC = () => {
         />
         <main className="content">{renderContent()}</main>
       </div>
-      <BottomNavigation activeTab={activeItem} onTabChange={handleItemClick} />
 
       {/* Modal de Confirmação de Logout */}
       {showLogoutModal && (

@@ -6,6 +6,13 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
 :root {
   font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
     "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
@@ -18,12 +25,12 @@
 body {
   background-color: #000000;
   color: #fff;
-  min-height: 100vh;
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Padrão de scrollbar customizada para todo o projeto */

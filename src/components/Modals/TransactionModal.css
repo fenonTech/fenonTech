@@ -243,8 +243,8 @@
   }
 
   .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 
   .form-group {
@@ -305,4 +305,130 @@
     font-size: 0.8rem; /* Evitar zoom no iOS */
     width: 100%;
   }
+}
+
+/* Date Picker Customizado */
+.date-picker-custom {
+  position: relative;
+  width: 100%;
+}
+
+.date-picker-button {
+  width: 100%;
+  padding: 0.875rem;
+  background: #0d0d0d;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.9375rem;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.date-picker-button:hover {
+  border-color: #c39703;
+  background: #121212;
+}
+
+.date-picker-button.error {
+  border-color: #ff6b6b;
+}
+
+.date-picker-button svg {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.date-picker-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  padding: 1rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.date-picker-section {
+  margin-bottom: 1rem;
+}
+
+.date-picker-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.date-picker-label {
+  display: block;
+  color: #c39703;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.date-picker-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.date-picker-option {
+  padding: 0.5rem;
+  background: #0d0d0d;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 0.875rem;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.date-picker-option:hover {
+  background: rgba(195, 151, 3, 0.1);
+  border-color: #c39703;
+  color: #fff;
+}
+
+.date-picker-option.selected {
+  background: rgba(195, 151, 3, 0.2);
+  border-color: #c39703;
+  color: #c39703;
+  font-weight: 600;
+}
+
+.date-picker-confirm {
+  width: 100%;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  background: #c39703;
+  border: none;
+  border-radius: 8px;
+  color: #000;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.date-picker-confirm:hover {
+  background: #d4a804;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(195, 151, 3, 0.3);
+}
+
+.date-picker-confirm:active {
+  transform: translateY(0);
 }

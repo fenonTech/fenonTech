@@ -1,10 +1,14 @@
 .configuracoes-page {
-  padding: 2rem;
+  padding: 2rem 2rem 10rem 2rem;
   margin: 1%;
   border-radius: 16px;
   background: #0b0b0b;
-  min-height: calc(100vh - 100px);
+  height: calc(100vh - 40px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
   color: white;
+  box-sizing: border-box;
 }
 
 /* Header com filtro de mês/ano */

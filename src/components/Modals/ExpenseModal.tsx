@@ -45,19 +45,23 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
   useEffect(() => {
     if (editingExpense && mode === "edit") {
-      // Converter a data para formato ISO se necessário
+      // Converter a data para formato ISO
       const formatDateForInput = (dateString: string) => {
         const date = new Date(dateString);
         return date.toISOString().split("T")[0];
       };
 
+      // Formatar valor para exibição
+      const formatValueForDisplay = (value: number): string => {
+        return value.toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      };
+
       setFormData({
         category: editingExpense.category,
-        value: editingExpense.formattedValue
-          ? editingExpense.formattedValue
-              .replace(/[R$\s]/g, "")
-              .replace(",", ".")
-          : editingExpense.value.toString(),
+        value: formatValueForDisplay(editingExpense.value),
         date: formatDateForInput(editingExpense.date),
       });
     } else {
@@ -70,11 +74,33 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
     setErrors({});
   }, [editingExpense, mode, isOpen]);
 
+  const formatCurrencyInput = (value: string): string => {
+    // Remove tudo que não for número
+    const numbers = value.replace(/\D/g, "");
+
+    if (!numbers) return "";
+
+    // Converte para número e divide por 100 para ter centavos
+    const numValue = parseFloat(numbers) / 100;
+
+    // Formata como moeda brasileira
+    return numValue.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "value") {
+      const formattedValue = formatCurrencyInput(value);
+      setFormData((prev) => ({ ...prev, [name]: formattedValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
 
     // Limpar erro do campo quando o usuário começar a digitar
     if (errors[name]) {
@@ -92,7 +118,9 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
     if (!formData.value) {
       newErrors.value = "Valor é obrigatório";
     } else {
-      const numValue = parseFloat(formData.value.replace(",", "."));
+      const numValue = parseFloat(
+        formData.value.replace(/\./g, "").replace(",", ".")
+      );
       if (isNaN(numValue) || numValue <= 0) {
         newErrors.value = "Valor deve ser um número positivo";
       }
@@ -111,7 +139,9 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
     if (!validateForm()) return;
 
-    const numValue = parseFloat(formData.value.replace(",", "."));
+    const numValue = parseFloat(
+      formData.value.replace(/\./g, "").replace(",", ".")
+    );
 
     const expenseData = {
       description: formData.category, // Usar categoria como descrição

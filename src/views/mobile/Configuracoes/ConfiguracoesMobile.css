@@ -1,0 +1,205 @@
+.configuracoes-mobile {
+  min-height: 100vh;
+  background: #000000;
+  font-family: "Poppins", sans-serif;
+  padding-bottom: 200px;
+}
+
+/* Header */
+.configuracoes-mobile-header {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  background: #000000;
+  z-index: 100;
+}
+
+.config-back-button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.config-back-button:active {
+  transform: scale(0.9);
+}
+
+.configuracoes-mobile-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* Content */
+.configuracoes-mobile-content {
+  padding: 0 1.25rem;
+}
+
+/* Profile Section */
+.config-profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.config-profile-avatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin-bottom: 1rem;
+}
+
+.config-profile-avatar img,
+.config-profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.config-profile-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #000000;
+  font-weight: 700;
+  font-size: 2.5rem;
+}
+
+.config-profile-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 32px;
+  height: 32px;
+  background: #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  border: 2px solid #000000;
+}
+
+.config-profile-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.config-profile-subtitle {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: #888888;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* Menu Section */
+.config-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.config-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  padding: 1.25rem 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.config-menu-item:first-child {
+  border-top: 1px solid #1a1a1a;
+}
+
+.config-menu-item:active {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.config-menu-item-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.config-menu-icon {
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.config-menu-text {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+}
+
+.config-menu-arrow {
+  color: #888888;
+  flex-shrink: 0;
+}
+
+/* Responsividade */
+@media (max-width: 480px) {
+  .configuracoes-mobile-header {
+    padding: 1rem;
+  }
+
+  .configuracoes-mobile-content {
+    padding: 0 1rem;
+  }
+
+  .config-profile-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .config-profile-avatar-placeholder {
+    font-size: 2rem;
+  }
+
+  .config-profile-badge {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+
+  .config-profile-name {
+    font-size: 1rem;
+  }
+
+  .config-profile-subtitle {
+    font-size: 0.65rem;
+  }
+
+  .config-menu-item {
+    padding: 1rem 0;
+  }
+
+  .config-menu-text {
+    font-size: 0.95rem;
+  }
+}

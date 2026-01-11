@@ -1,0 +1,176 @@
+.header-mobile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #000000;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  margin: 0.5rem 0rem 0rem 0rem;
+}
+
+/* Logo */
+.header-mobile-logo {
+  display: flex;
+  align-items: center;
+}
+
+.header-mobile .logo-navbar {
+  width: 50px;
+  height: auto;
+}
+
+/* User Section */
+.header-mobile-user {
+  position: relative;
+}
+
+.header-mobile-user-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.header-mobile-user-button:active {
+  transform: scale(0.95);
+}
+
+.header-mobile-user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-mobile-user-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #ffffff;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: "Poppins", sans-serif;
+}
+
+.header-mobile-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-mobile-user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header-mobile-user-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #0b0b0b;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.header-mobile-dropdown-icon {
+  color: #ccc;
+  transition: transform 0.3s ease;
+}
+
+.header-mobile-dropdown-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+.header-mobile-dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 99;
+}
+
+.header-mobile-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  z-index: 100;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.header-mobile-dropdown-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: "Poppins", sans-serif;
+  text-align: left;
+}
+
+.header-mobile-dropdown-item:hover {
+  background: #252525;
+}
+
+.header-mobile-dropdown-item:active {
+  background: #2a2a2a;
+}
+
+.header-mobile-dropdown-item svg {
+  color: #ccc;
+  flex-shrink: 0;
+}
+
+.header-mobile-dropdown-item.logout {
+  border-top: 1px solid #333;
+  color: #ff4444;
+}
+
+.header-mobile-dropdown-item.logout svg {
+  color: #ff4444;
+}
+
+.header-mobile-dropdown-item.logout:hover {
+  background: rgba(255, 68, 68, 0.1);
+}

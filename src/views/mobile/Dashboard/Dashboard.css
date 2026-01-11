@@ -1,0 +1,7 @@
+/* Dashboard Mobile Styles - usando classes globais do LayoutMobile.css */
+
+.dashboard-mobile-content p {
+  text-align: center;
+  margin-top: 2rem;
+  color: #999;
+}

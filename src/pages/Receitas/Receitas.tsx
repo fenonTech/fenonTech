@@ -1,16 +1,15 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import "./Receitas.css";
-import { UnifiedFinancialCard } from "../../components/Cards";
-import MobileFinancialCard from "../../components/MobileFinancialCard";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
-import MonthYearSelector from "../../components/MonthYearSelector";
-import DaySelector from "../../components/DaySelector";
+import PageHeader from "../../components/PageHeader";
+import FinancialCardGrid from "../../components/FinancialCardGrid";
+import MonthlyBarChart from "../../components/MonthlyBarChart";
 import { IncomeModal } from "../../components/Modals";
 
 import { useTransaction } from "../../contexts/TransactionContext";
+import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
-import useReceitasNavigation from "../../hooks/useReceitasNavigation";
 import {
   transactionApiService,
   parseMoneyValue,
@@ -21,17 +20,14 @@ import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import simboloMeuBolsoContasAReceberCard from "../../assets/simboloMeuBolsoContasAReceberCard.png";
 
 const Receitas: React.FC = () => {
-  const currentDate = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
-  const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
-  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const { selectedMonth, selectedYear, setSelectedMonth, setSelectedYear } =
+    useFilter();
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<any | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
-  const { activeCard, switchCard } = useReceitasNavigation("receita");
   const {
     incomes,
     receivables,
@@ -315,49 +311,33 @@ const Receitas: React.FC = () => {
     handleCloseIncomeModal();
   };
 
-  // Função para filtrar dados por mês/ano e dia
-  const filterByMonthYearDay = (
+  // Função para filtrar dados por mês/ano
+  const filterByMonthYear = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number,
-    selectedDay: number | null
+    selectedYear: number
   ) => {
     return data.filter((item) => {
       const dateString = item.date || item.dueDate;
       const [year, month, day] = dateString.split("-").map(Number);
       const itemDate = new Date(year, month - 1, day);
 
-      const matchesMonthYear =
+      return (
         itemDate.getMonth() === selectedMonth &&
-        itemDate.getFullYear() === selectedYear;
-
-      if (!matchesMonthYear) return false;
-
-      // Se um dia específico foi selecionado, filtrar por ele também
-      if (selectedDay !== null) {
-        return itemDate.getDate() === selectedDay;
-      }
-
-      return true;
+        itemDate.getFullYear() === selectedYear
+      );
     });
   };
 
-  // Filtrar receitas e contas a receber pelo mês/ano/dia selecionado
+  // Filtrar receitas e contas a receber pelo mês/ano selecionado
   const filteredIncomes = useMemo(
-    () =>
-      filterByMonthYearDay(incomes, selectedMonth, selectedYear, selectedDay),
-    [incomes, selectedMonth, selectedYear, selectedDay]
+    () => filterByMonthYear(incomes, selectedMonth, selectedYear),
+    [incomes, selectedMonth, selectedYear]
   );
 
   const filteredReceivables = useMemo(
-    () =>
-      filterByMonthYearDay(
-        receivables,
-        selectedMonth,
-        selectedYear,
-        selectedDay
-      ),
-    [receivables, selectedMonth, selectedYear, selectedDay]
+    () => filterByMonthYear(receivables, selectedMonth, selectedYear),
+    [receivables, selectedMonth, selectedYear]
   );
 
   // Converter dados do contexto para formato das tabelas
@@ -417,26 +397,6 @@ const Receitas: React.FC = () => {
     0
   );
 
-  // Configuração das opções do card mobile
-  const mobileCardOptions = [
-    {
-      key: "receita",
-      label: "Receitas",
-      title: "Receitas do mês",
-      value: formatValue(totalIncomes),
-      icon: sacoDeDinheiro,
-      type: "positive" as const,
-    },
-    {
-      key: "contas",
-      label: "A Receber",
-      title: "Valores a Receber",
-      value: formatValue(totalReceivables),
-      icon: simboloMeuBolsoContasAReceberCard,
-      type: "positive" as const,
-    },
-  ];
-
   // Dados dinâmicos das tabelas (usando dados filtrados)
   const receitasData = formatIncomeData(filteredIncomes);
   const contasAReceberData = formatReceivableData(filteredReceivables);
@@ -475,8 +435,6 @@ const Receitas: React.FC = () => {
       value: monthlyTotals[index],
     }));
   }, [incomes, selectedYear]);
-
-  const maxValue = Math.max(...monthlyData.map((item) => item.value), 1); // Mínimo 1 para evitar divisão por zero
 
   // Definir colunas para a tabela de receitas
   const receitasColumns: TableColumn[] = [
@@ -517,93 +475,36 @@ const Receitas: React.FC = () => {
   return (
     <div className="receitas-page">
       {/* Filtro de Mês e Ano */}
-      <div className="receitas-header">
-        <div className="receitas-filters">
-          <MonthYearSelector
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            onMonthChange={setSelectedMonth}
-            onYearChange={setSelectedYear}
-            className="header-style"
-          />
-          <DaySelector
-            selectedDay={selectedDay}
-            onDayChange={setSelectedDay}
-            selectedMonth={selectedMonth}
-            selectedYear={selectedYear}
-            className="day-filter"
-          />
-        </div>
-      </div>
-
-      {/* Cards principais - DESKTOP */}
-      <div className="receitas-cards">
-        <UnifiedFinancialCard
-          title="Receita Atual"
-          value={formatValue(totalIncomes)}
-          icon={sacoDeDinheiro}
-          type="positive"
-          className="receita-card-large"
-          showToggle={true}
-          isBalanceVisible={isBalanceVisible}
-          onToggleVisibility={toggleBalanceVisibility}
-        />
-        <UnifiedFinancialCard
-          title="Valores a Receber"
-          value={formatValue(totalReceivables)}
-          icon={simboloMeuBolsoContasAReceberCard}
-          type="neutral"
-          className="receita-card-large"
-          showToggle={true}
-          isBalanceVisible={isBalanceVisible}
-          onToggleVisibility={toggleBalanceVisibility}
-        />
-      </div>
-
-      {/* Sistema de Navegação - APENAS MOBILE */}
-      <MobileFinancialCard
-        navigationOptions={mobileCardOptions}
-        activeCard={activeCard}
-        onCardSwitch={(cardKey) => switchCard(cardKey as any)}
-        className="receitas-mobile-card"
+      <PageHeader
+        selectedMonth={selectedMonth}
+        selectedYear={selectedYear}
+        onMonthChange={setSelectedMonth}
+        onYearChange={setSelectedYear}
       />
 
-      {/* Conteúdo Mobile - Apenas Tabela */}
-      <div className="receitas-mobile-content mobile-only">
-        <div className="dashboard-grid">
-          {/* Mostrar tabela baseada no card ativo */}
-          {activeCard === "receita" ? (
-            <TransactionTable
-              title="Últimas Entradas"
-              columns={receitasColumns}
-              data={receitasData}
-              className="receitas-table-card"
-              showSummary={true}
-              summaryCountLabel="Entradas"
-              valueKey="value"
-              showActions={true}
-              onEdit={handleEditIncome}
-              onDelete={handleDeleteIncome}
-            />
-          ) : (
-            <TransactionTable
-              title="Valores a Receber"
-              columns={contasAReceberColumns}
-              data={contasAReceberData}
-              className="receitas-table-card"
-              showSummary={true}
-              summaryCountLabel="Contas"
-              valueKey="value"
-              showActions={true}
-              onEdit={handleEditIncome}
-              onDelete={handleDeleteIncome}
-            />
-          )}
-        </div>
-      </div>
+      {/* Cards principais - DESKTOP */}
+      <FinancialCardGrid
+        cards={[
+          {
+            title: "Receita Atual",
+            value: formatValue(totalIncomes),
+            icon: sacoDeDinheiro,
+            type: "positive",
+          },
+          {
+            title: "Valores a Receber",
+            value: formatValue(totalReceivables),
+            icon: simboloMeuBolsoContasAReceberCard,
+            type: "neutral",
+          },
+        ]}
+        isBalanceVisible={isBalanceVisible}
+        onToggleVisibility={toggleBalanceVisibility}
+        className="receitas-cards"
+      />
 
-      {/* Conteúdo Desktop - Sempre Visível */}
-      <div className="receitas-content desktop-content">
+      {/* Conteúdo Principal */}
+      <div className="receitas-content">
         {/* Primeira linha com tabelas */}
         <div className="receitas-tables-row">
           {/* Últimas Entradas */}
@@ -636,32 +537,12 @@ const Receitas: React.FC = () => {
         </div>
 
         {/* Gráfico de Receitas Mensais */}
-        <div className="receitas-card chart-card">
-          <h3 className="card-header">Receitas por Mês</h3>
-          <div className="chart-container">
-            <div className="bar-chart">
-              {monthlyData.map((item, index) => (
-                <div key={index} className="bar-item">
-                  <div className="bar-wrapper">
-                    <div
-                      className="bar"
-                      style={{
-                        height: `${(item.value / maxValue) * 100}%`,
-                        opacity: item.value === 0 ? 0.3 : 1,
-                      }}
-                      title={`${item.month}: ${formatCurrency(item.value)}`}
-                    >
-                      <span className="bar-tooltip">
-                        {formatCurrency(item.value)}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="bar-label">{item.month}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <MonthlyBarChart
+          title="Receitas por Mês"
+          data={monthlyData}
+          formatValue={formatCurrency}
+          className="receitas-card chart-card"
+        />
       </div>
 
       {/* Botão Flutuante de Adicionar */}
