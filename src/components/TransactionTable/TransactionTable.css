@@ -72,10 +72,12 @@
   overflow-x: auto;
   overflow-y: auto;
   max-height: 15rem;
+  width: 100%;
 }
 
 .data-table {
   width: 100%;
+  min-width: 500px;
   border-collapse: collapse;
   font-family: "Poppins", sans-serif;
 }

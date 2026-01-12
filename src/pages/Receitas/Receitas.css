@@ -157,10 +157,14 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1rem;
+  overflow-x: auto;
+  width: 100%;
 }
 
 .receitas-table-card {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .receitas-card {
@@ -1048,4 +1052,3 @@
     padding: 0.875rem;
   }
 }
-
