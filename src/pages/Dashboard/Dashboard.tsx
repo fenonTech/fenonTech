@@ -38,7 +38,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
     if (telefone && codigo) {
       console.log("🔑 Tentando login com parâmetros da URL...");
-      
+
       const doLogin = async () => {
         try {
           const response = await authService.login(
@@ -49,7 +49,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           if (response.status && response.token) {
             console.log("✅ Login via URL bem-sucedido");
             // Limpar parâmetros da URL
-            window.history.replaceState({}, document.title, window.location.pathname);
+            window.history.replaceState(
+              {},
+              document.title,
+              window.location.pathname
+            );
             // Recarregar a página para aplicar autenticação
             window.location.reload();
           } else {
