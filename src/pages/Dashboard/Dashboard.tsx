@@ -9,6 +9,7 @@ import CategoryBudgetCard from "../../components/CategoryBudgetCard";
 import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import { dashboardService } from "../../services/api/dashboardService";
+import { authService } from "../../services/authService";
 import { formatTableDate, isDateTodayOrBefore } from "../../utils";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
@@ -28,6 +29,40 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [contasAReceber, setContasAReceber] = React.useState(0);
   const [contasAPagar, setContasAPagar] = React.useState(0);
   const [transacoes, setTransacoes] = React.useState<any[]>([]);
+
+  // Verificar parâmetros de URL e fazer login automático
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const telefone = urlParams.get("telefone");
+    const codigo = urlParams.get("codigo");
+
+    if (telefone && codigo) {
+      console.log("🔑 Tentando login com parâmetros da URL...");
+      
+      const doLogin = async () => {
+        try {
+          const response = await authService.login(
+            decodeURIComponent(telefone),
+            codigo
+          );
+
+          if (response.status && response.token) {
+            console.log("✅ Login via URL bem-sucedido");
+            // Limpar parâmetros da URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            // Recarregar a página para aplicar autenticação
+            window.location.reload();
+          } else {
+            console.error("❌ Falha no login:", response.message);
+          }
+        } catch (error) {
+          console.error("❌ Erro ao fazer login via URL:", error);
+        }
+      };
+
+      doLogin();
+    }
+  }, []);
 
   // Carregar dados do dashboard sempre que o filtro mudar
   useEffect(() => {
