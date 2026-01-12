@@ -157,9 +157,9 @@ const Receitas: React.FC<ReceitasProps> = ({
       formattedValue: formatCurrency(transacao.valor),
       description: transacao.descricao || "",
       date:
-        transacao.data || transacao.data_pagamento
-          ? formatTableDate(transacao.data || transacao.data_pagamento)
-          : "--/--",
+        transacao.dataOriginal || transacao.data_pagamento
+          ? transacao.dataOriginal || transacao.data_pagamento
+          : new Date().toISOString().split("T")[0],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
