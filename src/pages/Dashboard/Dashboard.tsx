@@ -46,9 +46,16 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           authService.clearUserCredentials();
           console.log("🧹 localStorage limpo");
 
+          // Preparar payload
+          const telefoneDecodificado = decodeURIComponent(telefone);
+          console.log("📦 Payload para API de login:", {
+            telefone: telefoneDecodificado,
+            codigo: codigo,
+          });
+
           // Fazer login com os parâmetros da URL
           const response = await authService.login(
-            decodeURIComponent(telefone),
+            telefoneDecodificado,
             codigo
           );
 
