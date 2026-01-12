@@ -9,7 +9,7 @@ import CategoryBudgetCard from "../../components/CategoryBudgetCard";
 import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import { dashboardService } from "../../services/api/dashboardService";
-import { formatTableDate } from "../../utils";
+import { formatTableDate, isDateTodayOrBefore } from "../../utils";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import setaParaBaixo from "../../assets/setaParaBaixo.png";
@@ -77,10 +77,136 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     });
   }, [transacoes]);
 
-  // Dados vazios para gráficos e tabelas que ainda não foram implementados
-  const bills = useMemo(() => [], []);
-  const categoryBarsData = useMemo(() => [], []);
-  const categoryData = useMemo(() => [], []);
+  // Preparar contas a pagar (despesas futuras)
+  const bills = useMemo(() => {
+    return transacoes
+      .filter((t) => !t.is_entrada && !isDateTodayOrBefore(t.data_pagamento))
+      .map((transacao) => ({
+        id: transacao.codigo.toString(),
+        date: formatTableDate(transacao.data_pagamento),
+        description: transacao.descricao || transacao.tipo,
+        category: transacao.tipo,
+        value: new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(transacao.valor),
+        type: "expense" as const,
+      }));
+  }, [transacoes]);
+
+  // Agrupar despesas por categoria para o gráfico de pizza
+  const categoryData = useMemo(() => {
+    // Categorias pré-cadastradas com cores fixas
+    const predefinedCategories = [
+      { name: "Alimentação", color: "#FF6B6B" },
+      { name: "Transporte", color: "#4ECDC4" },
+      { name: "Moradia", color: "#45B7D1" },
+      { name: "Lazer", color: "#96CEB4" },
+      { name: "Saúde", color: "#FFEAA7" },
+      { name: "Educação", color: "#DDA0DD" },
+      { name: "Mercado", color: "#98D8C8" },
+      { name: "Outros", color: "#B0BEC5" },
+    ];
+
+    // Filtrar apenas despesas (não receitas) já pagas
+    const expenses = transacoes.filter(
+      (t) => !t.is_entrada && isDateTodayOrBefore(t.data_pagamento)
+    );
+
+    if (expenses.length === 0) {
+      return [];
+    }
+
+    // Agrupar despesas por categoria
+    const categoryTotals: { [key: string]: number } = {};
+    expenses.forEach((expense) => {
+      const category = expense.tipo?.toLowerCase() || "outros";
+      categoryTotals[category] =
+        (categoryTotals[category] || 0) + expense.valor;
+    });
+
+    const totalExpenseValue = Object.values(categoryTotals).reduce(
+      (sum, value) => sum + value,
+      0
+    );
+
+    // Mapear categorias pré-definidas com dados reais
+    return predefinedCategories
+      .map((predefCategory) => {
+        const categoryKey = predefCategory.name.toLowerCase();
+        const value = categoryTotals[categoryKey] || 0;
+        return {
+          name: predefCategory.name,
+          percentage:
+            totalExpenseValue > 0
+              ? Math.round((value / totalExpenseValue) * 100)
+              : 0,
+          color: predefCategory.color,
+        };
+      })
+      .filter((cat) => cat.percentage > 0);
+  }, [transacoes]);
+
+  // Calcular total de despesas para exibir no gráfico
+  const totalDespesas = useMemo(() => {
+    return transacoes
+      .filter((t) => !t.is_entrada && isDateTodayOrBefore(t.data_pagamento))
+      .reduce((sum, t) => sum + t.valor, 0);
+  }, [transacoes]);
+
+  // Dados para visão por categoria (apenas despesas)
+  const categoryBarsData = useMemo(() => {
+    // Filtrar apenas despesas
+    const expenses = transacoes.filter((t) => !t.is_entrada);
+
+    if (expenses.length === 0) {
+      return [];
+    }
+
+    // Agrupar por categoria
+    const categoryMap = new Map<string, { spent: number; planned: number }>();
+
+    expenses.forEach((expense) => {
+      const categoryName = expense.tipo || expense.descricao || "Outros";
+
+      if (!categoryMap.has(categoryName)) {
+        categoryMap.set(categoryName, { spent: 0, planned: 0 });
+      }
+
+      const categoryData = categoryMap.get(categoryName)!;
+      categoryData.planned += expense.valor;
+
+      // Se já foi pago (data <= hoje), adiciona ao gasto
+      if (isDateTodayOrBefore(expense.data_pagamento)) {
+        categoryData.spent += expense.valor;
+      }
+    });
+
+    // Cores fixas para cada categoria
+    const categoryColors: { [key: string]: string } = {
+      alimentação: "#FF6B6B",
+      transporte: "#4ECDC4",
+      moradia: "#45B7D1",
+      lazer: "#96CEB4",
+      saúde: "#FFEAA7",
+      educação: "#DDA0DD",
+      mercado: "#98D8C8",
+      outros: "#B0BEC5",
+    };
+
+    // Converter para array e ordenar por valor planejado
+    return Array.from(categoryMap.entries())
+      .map(([name, data]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        spent: data.spent,
+        planned: data.planned,
+        percentage:
+          data.planned > 0 ? Math.round((data.spent / data.planned) * 100) : 0,
+        color: categoryColors[name.toLowerCase()] || "#B0BEC5",
+      }))
+      .sort((a, b) => b.planned - a.planned)
+      .slice(0, 6); // Mostrar apenas top 6 categorias
+  }, [transacoes]);
 
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
@@ -191,7 +317,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         <ExpensesPieChart
           title="Despesas por categoria"
           totalLabel="TOTAL DESPESAS"
-          totalValue={formatValue(0)}
+          totalValue={formatValue(totalDespesas)}
           categories={categoryData}
           className="expenses-chart-card"
         />

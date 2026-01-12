@@ -4,7 +4,7 @@ import lupa from "/src/assets/lupa.png";
 import receitaIcon from "/src/assets/receita.png";
 import despesaIcon from "/src/assets/despesa.png";
 import editarIcon from "/src/assets/editar.png";
-import { formatTableDate, createSafeDate } from "../../utils";
+import { createSafeDate } from "../../utils";
 
 interface Transacao {
   id: string;
@@ -31,8 +31,6 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
   onSearch,
   onFilterChange,
   showFooter = false,
-  totalTransacoes,
-  valorTotal,
   isBalanceVisible = true,
   onEditTransaction,
   // onDeleteTransaction removido pois não está sendo usado

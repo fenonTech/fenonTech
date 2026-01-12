@@ -18,12 +18,14 @@ interface ReceitasProps {
   onNavigate?: (screen: MobileScreenType) => void;
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
+  userName?: string;
 }
 
 const Receitas: React.FC<ReceitasProps> = ({
   onNavigate,
   isBalanceVisible = true,
   onToggleVisibility,
+  userName = "Usuário",
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
@@ -224,7 +226,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   return (
     <div className="mobile-screen-container">
       <HeaderMobile
-        userName="Gustavo Lindão"
+        userName={userName}
         onConfigClick={handleConfigClick}
         onLogoutClick={handleLogoutClick}
       />

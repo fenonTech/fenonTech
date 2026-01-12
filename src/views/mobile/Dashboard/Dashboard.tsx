@@ -13,12 +13,14 @@ interface DashboardProps {
   onNavigate?: (screen: MobileScreenType) => void;
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
+  userName?: string;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
   onNavigate,
   isBalanceVisible = true,
   onToggleVisibility,
+  userName = "Usuário",
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [activeNavTab, setActiveNavTab] = useState<
@@ -82,7 +84,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="mobile-screen-container">
       <HeaderMobile
-        userName="Gustavo Lindão"
+        userName={userName}
         onConfigClick={handleConfigClick}
         onLogoutClick={handleLogoutClick}
       />

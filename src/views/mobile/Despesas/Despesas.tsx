@@ -18,12 +18,14 @@ interface DespesasProps {
   onNavigate?: (screen: MobileScreenType) => void;
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
+  userName?: string;
 }
 
 const Despesas: React.FC<DespesasProps> = ({
   onNavigate,
   isBalanceVisible = true,
   onToggleVisibility,
+  userName = "Usuário",
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -224,7 +226,7 @@ const Despesas: React.FC<DespesasProps> = ({
   return (
     <div className="mobile-screen-container">
       <HeaderMobile
-        userName="Gustavo Lindão"
+        userName={userName}
         onConfigClick={handleConfigClick}
         onLogoutClick={handleLogoutClick}
       />

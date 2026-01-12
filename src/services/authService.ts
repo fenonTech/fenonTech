@@ -148,6 +148,18 @@ export const authService = {
   },
 
   /**
+   * Atualizar nome do usuário no localStorage
+   * @param newName - Novo nome do usuário
+   */
+  updateUserName(newName: string): void {
+    localStorage.setItem(STORAGE_KEYS.USER_NAME, newName);
+    console.log("🔄 Nome do usuário atualizado no localStorage:", newName);
+
+    // Disparar evento customizado para notificar componentes sobre a mudança
+    window.dispatchEvent(new Event("userNameUpdated"));
+  },
+
+  /**
    * Obter dados da assinatura
    */
   getSubscription(): any | null {

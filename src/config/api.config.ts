@@ -44,6 +44,17 @@ export const API_ENDPOINTS = {
     list: "/despesas", // GET com query params: ?mes={mes}&ano={ano}
   },
 
+  // Usuários
+  usuarios: {
+    me: "/usuarios/me", // GET - Dados do usuário logado
+    perfil: "/usuarios/perfil", // PUT - Atualizar perfil do usuário
+  },
+
+  // Assinaturas
+  assinaturas: {
+    minhas: "/assinaturas/minhas", // GET - Assinatura atual e histórico
+  },
+
   // Transações (antigo - manter compatibilidade)
   transactions: {
     list: "/transactions",

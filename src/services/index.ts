@@ -16,6 +16,8 @@ export * from "./authService";
 export * from "./api/transactionService";
 export * from "./api/dashboardService";
 export * from "./api/categoryService";
+export * from "./api/userService";
+export * from "./api/assinaturasService";
 
 // ========================================
 // 🔧 UTILITÁRIOS

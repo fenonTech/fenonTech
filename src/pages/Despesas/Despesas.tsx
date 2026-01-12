@@ -35,6 +35,9 @@ const Despesas: React.FC = () => {
   const [despesaAtual, setDespesaAtual] = React.useState(0);
   const [contasAPagar, setContasAPagar] = React.useState(0);
   const [despesas, setDespesas] = React.useState<any[]>([]);
+  const [despesasMensais, setDespesasMensais] = React.useState<{
+    [key: number]: number;
+  }>({});
 
   // Carregar dados de despesas sempre que o filtro mudar
   useEffect(() => {
@@ -65,6 +68,33 @@ const Despesas: React.FC = () => {
 
     loadDespesasData();
   }, [selectedMonth, selectedYear]); // Recarregar quando o filtro mudar
+
+  // Carregar despesas de todos os meses do ano para o gráfico
+  useEffect(() => {
+    const loadYearlyExpenses = async () => {
+      try {
+        const monthlyTotals: { [key: number]: number } = {};
+
+        // Buscar dados de todos os 12 meses do ano selecionado
+        for (let mes = 1; mes <= 12; mes++) {
+          try {
+            const data = await despesasService.getDespesas(mes, selectedYear);
+            monthlyTotals[mes] = data.despesaAtual;
+          } catch (error) {
+            console.warn(`Erro ao carregar despesas do mês ${mes}:`, error);
+            monthlyTotals[mes] = 0;
+          }
+        }
+
+        setDespesasMensais(monthlyTotals);
+        console.log("✅ Despesas anuais carregadas com sucesso");
+      } catch (error) {
+        console.error("❌ Erro ao carregar despesas anuais:", error);
+      }
+    };
+
+    loadYearlyExpenses();
+  }, [selectedYear]); // Recarregar quando o ano mudar
 
   // Preparar dados para as tabelas
   const despesasData = useMemo(() => {
@@ -242,7 +272,7 @@ const Despesas: React.FC = () => {
       .filter((cat) => cat.percentage > 0 || despesas.length === 0);
   }, [despesas]);
 
-  // Dados para o gráfico de barras - TODO: será implementado posteriormente
+  // Dados para o gráfico de barras mensais
   const monthlyData = useMemo(() => {
     const months = [
       "Jan",
@@ -259,17 +289,61 @@ const Despesas: React.FC = () => {
       "Dez",
     ];
 
-    // Por enquanto, retornar dados vazios
-    return months.map((month) => ({
+    return months.map((month, index) => ({
       month,
-      value: 0,
+      value: despesasMensais[index + 1] || 0,
     }));
-  }, []);
+  }, [despesasMensais]);
 
-  // Dados dinâmicos para barras de visão por categoria - TODO: implementar com budgets
+  // Dados dinâmicos para barras de visão por categoria (apenas despesas)
   const categoryBarsData = useMemo(() => {
-    return [];
-  }, []);
+    if (despesas.length === 0) {
+      return [];
+    }
+
+    // Agrupar por categoria
+    const categoryMap = new Map<string, { spent: number; planned: number }>();
+
+    despesas.forEach((despesa) => {
+      const categoryName = despesa.tipo || despesa.descricao || "Outros";
+
+      if (!categoryMap.has(categoryName)) {
+        categoryMap.set(categoryName, { spent: 0, planned: 0 });
+      }
+
+      const categoryData = categoryMap.get(categoryName)!;
+      categoryData.planned += despesa.valor;
+
+      // Se já foi pago (data <= hoje), adiciona ao gasto
+      if (isDateTodayOrBefore(despesa.data_pagamento)) {
+        categoryData.spent += despesa.valor;
+      }
+    });
+
+    // Cores fixas para cada categoria
+    const categoryColors: { [key: string]: string } = {
+      alimentação: "#FF6B6B",
+      transporte: "#4ECDC4",
+      moradia: "#45B7D1",
+      lazer: "#96CEB4",
+      saúde: "#FFEAA7",
+      educação: "#DDA0DD",
+      mercado: "#98D8C8",
+      outros: "#B0BEC5",
+    };
+
+    // Converter para array e ordenar por valor planejado
+    return Array.from(categoryMap.entries())
+      .map(([name, data]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        spent: data.spent,
+        planned: data.planned,
+        percentage:
+          data.planned > 0 ? Math.round((data.spent / data.planned) * 100) : 0,
+        color: categoryColors[name.toLowerCase()] || "#B0BEC5",
+      }))
+      .sort((a, b) => b.planned - a.planned);
+  }, [despesas]);
 
   // Definir colunas para a tabela de despesas
   const despesasColumns: TableColumn[] = [
