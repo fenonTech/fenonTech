@@ -39,6 +39,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     // Se tem parâmetros na URL, sempre fazer login novamente
     if (telefone && codigo) {
       console.log("🔑 Parâmetros detectados na URL, iniciando novo login...");
+      console.log("🌍 Ambiente:", window.location.origin);
 
       const doLogin = async () => {
         try {
@@ -52,12 +53,18 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             telefone: telefoneDecodificado,
             codigo: codigo,
           });
+          console.log("📦 Payload RAW (antes decode):", {
+            telefone: telefone,
+            codigo: codigo,
+          });
 
           // Fazer login com os parâmetros da URL
           const response = await authService.login(
             telefoneDecodificado,
             codigo
           );
+
+          console.log("📥 Resposta da API:", response);
 
           if (response.status && response.token) {
             console.log("✅ Login via URL bem-sucedido");
@@ -72,9 +79,16 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             window.location.reload();
           } else {
             console.error("❌ Falha no login:", response.message);
+            console.error("❌ Status code:", response.status_code);
+            console.error("❌ Resposta completa:", response);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("❌ Erro ao fazer login via URL:", error);
+          console.error("❌ Erro detalhes:", {
+            message: error.message,
+            response: error.response?.data,
+            status: error.response?.status,
+          });
         }
       };
 

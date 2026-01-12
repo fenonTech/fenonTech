@@ -50,6 +50,10 @@ export const authService = {
    */
   async login(telefone: string, codigo: string): Promise<LoginResponse> {
     try {
+      console.log("🔐 authService.login chamado");
+      console.log("📍 Endpoint:", API_ENDPOINTS.auth.login);
+      console.log("📤 Enviando payload:", { telefone, codigo });
+
       const response = await apiClient.post<LoginResponse>(
         API_ENDPOINTS.auth.login,
         {
@@ -59,6 +63,7 @@ export const authService = {
       );
 
       const data = response.data;
+      console.log("📥 Resposta recebida:", data);
 
       // Se login bem-sucedido, salvar dados no localStorage
       if (data.status && data.token && data.usuario) {
@@ -72,13 +77,20 @@ export const authService = {
 
       return data;
     } catch (error: any) {
+      console.error("❌ Erro capturado no authService.login:", error);
+
       // Se receber erro 400, retornar a resposta de erro
       if (error.response?.status === 400) {
+        console.error("❌ Erro 400 - Bad Request:", error.response.data);
         return error.response.data as LoginResponse;
       }
 
       // Outros erros
-      console.error("❌ Erro ao fazer login:", error);
+      console.error("❌ Erro ao fazer login:", {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
       throw error;
     }
   },
