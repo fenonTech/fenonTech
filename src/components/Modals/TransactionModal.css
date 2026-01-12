@@ -168,9 +168,9 @@
 .btn-save,
 .btn-cancel,
 .btn-delete {
-  padding: 14px 40px;
-  border-radius: 10px;
-  font-size: 0.95rem;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-size: 0.875rem;
   font-weight: 600;
   font-family: "Poppins", sans-serif;
   cursor: pointer;
@@ -178,8 +178,8 @@
   letter-spacing: 0.025em;
   position: relative;
   overflow: hidden;
-  min-height: 52px;
-  min-width: 140px;
+  min-height: 40px;
+  min-width: 110px;
   text-transform: none;
   display: flex;
   align-items: center;
