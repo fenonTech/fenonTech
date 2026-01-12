@@ -36,11 +36,17 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     const telefone = urlParams.get("telefone");
     const codigo = urlParams.get("codigo");
 
+    // Se tem parâmetros na URL, sempre fazer login novamente
     if (telefone && codigo) {
-      console.log("🔑 Tentando login com parâmetros da URL...");
+      console.log("🔑 Parâmetros detectados na URL, iniciando novo login...");
 
       const doLogin = async () => {
         try {
+          // Limpar localStorage existente antes de fazer novo login
+          authService.clearUserCredentials();
+          console.log("🧹 localStorage limpo");
+
+          // Fazer login com os parâmetros da URL
           const response = await authService.login(
             decodeURIComponent(telefone),
             codigo
@@ -48,6 +54,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
           if (response.status && response.token) {
             console.log("✅ Login via URL bem-sucedido");
+            console.log("💾 Novo token salvo no localStorage");
             // Limpar parâmetros da URL
             window.history.replaceState(
               {},
