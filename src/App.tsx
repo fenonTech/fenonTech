@@ -2,7 +2,6 @@ import "./App.css";
 import Layout from "./components/Layout";
 import LayoutMobile from "./components/LayoutMobile";
 import AuthGuard from "./components/AuthGuard";
-import { FinancialProvider } from "./contexts";
 import { TransactionProvider } from "./contexts/TransactionContext";
 import { FilterProvider } from "./contexts/FilterContext";
 import { useDeviceDetection } from "./hooks/useDeviceDetection";
@@ -13,11 +12,9 @@ function App() {
   return (
     <AuthGuard>
       <FilterProvider>
-        <FinancialProvider>
-          <TransactionProvider>
-            {isMobile ? <LayoutMobile /> : <Layout />}
-          </TransactionProvider>
-        </FinancialProvider>
+        <TransactionProvider>
+          {isMobile ? <LayoutMobile /> : <Layout />}
+        </TransactionProvider>
       </FilterProvider>
     </AuthGuard>
   );

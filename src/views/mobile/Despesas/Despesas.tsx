@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HeaderMobile from "../../../components/HeaderMobile";
 import FinancialCardMobile from "../../../components/FinancialCardMobile";
 import { UltimasTransacoesMobile } from "../../../components/UltimasTransacoesMobile";
@@ -8,21 +8,52 @@ import ExpenseModal from "../../../components/Modals/ExpenseModal";
 import { CategoryViewMobile } from "../../../components/CategoryViewMobile";
 import type { Expense } from "../../../types/transactions";
 import type { MobileScreenType } from "../../../components/LayoutMobile";
+import { useFilter } from "../../../contexts/FilterContext";
+import { despesasService } from "../../../services/api/despesasService";
+import { transactionsService } from "../../../services/api/transactionsService";
+import { formatCurrency, formatTableDate } from "../../../utils";
 import "./Despesas.css";
 
 interface DespesasProps {
   onNavigate?: (screen: MobileScreenType) => void;
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
+  userName?: string;
 }
 
 const Despesas: React.FC<DespesasProps> = ({
   onNavigate,
   isBalanceVisible = true,
   onToggleVisibility,
+  userName = "Usuário",
 }) => {
+  const { selectedMonth, selectedYear } = useFilter();
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  // Estados para dados de despesas
+  const [despesaAtual, setDespesaAtual] = useState(0);
+  const [contasAPagar, setContasAPagar] = useState(0);
+  const [despesas, setDespesas] = useState<any[]>([]);
+
+  // Carregar dados de despesas
+  useEffect(() => {
+    const loadDespesasData = async () => {
+      try {
+        const data = await despesasService.getDespesas(
+          selectedMonth + 1,
+          selectedYear
+        );
+        setDespesaAtual(data.despesaAtual);
+        setContasAPagar(data.contasAPagar);
+        setDespesas(data.despesas);
+      } catch (error) {
+        console.error("❌ Erro ao carregar despesas:", error);
+      }
+    };
+    loadDespesasData();
+  }, [selectedMonth, selectedYear]);
   const handleConfigClick = () => {
     if (onNavigate) {
       onNavigate("configuracoes");
@@ -43,104 +74,174 @@ const Despesas: React.FC<DespesasProps> = ({
 
   const handleOpenExpenseModal = () => {
     setEditingExpense(null);
+    setIsEditMode(false);
     setIsExpenseModalOpen(true);
   };
 
   const handleCloseExpenseModal = () => {
     setIsExpenseModalOpen(false);
     setEditingExpense(null);
+    setIsEditMode(false);
   };
 
-  const handleSaveExpense = (
+  const handleSaveExpense = async (
     expenseData: Omit<Expense, "id" | "createdAt" | "updatedAt">
   ) => {
-    console.log("Nova despesa:", expenseData);
-    // TODO: Implementar salvamento da despesa
-    handleCloseExpenseModal();
+    try {
+      const payload = {
+        valor: expenseData.value,
+        is_entrada: false,
+        data_pagamento: expenseData.date,
+        descricao: expenseData.category || "Despesa",
+      };
+
+      if (isEditMode && editingExpense) {
+        await transactionsService.update(Number(editingExpense.id), payload);
+      } else {
+        await transactionsService.create(payload);
+      }
+
+      // Recarregar dados
+      const data = await despesasService.getDespesas(
+        selectedMonth + 1,
+        selectedYear
+      );
+      setDespesaAtual(data.despesaAtual);
+      setContasAPagar(data.contasAPagar);
+      setDespesas(data.despesas);
+
+      handleCloseExpenseModal();
+    } catch (error) {
+      console.error("❌ Erro ao salvar despesa:", error);
+      alert("Erro ao salvar despesa. Tente novamente.");
+    }
   };
 
   const handleUpdateExpense = (expense: Expense) => {
-    console.log("Editando despesa:", expense);
-    // TODO: Implementar edição da despesa
-    handleCloseExpenseModal();
+    handleSaveExpense(expense);
   };
 
-  const handleDeleteExpense = (id: string) => {
-    console.log("Excluindo despesa ID:", id);
-    // TODO: Implementar exclusão da despesa
-    handleCloseExpenseModal();
+  const handleDeleteExpense = async (id: string) => {
+    if (!window.confirm("Tem certeza que deseja excluir esta despesa?")) {
+      return;
+    }
+
+    try {
+      await transactionsService.delete(Number(id));
+
+      // Recarregar dados
+      const data = await despesasService.getDespesas(
+        selectedMonth + 1,
+        selectedYear
+      );
+      setDespesaAtual(data.despesaAtual);
+      setContasAPagar(data.contasAPagar);
+      setDespesas(data.despesas);
+
+      handleCloseExpenseModal();
+    } catch (error) {
+      console.error("❌ Erro ao deletar despesa:", error);
+      alert("Erro ao deletar despesa. Tente novamente.");
+    }
   };
 
   const handleEditTransaction = (transacao: any) => {
-    // Converte a transação para o formato Expense
+    // Transformar dados da API para o formato esperado pelo modal
     const expense: Expense = {
-      id: transacao.id || `temp-${Date.now()}`,
+      id: transacao.id || transacao.codigo?.toString() || `temp-${Date.now()}`,
       type: "expense" as const,
-      category: transacao.categoria,
-      value: parseFloat(transacao.valor.toString().replace(",", ".")),
-      formattedValue: transacao.valor.toString(),
+      category:
+        transacao.categoria || transacao.tipo || transacao.descricao || "",
+      value:
+        typeof transacao.valor === "number"
+          ? transacao.valor
+          : parseFloat(transacao.valor.toString().replace(",", ".")),
+      formattedValue: formatCurrency(transacao.valor),
       description: transacao.descricao || "",
-      date: transacao.data,
+      date:
+        transacao.dataOriginal || transacao.data_pagamento
+          ? transacao.dataOriginal || transacao.data_pagamento
+          : new Date().toISOString().split("T")[0],
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     setEditingExpense(expense);
+    setIsEditMode(true);
     setIsExpenseModalOpen(true);
   };
 
-  // Dados de exemplo para despesas
-  const despesasTransacoes = [
-    {
-      id: "d1",
-      tipo: "saida" as const,
-      categoria: "Alimentação",
-      valor: 250.0,
-      data: "2025-10-31",
-    },
-    {
-      id: "d2",
-      tipo: "saida" as const,
-      categoria: "Transporte",
-      valor: 120.0,
-      data: "2025-10-30",
-    },
-    {
-      id: "d3",
-      tipo: "saida" as const,
-      categoria: "Lazer",
-      valor: 80.0,
-      data: "2025-10-29",
-    },
-    {
-      id: "d4",
-      tipo: "saida" as const,
-      categoria: "Compras",
-      valor: 350.0,
-      data: "2025-10-28",
-    },
-  ];
+  // Calcular categorias dinamicamente baseado nas despesas
+  const calcularCategorias = () => {
+    const categoriasMap = new Map<
+      string,
+      { valorGasto: number; valorTotal: number }
+    >();
 
-  const totalDespesas = despesasTransacoes.reduce(
-    (total, transacao) => total + transacao.valor,
-    0
-  );
+    // Processar despesas
+    despesas.forEach((despesa) => {
+      const categoria = despesa.tipo || despesa.descricao || "Despesa";
+      const valor = despesa.valor;
+
+      if (!categoriasMap.has(categoria)) {
+        categoriasMap.set(categoria, { valorGasto: 0, valorTotal: 0 });
+      }
+
+      const categoriaData = categoriasMap.get(categoria)!;
+      categoriaData.valorTotal += valor;
+
+      // Para despesas, consideramos que o "gasto" é o valor já pago
+      // (baseado na data de pagamento vs hoje)
+      const hoje = new Date();
+      const dataPagamento = despesa.data_pagamento
+        ? new Date(despesa.data_pagamento)
+        : new Date();
+      if (dataPagamento <= hoje) {
+        categoriaData.valorGasto += valor;
+      }
+    });
+
+    // Converter para array e ordenar por valor total
+    return Array.from(categoriasMap.entries())
+      .map(([nome, dados]) => ({
+        nome,
+        valorGasto: dados.valorGasto,
+        valorTotal: dados.valorTotal,
+      }))
+      .sort((a, b) => b.valorTotal - a.valorTotal);
+  };
+
+  const categoriasDinamicas = calcularCategorias();
+  const despesasTransacoes = despesas.map((despesa) => ({
+    id: despesa.codigo.toString(),
+    tipo: "saida" as const,
+    categoria: despesa.tipo || despesa.descricao || "Despesa",
+    valor: despesa.valor,
+    data: despesa.data_pagamento
+      ? formatTableDate(despesa.data_pagamento)
+      : "--/--",
+    dataOriginal: despesa.data_pagamento, // Data original para filtro
+    codigo: despesa.codigo,
+  }));
 
   return (
     <div className="mobile-screen-container">
       <HeaderMobile
-        userName="Gustavo Lindão"
+        userName={userName}
         onConfigClick={handleConfigClick}
         onLogoutClick={handleLogoutClick}
       />
       <div className="mobile-screen-content">
         <FinancialCardMobile
           receitas={0}
-          despesas={totalDespesas}
-          contasPagar={totalDespesas}
+          despesas={despesaAtual}
+          contasPagar={contasAPagar}
           contasReceber={0}
           isBalanceVisible={isBalanceVisible}
           onToggleVisibility={onToggleVisibility}
-          mesAno="OUT/2025"
+          mesAno={`${String(selectedMonth + 1).padStart(
+            2,
+            "0"
+          )}/${selectedYear}`}
           mode="despesas"
           onNavigate={handleNavTabChange}
         />
@@ -148,19 +249,11 @@ const Despesas: React.FC<DespesasProps> = ({
           transacoes={despesasTransacoes}
           showFooter={true}
           totalTransacoes={despesasTransacoes.length}
-          valorTotal={totalDespesas}
+          valorTotal={despesaAtual}
           isBalanceVisible={isBalanceVisible}
           onEditTransaction={handleEditTransaction}
         />
-        <CategoryViewMobile
-          categorias={[
-            { nome: "Ifood", valorGasto: 40, valorTotal: 100 },
-            { nome: "Uber", valorGasto: 10, valorTotal: 85 },
-            { nome: "Roupas", valorGasto: 5, valorTotal: 80 },
-            { nome: "Despesas Fixas", valorGasto: 0, valorTotal: 100 },
-            { nome: "Contas Variaveis", valorGasto: 0, valorTotal: 100 },
-          ]}
-        />
+        <CategoryViewMobile categorias={categoriasDinamicas} />
       </div>
 
       <BottomNavigationMobile
@@ -181,7 +274,7 @@ const Despesas: React.FC<DespesasProps> = ({
         onUpdate={handleUpdateExpense}
         onDelete={handleDeleteExpense}
         editingExpense={editingExpense}
-        mode={editingExpense ? "edit" : "add"}
+        mode={isEditMode ? "edit" : "add"}
       />
     </div>
   );

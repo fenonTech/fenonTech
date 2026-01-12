@@ -3,12 +3,14 @@ import "./FinancialCardMobile.css";
 import receitaIcon from "/src/assets/receita.png";
 import despesaIcon from "/src/assets/despesa.png";
 import calendario from "/src/assets/calendario.png";
+import { useFilter } from "../../contexts/FilterContext";
 
 interface FinancialCardMobileProps {
   receitas: number;
   despesas: number;
   contasPagar: number;
   contasReceber: number;
+  saldo?: number; // Saldo opcional - se não fornecido, calcula receitas - despesas
   isBalanceVisible: boolean;
   onToggleVisibility: () => void;
   mesAno?: string;
@@ -23,6 +25,7 @@ const FinancialCardMobile: React.FC<FinancialCardMobileProps> = ({
   despesas,
   contasPagar,
   contasReceber,
+  saldo: saldoProp,
   isBalanceVisible,
   onToggleVisibility,
   mode = "dashboard",
@@ -40,14 +43,12 @@ const FinancialCardMobile: React.FC<FinancialCardMobileProps> = ({
     "right"
   );
   const [prevMode, setPrevMode] = useState(mode);
-  const [selectedCompetencia, setSelectedCompetencia] = useState(() => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    return `${year}-${month}`;
-  });
+
+  // Usar FilterContext ao invés de estado local
+  const { selectedMonth, selectedYear, setSelectedMonth, setSelectedYear } =
+    useFilter();
   const [isCompetenciaOpen, setIsCompetenciaOpen] = useState(false);
-  const [selectorYear, setSelectorYear] = useState(new Date().getFullYear());
+  const [selectorYear, setSelectorYear] = useState(selectedYear);
   const competenciaRef = useRef<HTMLDivElement>(null);
 
   const months = [
@@ -66,15 +67,19 @@ const FinancialCardMobile: React.FC<FinancialCardMobileProps> = ({
   ];
 
   const handleCompetenciaSelect = (month: string, year: number) => {
-    setSelectedCompetencia(`${year}-${month}`);
+    // Converter para índices corretos (0-11 para mês, ano direto)
+    const monthIndex = parseInt(month) - 1; // Converter de 1-12 para 0-11
+    setSelectedMonth(monthIndex);
+    setSelectedYear(year);
     setIsCompetenciaOpen(false);
     console.log("Competência selecionada:", `${year}-${month}`);
   };
 
-  const formatCompetenciaDisplay = (dateStr: string) => {
-    const [year, month] = dateStr.split("-");
-    const monthName = months.find((m) => m.num === month)?.name || "";
-    return `${monthName}/${year}`;
+  const formatCompetenciaDisplay = () => {
+    const monthName =
+      months.find((m) => m.num === String(selectedMonth + 1).padStart(2, "0"))
+        ?.name || "";
+    return `${monthName}/${selectedYear}`;
   };
 
   const getModeOrder = (currentMode: string): number => {
@@ -91,6 +96,11 @@ const FinancialCardMobile: React.FC<FinancialCardMobileProps> = ({
         return 0;
     }
   };
+
+  // Sincronizar selectorYear com selectedYear do FilterContext
+  useEffect(() => {
+    setSelectorYear(selectedYear);
+  }, [selectedYear]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -135,7 +145,7 @@ const FinancialCardMobile: React.FC<FinancialCardMobileProps> = ({
     }).format(value);
   };
 
-  const saldo = receitas - despesas;
+  const saldo = saldoProp !== undefined ? saldoProp : receitas - despesas;
 
   const getMainValue = () => {
     if (mode === "receitas") {
@@ -209,7 +219,7 @@ const FinancialCardMobile: React.FC<FinancialCardMobileProps> = ({
               onClick={() => setIsCompetenciaOpen(!isCompetenciaOpen)}
               aria-label="Selecionar competência"
             >
-              <span>{formatCompetenciaDisplay(selectedCompetencia)}</span>
+              <span>{formatCompetenciaDisplay()}</span>
               <img
                 src={calendario}
                 alt="Calendário"
@@ -238,7 +248,8 @@ const FinancialCardMobile: React.FC<FinancialCardMobileProps> = ({
                 <div className="competencia-months">
                   {months.map((month) => {
                     const isSelected =
-                      selectedCompetencia === `${selectorYear}-${month.num}`;
+                      selectedMonth + 1 === parseInt(month.num) &&
+                      selectedYear === selectorYear;
                     return (
                       <button
                         key={month.num}

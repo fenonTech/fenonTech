@@ -218,3 +218,99 @@
     font-size: 0.95rem;
   }
 }
+
+/* Editable Name Field */
+.atualizacao-form-editable {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background-color 0.2s ease;
+}
+
+.atualizacao-form-editable:hover {
+  background-color: #1a1a1a;
+}
+
+.atualizacao-edit-icon {
+  opacity: 0.6;
+  font-size: 0.9rem;
+  margin-left: 0.5rem;
+}
+
+.atualizacao-form-edit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.atualizacao-form-input {
+  background: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: "Poppins", sans-serif;
+  font-size: 1rem;
+  outline: none;
+  padding: 0.875rem 1rem;
+  transition: border-color 0.2s ease;
+  width: 100%;
+}
+
+.atualizacao-form-input:focus {
+  border-color: #ffd700;
+}
+
+.atualizacao-form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.atualizacao-form-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.atualizacao-save-button,
+.atualizacao-cancel-button {
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  outline: none;
+  padding: 0.625rem 1rem;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.atualizacao-save-button {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #000000;
+}
+
+.atualizacao-save-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+}
+
+.atualizacao-save-button:disabled {
+  background: #666666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.atualizacao-cancel-button {
+  background: transparent;
+  border: 1px solid #666666;
+  color: #ffffff;
+}
+
+.atualizacao-cancel-button:hover:not(:disabled) {
+  background: #333333;
+}
+
+.atualizacao-cancel-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

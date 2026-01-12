@@ -226,3 +226,81 @@
     font-size: 0.7rem;
   }
 }
+
+/* Loading and Error States */
+.pagamentos-loading,
+.pagamentos-error,
+.no-data,
+.no-payments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.pagamentos-loading p,
+.no-data p,
+.no-payments p {
+  color: #888888;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.pagamentos-error p {
+  color: #ff6b6b;
+  font-size: 1rem;
+  margin: 0 0 1rem 0;
+}
+
+.pagamentos-error button {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border: none;
+  border-radius: 6px;
+  color: #000000;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  outline: none;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.pagamentos-error button:hover {
+  background: linear-gradient(135deg, #ffed4e 0%, #ffd700 100%);
+}
+
+/* Status Styles */
+.status-active {
+  color: #4caf50 !important;
+}
+
+.status-canceled {
+  color: #ff6b6b !important;
+}
+
+/* Payment Info Column */
+.payment-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.payment-status {
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.payment-expiry {
+  color: #888888;
+  font-size: 0.75rem;
+}
+
+.payment-canceled {
+  color: #ff6b6b;
+  font-size: 0.7rem;
+  font-style: italic;
+}

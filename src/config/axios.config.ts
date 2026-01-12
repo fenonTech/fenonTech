@@ -29,11 +29,11 @@ apiClient.interceptors.request.use(
       });
     }
 
-    // Adicione aqui lógica para tokens de autenticação quando necessário
-    // const token = localStorage.getItem('authToken');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // Adicionar token de autenticação em todas as requisições
+    const token = localStorage.getItem("fenontech-token");
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
     return config;
   },

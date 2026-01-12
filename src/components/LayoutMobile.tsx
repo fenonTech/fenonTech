@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dashboard, Receitas, Despesas } from "../views/mobile";
 import { ConfiguracoesMobile } from "../views/mobile/Configuracoes";
 import { NotificacoesMobile } from "../views/mobile/Notificacoes";
 import { PagamentosMobile } from "../views/mobile/Pagamentos";
 import { AtualizacaoCadastralMobile } from "../views/mobile/AtualizacaoCadastral";
+import { authService } from "../services/authService";
 import "./LayoutMobile.css";
 
 export type MobileScreenType =
@@ -18,6 +19,22 @@ export type MobileScreenType =
 const LayoutMobile: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<MobileScreenType>("inicio");
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [userName, setUserName] = useState(
+    authService.getUserName() || "Usuário"
+  );
+
+  // Escutar mudanças no nome do usuário
+  useEffect(() => {
+    const handleUserNameUpdate = () => {
+      setUserName(authService.getUserName() || "Usuário");
+    };
+
+    window.addEventListener("userNameUpdated", handleUserNameUpdate);
+
+    return () => {
+      window.removeEventListener("userNameUpdated", handleUserNameUpdate);
+    };
+  }, []);
 
   const handleScreenChange = (screen: MobileScreenType) => {
     setActiveScreen(screen);
@@ -35,6 +52,7 @@ const LayoutMobile: React.FC = () => {
             onNavigate={handleScreenChange}
             isBalanceVisible={isBalanceVisible}
             onToggleVisibility={handleToggleVisibility}
+            userName={userName}
           />
         );
       case "despesas":
@@ -43,12 +61,13 @@ const LayoutMobile: React.FC = () => {
             onNavigate={handleScreenChange}
             isBalanceVisible={isBalanceVisible}
             onToggleVisibility={handleToggleVisibility}
+            userName={userName}
           />
         );
       case "configuracoes":
         return (
           <ConfiguracoesMobile
-            userName="Gustavo Gomes do Nascimento"
+            userName={userName}
             onBack={() => handleScreenChange("inicio")}
             onNavigate={(screen) => {
               if (screen === "notificacoes") {
@@ -77,7 +96,6 @@ const LayoutMobile: React.FC = () => {
         return (
           <AtualizacaoCadastralMobile
             onBack={() => handleScreenChange("configuracoes")}
-            userName="Gustavo Gomes do Nascimento"
           />
         );
       case "inicio":
@@ -87,6 +105,7 @@ const LayoutMobile: React.FC = () => {
             onNavigate={handleScreenChange}
             isBalanceVisible={isBalanceVisible}
             onToggleVisibility={handleToggleVisibility}
+            userName={userName}
           />
         );
     }

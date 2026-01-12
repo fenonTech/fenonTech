@@ -1,7 +1,7 @@
-// Desktop-specific pages (views/desktop)
-export { default as Dashboard } from "../views/desktop/Dashboard";
-export { default as Receitas } from "../views/desktop/Receitas";
-export { default as Despesas } from "../views/desktop/Despesas";
+// Desktop-specific pages (now in pages directory)
+export { default as Dashboard } from "./Dashboard/Dashboard";
+export { default as Receitas } from "./Receitas/Receitas";
+export { default as Despesas } from "./Despesas/Despesas";
 
 // Shared pages (mobile & desktop)
 export { default as Configuracoes } from "./Configuracoes";

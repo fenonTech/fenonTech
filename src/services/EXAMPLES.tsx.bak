@@ -1,0 +1,357 @@
+/**
+ * Exemplo de Uso dos Serviços Centralizados
+ *
+ * Este arquivo demonstra como usar os serviços de API
+ * em componentes React (Mobile e Desktop)
+ */
+
+import { useEffect, useState } from "react";
+import {
+  // Serviços
+  authService,
+  transactionService,
+  dashboardService,
+  categoryService,
+  // Helpers
+  formatMoneyDisplay,
+  filterByPeriod,
+  groupByCategory,
+  // Tipos
+  type LocalTransaction,
+} from "../services";
+
+// ========================================
+// EXEMPLO 1: Component de Dashboard
+// ========================================
+export const DashboardExample = () => {
+  const [summary, setSummary] = useState({
+    totalReceitas: 0,
+    totalDespesas: 0,
+    saldo: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const loadDashboard = async () => {
+    try {
+      const data = await dashboardService.getFinancialSummary();
+      setSummary(data);
+    } catch (error) {
+      console.error("Erro ao carregar dashboard:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Carregando...</div>;
+
+  return (
+    <div>
+      <h2>Resumo Financeiro</h2>
+      <p>Receitas: {formatMoneyDisplay(summary.totalReceitas)}</p>
+      <p>Despesas: {formatMoneyDisplay(summary.totalDespesas)}</p>
+      <p>Saldo: {formatMoneyDisplay(summary.saldo)}</p>
+    </div>
+  );
+};
+
+// ========================================
+// EXEMPLO 2: Component de Listagem de Transações
+// ========================================
+export const TransactionListExample = () => {
+  const [transactions, setTransactions] = useState<LocalTransaction[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
+
+  const loadTransactions = async () => {
+    try {
+      // Buscar todas as transações
+      const data = await transactionService.getAllTransactions();
+      setTransactions(data);
+    } catch (error) {
+      console.error("Erro ao carregar transações:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div>Carregando...</div>;
+
+  return (
+    <div>
+      <h2>Últimas Transações</h2>
+      <ul>
+        {transactions.map((transaction) => (
+          <li key={transaction.id}>
+            <span>{transaction.category}</span>
+            <span>{transaction.formattedValue}</span>
+            <span>{transaction.type === "income" ? "💰" : "💸"}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// ========================================
+// EXEMPLO 3: Formulário de Criação de Receita
+// ========================================
+export const CreateIncomeExample = () => {
+  const [formData, setFormData] = useState({
+    date: "",
+    category: "",
+    value: 0,
+  });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const data = await categoryService.getIncomeCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setSubmitting(true);
+
+      await transactionService.createIncome({
+        date: formData.date,
+        category: formData.category,
+        value: formData.value,
+      });
+
+      alert("Receita criada com sucesso!");
+
+      // Limpar formulário
+      setFormData({ date: "", category: "", value: 0 });
+    } catch (error) {
+      console.error("Erro ao criar receita:", error);
+      alert("Erro ao criar receita");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <h2>Nova Receita</h2>
+
+      <input
+        type="date"
+        value={formData.date}
+        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+        required
+      />
+
+      <select
+        value={formData.category}
+        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+        required
+      >
+        <option value="">Selecione uma categoria</option>
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
+      </select>
+
+      <input
+        type="number"
+        value={formData.value}
+        onChange={(e) =>
+          setFormData({ ...formData, value: Number(e.target.value) })
+        }
+        placeholder="Valor"
+        required
+      />
+
+      <button type="submit" disabled={submitting}>
+        {submitting ? "Salvando..." : "Salvar Receita"}
+      </button>
+    </form>
+  );
+};
+
+// ========================================
+// EXEMPLO 4: Filtros e Agrupamentos
+// ========================================
+export const TransactionFiltersExample = () => {
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    LocalTransaction[]
+  >([]);
+  const [groupedByCategory, setGroupedByCategory] = useState<
+    Record<string, number>
+  >({});
+
+  useEffect(() => {
+    loadAndFilterTransactions();
+  }, []);
+
+  const loadAndFilterTransactions = async () => {
+    try {
+      // Buscar todas as transações
+      const allTransactions = await transactionService.getAllTransactions();
+
+      // Filtrar apenas transações do mês atual
+      const firstDay = new Date();
+      firstDay.setDate(1);
+      const lastDay = new Date(
+        firstDay.getFullYear(),
+        firstDay.getMonth() + 1,
+        0
+      );
+
+      const currentMonthTransactions = filterByPeriod(
+        allTransactions,
+        firstDay.toISOString().split("T")[0],
+        lastDay.toISOString().split("T")[0]
+      );
+
+      setFilteredTransactions(currentMonthTransactions);
+
+      // Agrupar por categoria
+      const grouped = groupByCategory(currentMonthTransactions);
+      setGroupedByCategory(grouped);
+    } catch (error) {
+      console.error("Erro ao carregar e filtrar transações:", error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Transações do Mês Atual</h2>
+      <p>Total de transações: {filteredTransactions.length}</p>
+
+      <h3>Por Categoria:</h3>
+      <ul>
+        {Object.entries(groupedByCategory).map(([category, total]) => (
+          <li key={category}>
+            {category}: {formatMoneyDisplay(total)}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// ========================================
+// EXEMPLO 5: Autenticação
+// ========================================
+export const AuthExample = () => {
+  const handleLogin = async (telefone: string, codigoTemp: string) => {
+    try {
+      // Salvar credenciais
+      authService.saveUserCredentials({ telefone, codigoTemp });
+
+      // Verificar autenticação
+      if (authService.isAuthenticated()) {
+        console.log("Usuário autenticado!");
+
+        // Obter credenciais
+        const credentials = authService.getUserCredentials();
+        console.log("Telefone:", credentials.telefone);
+      }
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+    }
+  };
+
+  const handleLogout = () => {
+    authService.clearUserCredentials();
+    console.log("Logout realizado!");
+  };
+
+  return (
+    <div>
+      <button onClick={() => handleLogin("11999999999", "abc123")}>
+        Login
+      </button>
+      <button onClick={handleLogout}>Logout</button>
+    </div>
+  );
+};
+
+// ========================================
+// EXEMPLO 6: Operações CRUD Completas
+// ========================================
+export const CRUDExample = () => {
+  // CREATE - Criar nova despesa
+  const createNewExpense = async () => {
+    try {
+      await transactionService.createExpense({
+        date: "2025-01-15",
+        category: "Alimentação",
+        value: 150,
+      });
+
+      console.log("Despesa criada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao criar despesa:", error);
+    }
+  };
+
+  // READ - Buscar todas as transações
+  const getAllTransactions = async () => {
+    try {
+      const data = await transactionService.getAllTransactions();
+      console.log("Transações:", data);
+      return data;
+    } catch (error) {
+      console.error("Erro ao buscar transações:", error);
+      return [];
+    }
+  };
+
+  // UPDATE - Atualizar uma despesa
+  const updateExpense = async (transactionCode: number) => {
+    try {
+      await transactionService.updateExpense({
+        transactionCode,
+        date: "2025-01-16",
+        category: "Transporte",
+        value: 200,
+      });
+
+      console.log("Despesa atualizada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao atualizar transação:", error);
+    }
+  };
+
+  // DELETE - Deletar uma despesa
+  const deleteExpense = async (transactionCode: number) => {
+    try {
+      await transactionService.deleteExpense(transactionCode);
+      console.log("Despesa deletada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao deletar transação:", error);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Operações CRUD</h2>
+      <button onClick={createNewExpense}>Criar Nova Despesa</button>
+      <button onClick={getAllTransactions}>Buscar Transações</button>
+      <button onClick={() => updateExpense(123)}>Atualizar Despesa #123</button>
+      <button onClick={() => deleteExpense(123)}>Deletar Despesa #123</button>
+    </div>
+  );
+};

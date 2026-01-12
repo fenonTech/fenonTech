@@ -2,14 +2,20 @@
  * Configuração de Ambiente - Seletor Automático
  *
  * Este arquivo exporta o ambiente correto baseado no modo de build do Vite
+ *
+ * IMPORTANTE: Para mudar a URL da API, edite:
+ * - Desenvolvimento: environment.development.ts
+ * - Produção: environment.production.ts
+ *
+ * A URL base atual é: https://backend-pearl-rho-82.vercel.app/api
  */
 
-// @ts-ignore
-const isDevelopment = import.meta.env.DEV;
+import { environment as devEnvironment } from "./environment.development";
+import { environment as prodEnvironment } from "./environment.production";
 
-// Importar o ambiente correto
-export const environment = isDevelopment
-  ? await import("./environment.development").then((m) => m.environment)
-  : await import("./environment.production").then((m) => m.environment);
+// Seleciona o ambiente correto baseado no modo do Vite
+export const environment = import.meta.env.DEV
+  ? devEnvironment
+  : prodEnvironment;
 
 export default environment;

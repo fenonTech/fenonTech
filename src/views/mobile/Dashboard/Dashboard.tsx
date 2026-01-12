@@ -1,25 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import HeaderMobile from "../../../components/HeaderMobile";
 import FinancialCardMobile from "../../../components/FinancialCardMobile";
 import { UltimasTransacoesMobile } from "../../../components/UltimasTransacoesMobile";
 import { BottomNavigationMobile } from "../../../components/BottomNavigationMobile";
 import type { MobileScreenType } from "../../../components/LayoutMobile";
+import { useFilter } from "../../../contexts/FilterContext";
+import { dashboardService } from "../../../services/api/dashboardService";
+import { formatTableDate } from "../../../utils";
 import "./Dashboard.css";
 
 interface DashboardProps {
   onNavigate?: (screen: MobileScreenType) => void;
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
+  userName?: string;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
   onNavigate,
   isBalanceVisible = true,
   onToggleVisibility,
+  userName = "Usuário",
 }) => {
+  const { selectedMonth, selectedYear } = useFilter();
   const [activeNavTab, setActiveNavTab] = useState<
     "inicio" | "receitas" | "despesas"
   >("inicio");
+
+  // Estados para dados do dashboard - MESMOS DADOS DO DESKTOP
+  const [saldo, setSaldo] = useState(0);
+  const [contasAReceber, setContasAReceber] = useState(0);
+  const [contasAPagar, setContasAPagar] = useState(0);
+  const [transacoes, setTransacoes] = useState<any[]>([]);
+
+  // Carregar dados do dashboard - MESMO SERVIÇO DO DESKTOP
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        const data = await dashboardService.getDashboardData(
+          selectedMonth + 1,
+          selectedYear
+        );
+        setSaldo(data.saldo);
+        setContasAReceber(data.contasAReceber);
+        setContasAPagar(data.contasAPagar);
+        setTransacoes(data.transacoes);
+      } catch (error) {
+        console.error("❌ Erro ao carregar dashboard:", error);
+      }
+    };
+    loadDashboardData();
+  }, [selectedMonth, selectedYear]);
+
+  // Formatar transações para o componente UltimasTransacoesMobile
+  const ultimasTransacoes = transacoes.slice(0, 9).map((t) => ({
+    id: t.codigo.toString(),
+    tipo: t.is_entrada ? ("entrada" as const) : ("saida" as const),
+    categoria: t.tipo || t.descricao || "Sem categoria",
+    valor: t.valor,
+    data: t.data_pagamento ? formatTableDate(t.data_pagamento) : "--/--",
+    dataOriginal: t.data_pagamento, // Data original para filtro
+  }));
 
   const handleConfigClick = () => {
     if (onNavigate) {
@@ -40,89 +81,26 @@ const Dashboard: React.FC<DashboardProps> = ({
     }
   };
 
-  // Dados de exemplo para as últimas transações
-  const ultimasTransacoes = [
-    {
-      id: "1",
-      tipo: "saida" as const,
-      categoria: "Alimentação",
-      valor: 50.0,
-      data: "2025-10-31",
-    },
-    {
-      id: "2",
-      tipo: "entrada" as const,
-      categoria: "Alimentação",
-      valor: 50.0,
-      data: "2025-10-31",
-    },
-    {
-      id: "3",
-      tipo: "saida" as const,
-      categoria: "Alimentação",
-      valor: 50.0,
-      data: "2025-10-31",
-    },
-    {
-      id: "4",
-      tipo: "saida" as const,
-      categoria: "Alimentação",
-      valor: 50.0,
-      data: "2025-10-31",
-    },
-    {
-      id: "5",
-      tipo: "entrada" as const,
-      categoria: "Freelance",
-      valor: 150.0,
-      data: "2025-10-30",
-    },
-    {
-      id: "6",
-      tipo: "saida" as const,
-      categoria: "Transporte",
-      valor: 25.0,
-      data: "2025-10-29",
-    },
-    {
-      id: "7",
-      tipo: "entrada" as const,
-      categoria: "Vendas",
-      valor: 300.0,
-      data: "2025-10-28",
-    },
-    {
-      id: "8",
-      tipo: "saida" as const,
-      categoria: "Lazer",
-      valor: 80.0,
-      data: "2025-10-27",
-    },
-    {
-      id: "9",
-      tipo: "entrada" as const,
-      categoria: "Investimentos",
-      valor: 200.0,
-      data: "2025-10-26",
-    },
-  ];
-
   return (
     <div className="mobile-screen-container">
       <HeaderMobile
-        userName="Gustavo Lindão"
+        userName={userName}
         onConfigClick={handleConfigClick}
         onLogoutClick={handleLogoutClick}
       />
       <div className="mobile-screen-content">
         <FinancialCardMobile
-          receitas={2150.37}
-          despesas={1950.37}
-          contasPagar={1950.37}
-          contasReceber={2150.37}
+          receitas={0} // Não usado quando saldo é fornecido
+          despesas={0} // Não usado quando saldo é fornecido
+          contasPagar={contasAPagar}
+          contasReceber={contasAReceber}
+          saldo={saldo}
           isBalanceVisible={isBalanceVisible}
           onToggleVisibility={onToggleVisibility}
-          mesAno="OUT/2025"
+          mesAno={`${String(selectedMonth + 1).padStart(
+            2,
+            "0"
+          )}/${selectedYear}`}
           mode="dashboard"
           onNavigate={handleNavTabChange}
         />

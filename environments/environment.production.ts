@@ -8,7 +8,7 @@ export const environment = {
 
   // APIs
   api: {
-    baseUrl: "https://n8n.srv1056458.hstgr.cloud/webhook/meuBolso",
+    baseUrl: "https://backend-pearl-rho-82.vercel.app/api",
     timeout: 30000,
   },
 

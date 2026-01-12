@@ -1,17 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Layout.css";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import Dashboard from "../views/desktop/Dashboard";
-import Receitas from "../views/desktop/Receitas";
-import Despesas from "../views/desktop/Despesas";
+import Dashboard from "../pages/Dashboard/Dashboard";
+import Receitas from "../pages/Receitas/Receitas";
+import Despesas from "../pages/Despesas/Despesas";
 import Configuracoes from "../pages/Configuracoes";
 import { APP_URLS } from "../config";
+import { authService } from "../services/authService";
 
 const Layout: React.FC = () => {
   const [activeItem, setActiveItem] = useState("dashboard");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [userName, setUserName] = useState(
+    authService.getUserName() || "Usuário"
+  );
+
+  // Escutar mudanças no nome do usuário
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setUserName(authService.getUserName() || "Usuário");
+    };
+
+    // Escutar eventos de storage do próprio window (quando localStorage muda)
+    window.addEventListener("storage", handleStorageChange);
+
+    // Também escutar um evento customizado para mudanças na mesma aba
+    window.addEventListener("userNameUpdated", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("userNameUpdated", handleStorageChange);
+    };
+  }, []);
 
   const handleItemClick = (item: string) => {
     setActiveItem(item);
@@ -116,7 +138,7 @@ const Layout: React.FC = () => {
         }`}
       >
         <Header
-          userName={localStorage.getItem("fenontech-userName") || "Usuário"}
+          userName={userName}
           pageTitle={pageInfo.title}
           pageDescription={pageInfo.description}
           onConfigClick={handleConfigClick}

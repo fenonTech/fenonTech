@@ -1,16 +1,15 @@
 import React from "react";
 import { APP_URLS } from "../../config";
+import { authService } from "../../services/authService";
 import "./SessionExpired.css";
 import logo from "../../assets/logo.png";
 
 const SessionExpired: React.FC = () => {
   const handleNewSession = () => {
-    // Limpar todas as credenciais e flags do localStorage
-    localStorage.removeItem("fenontech-telefone");
-    localStorage.removeItem("fenontech-codigoTemp");
+    // Limpar todas as credenciais usando authService
+    authService.clearUserCredentials();
     localStorage.removeItem("fenontech-session-expired");
     localStorage.removeItem("fenontech-subscription-expired");
-    localStorage.removeItem("fenontech-userName");
 
     // Redirecionar para login
     window.location.href = APP_URLS.LOGIN;

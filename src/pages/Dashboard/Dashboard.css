@@ -1,0 +1,30 @@
+/* Dashboard Styles */
+
+.dashboard {
+  padding: 2rem 2rem 10rem 2rem;
+  margin: 1%;
+  border-radius: 16px;
+  background: #0b0b0b;
+  height: calc(100vh - 40px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  color: white;
+  box-sizing: border-box;
+}
+
+/* Primeira Linha - Transações + Gráfico Pizza */
+.dashboard-first-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Segunda Linha - Contas + Visão Categoria */
+.dashboard-second-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}

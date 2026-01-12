@@ -4,13 +4,15 @@ import lupa from "/src/assets/lupa.png";
 import receitaIcon from "/src/assets/receita.png";
 import despesaIcon from "/src/assets/despesa.png";
 import editarIcon from "/src/assets/editar.png";
+import { createSafeDate } from "../../utils";
 
 interface Transacao {
   id: string;
   tipo: "entrada" | "saida";
   categoria: string;
   valor: number;
-  data: string;
+  data: string; // Data formatada para exibição (DD/MM)
+  dataOriginal?: string; // Data original da API para filtro (YYYY-MM-DD)
 }
 
 interface UltimasTransacoesMobileProps {
@@ -29,8 +31,6 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
   onSearch,
   onFilterChange,
   showFooter = false,
-  totalTransacoes,
-  valorTotal,
   isBalanceVisible = true,
   onEditTransaction,
   // onDeleteTransaction removido pois não está sendo usado
@@ -44,16 +44,47 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
     }).format(value);
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    return `${day}/${month}`;
-  };
-
   const getTransactionText = (tipo: "entrada" | "saida") => {
     return tipo === "entrada" ? "Entrada" : "Saída";
   };
+
+  // Função para filtrar transações por data
+  const filterTransactionsByDate = (transactions: Transacao[]) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Zerar horas para comparação apenas de data
+
+    return transactions.filter((transacao) => {
+      let transactionDate: Date;
+
+      // Se temos data original (YYYY-MM-DD), usar ela
+      if (transacao.dataOriginal) {
+        transactionDate = createSafeDate(transacao.dataOriginal);
+      } else if (transacao.data && transacao.data !== "--/--") {
+        // Tentar converter data formatada DD/MM de volta para Date
+        const [day, month] = transacao.data.split("/");
+        const year = today.getFullYear(); // Assumir ano atual se não foi informado
+        transactionDate = new Date(year, parseInt(month) - 1, parseInt(day));
+      } else {
+        // Se não tem data válida, não filtrar
+        return true;
+      }
+
+      transactionDate.setHours(0, 0, 0, 0);
+
+      switch (selectedFilter) {
+        case "atual":
+          return transactionDate <= today;
+        case "futuros":
+          return transactionDate > today;
+        case "todos":
+        default:
+          return true;
+      }
+    });
+  };
+
+  // Aplicar filtros nas transações
+  const filteredTransactions = filterTransactionsByDate(transacoes);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -81,9 +112,9 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
             onChange={handleFilterChange}
             className="transaction-filter-select"
           >
-            <option value="todos">Todos</option>
-            <option value="atual">Atual</option>
-            <option value="futuros">Futuros</option>
+            <option value="todos">Todas</option>
+            <option value="atual">Atuais</option>
+            <option value="futuros">Futuras</option>
           </select>
           <div className="ultimas-transacoes-search">
             <input
@@ -100,7 +131,7 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
 
       <div className="ultimas-transacoes-mobile">
         <div className="ultimas-transacoes-list">
-          {transacoes.map((transacao) => (
+          {filteredTransactions.map((transacao) => (
             <div key={transacao.id} className="ultimas-transacoes-item">
               <div className="transaction-icon-container">
                 <img
@@ -123,9 +154,7 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
                 <div className="transaction-amount">
                   {formatCurrency(transacao.valor)}
                 </div>
-                <div className="transaction-date">
-                  {formatDate(transacao.data)}
-                </div>
+                <div className="transaction-date">{transacao.data}</div>
               </div>
 
               {/* Botão Editar - só aparece quando callback está definido */}
@@ -150,22 +179,20 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
             <div className="footer-item">
               <span className="footer-label">Transações:</span>
               <span className="footer-value">
-                {totalTransacoes || transacoes.length}
+                {filteredTransactions.length}
               </span>
             </div>
             <div className="footer-item">
               <span className="footer-label">Valor Total:</span>
               <span className="footer-value">
                 {isBalanceVisible
-                  ? valorTotal !== undefined
-                    ? formatCurrency(valorTotal)
-                    : formatCurrency(
-                        transacoes.reduce(
-                          (acc, t) =>
-                            acc + (t.tipo === "entrada" ? t.valor : -t.valor),
-                          0
-                        )
+                  ? formatCurrency(
+                      filteredTransactions.reduce(
+                        (acc, t) =>
+                          acc + (t.tipo === "entrada" ? t.valor : -t.valor),
+                        0
                       )
+                    )
                   : "R$ •••••"}
               </span>
             </div>
