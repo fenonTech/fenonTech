@@ -168,17 +168,18 @@
 .btn-cancel,
 .btn-save {
   flex: 1;
-  padding: 14px 24px;
-  border-radius: 10px;
+  padding: 16px 32px;
+  border-radius: 12px;
   font-weight: 600;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   font-family: "Poppins", sans-serif;
   position: relative;
   overflow: hidden;
+  min-height: 48px;
 }
 
 .btn-cancel {
