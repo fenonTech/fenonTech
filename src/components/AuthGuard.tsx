@@ -14,15 +14,15 @@ const AuthGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
     const authenticateUser = async () => {
       // 🚀 MODO DESENVOLVIMENTO: Pular autenticação
-      if (isDevelopment) {
-        console.log("🔓 Modo DEV: Autenticação desabilitada");
-        // Limpar flags de desenvolvimento
-        localStorage.removeItem("fenontech-session-expired");
-        localStorage.removeItem("fenontech-subscription-expired");
-        setIsAuthenticated(true);
-        setIsLoading(false);
-        return;
-      }
+      // if (isDevelopment) {
+      //   console.log("🔓 Modo DEV: Autenticação desabilitada");
+      //   // Limpar flags de desenvolvimento
+      //   localStorage.removeItem("fenontech-session-expired");
+      //   localStorage.removeItem("fenontech-subscription-expired");
+      //   setIsAuthenticated(true);
+      //   setIsLoading(false);
+      //   return;
+      // }
 
       // Capturar parâmetros como query string: ?telefone=+5511911451180&codigo=x76elj
       const urlParams = new URLSearchParams(window.location.search);
