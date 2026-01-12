@@ -78,7 +78,7 @@ export const authService = {
       return data;
     } catch (error: any) {
       console.error("❌ Erro capturado no authService.login:", error);
-      
+
       // Se receber erro 400, retornar a resposta de erro
       if (error.response?.status === 400) {
         console.error("❌ Erro 400 - Bad Request:", error.response.data);
