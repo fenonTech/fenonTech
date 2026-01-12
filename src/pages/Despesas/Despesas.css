@@ -137,6 +137,8 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   margin-bottom: 1rem;
+  overflow-x: auto;
+  width: 100%;
 }
 
 .despesas-charts-row {
@@ -148,6 +150,8 @@
 
 .despesas-table-card {
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .despesas-card {
@@ -1170,4 +1174,3 @@
     padding: 0.875rem;
   }
 }
-
