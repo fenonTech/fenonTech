@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import "./Layout.css";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import Dashboard from "../views/desktop/Dashboard";
-import Receitas from "../views/desktop/Receitas";
-import Despesas from "../views/desktop/Despesas";
+import Dashboard from "../pages/Dashboard/Dashboard";
+import Receitas from "../pages/Receitas/Receitas";
+import Despesas from "../pages/Despesas/Despesas";
 import Configuracoes from "../pages/Configuracoes";
 import { APP_URLS } from "../config";
 

@@ -1,26 +1,50 @@
 /**
  * Configuração centralizada de URLs da API
  *
- * Agora usando variáveis de ambiente do Vite
- * - Development: usa environments/.env.development
- * - Production: usa environments/.env.production
+ * A base URL está configurada nos arquivos de ambiente:
+ * - Production: environments/environment.production.ts
+ * - Development: environments/environment.development.ts
+ *
+ * Para mudar a URL da API, edite apenas o arquivo de ambiente correspondente.
  */
 
-// Obter URL da API das variáveis de ambiente
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+import { environment } from "../../environments/environment";
+
+// URL base da API - vem do arquivo de ambiente
+export const API_BASE_URL = environment.api.baseUrl;
 
 // Detectar ambiente
-export const CURRENT_ENVIRONMENT = import.meta.env.MODE;
+export const CURRENT_ENVIRONMENT = environment.name;
 
 // Log do ambiente atual (apenas em dev)
-if (import.meta.env.DEV) {
+if (!environment.production) {
   console.log("🌍 Ambiente:", CURRENT_ENVIRONMENT);
   console.log("🔗 API URL:", API_BASE_URL);
 }
 
 // Endpoints da API (adicione conforme necessário)
 export const API_ENDPOINTS = {
+  // Autenticação
+  auth: {
+    login: "/auth/login",
+  },
+
   // Transações
+  transacoes: {
+    list: "/transacoes", // GET com query params: ?mes={mes}&ano={ano}
+  },
+
+  // Entradas (Receitas)
+  entradas: {
+    list: "/entradas", // GET com query params: ?mes={mes}&ano={ano}
+  },
+
+  // Despesas/Saídas
+  despesas: {
+    list: "/despesas", // GET com query params: ?mes={mes}&ano={ano}
+  },
+
+  // Transações (antigo - manter compatibilidade)
   transactions: {
     list: "/transactions",
     create: "/transactions",

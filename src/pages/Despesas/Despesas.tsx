@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import "./Despesas.css";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
@@ -9,16 +9,15 @@ import CategoryBudgetCard from "../../components/CategoryBudgetCard";
 import MonthlyBarChart from "../../components/MonthlyBarChart";
 import { ExpenseModal } from "../../components/Modals";
 
-import { useTransaction } from "../../contexts/TransactionContext";
 import { useFilter } from "../../contexts/FilterContext";
-
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
+import { despesasService } from "../../services/api/despesasService";
+import { transactionsService } from "../../services/api/transactionsService";
 import {
-  transactionApiService,
-  parseMoneyValue,
-  convertApiTransactionToLocal,
-} from "../../services";
-import { formatCurrency } from "../../utils";
+  formatCurrency,
+  formatTableDate,
+  isDateTodayOrBefore,
+} from "../../utils";
 import carteiraCardDespesasdoMês from "../../assets/carteiraCardDespesasdoMês.png";
 import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
@@ -31,99 +30,72 @@ const Despesas: React.FC = () => {
 
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
-  const {
-    expenses,
-    payables,
-    budgets,
-    addExpense,
-    addExpenseComplete,
-    updateExpense,
-    deleteExpense,
-    addPayable,
-    addPayableComplete,
-    updatePayable,
-    deletePayable,
-    clearExpenses,
-    clearPayables,
-  } = useTransaction();
 
-  // Ref para controlar se já carregou inicialmente
-  const initialLoadDone = useRef(false);
+  // Estados locais para os dados de despesas
+  const [despesaAtual, setDespesaAtual] = React.useState(0);
+  const [contasAPagar, setContasAPagar] = React.useState(0);
+  const [despesas, setDespesas] = React.useState<any[]>([]);
 
-  // Função para carregar/recarregar despesas da API
-  const recarregarDados = async () => {
-    console.log("🔄 Recarregando dados...");
-    clearExpenses();
-    clearPayables();
-
-    try {
-      const apiExpenses = await transactionApiService.getExpenses();
-      console.log(`📦 Recebido ${apiExpenses.length} registros da API`);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      let despesasCount = 0;
-      let payablesCount = 0;
-
-      apiExpenses.forEach((apiExpense) => {
-        const converted = convertApiTransactionToLocal(apiExpense);
-
-        if (!converted || converted.type !== "expense") {
-          return;
-        }
-
-        const expenseDate = new Date(apiExpense.data_pagamento!);
-        expenseDate.setHours(0, 0, 0, 0); // Zerar horas para comparar apenas a data
-        const isFuture = expenseDate > today;
-
-        if (isFuture) {
-          payablesCount++;
-          addPayableComplete({
-            id: converted.id,
-            date: converted.date,
-            dueDate: converted.date,
-            category: converted.category,
-            description: converted.description,
-            value: converted.value,
-            formattedValue: converted.formattedValue,
-            status: "pending" as const,
-            type: "payable" as const,
-            createdAt: new Date(converted.createdAt),
-            updatedAt: new Date(converted.createdAt),
-          });
-        } else {
-          despesasCount++;
-          addExpenseComplete({
-            id: converted.id,
-            date: converted.date,
-            category: converted.category,
-            description: converted.description,
-            value: converted.value,
-            formattedValue: converted.formattedValue,
-            type: "expense" as const,
-            createdAt: new Date(converted.createdAt),
-            updatedAt: new Date(converted.createdAt),
-          });
-        }
-      });
-
-      console.log(
-        `✅ Adicionados: ${despesasCount} despesas pagas, ${payablesCount} contas a pagar`
-      );
-    } catch (error) {
-      console.error("❌ Erro ao carregar despesas:", error);
-    }
-  };
-
-  // Carregar despesas ao montar o componente
+  // Carregar dados de despesas sempre que o filtro mudar
   useEffect(() => {
-    // Prevenir dupla execução (React StrictMode em dev executa useEffect 2x)
-    if (initialLoadDone.current) {
-      return;
-    }
-    initialLoadDone.current = true;
-    recarregarDados();
-  }, []); // Executa apenas ao montar
+    const loadDespesasData = async () => {
+      try {
+        console.log(
+          `🔄 Carregando despesas: mês=${
+            selectedMonth + 1
+          }, ano=${selectedYear}`
+        );
+
+        // Chamar API com filtro de mês e ano
+        const data = await despesasService.getDespesas(
+          selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
+          selectedYear
+        );
+
+        // Atualizar estados
+        setDespesaAtual(data.despesaAtual);
+        setContasAPagar(data.contasAPagar);
+        setDespesas(data.despesas);
+
+        console.log("✅ Despesas carregadas com sucesso");
+      } catch (error) {
+        console.error("❌ Erro ao carregar despesas:", error);
+      }
+    };
+
+    loadDespesasData();
+  }, [selectedMonth, selectedYear]); // Recarregar quando o filtro mudar
+
+  // Preparar dados para as tabelas
+  const despesasData = useMemo(() => {
+    return despesas
+      .filter((despesa) => isDateTodayOrBefore(despesa.data_pagamento))
+      .map((despesa) => {
+        return {
+          id: despesa.codigo.toString(),
+          date: formatTableDate(despesa.data_pagamento),
+          category: despesa.tipo,
+          type: despesa.descricao || "Variável",
+          value: formatCurrency(despesa.valor),
+          originalData: despesa,
+        };
+      });
+  }, [despesas]);
+
+  const contasAPagarData = useMemo(() => {
+    return despesas
+      .filter((despesa) => !isDateTodayOrBefore(despesa.data_pagamento))
+      .map((despesa) => {
+        return {
+          id: despesa.codigo.toString(),
+          date: formatTableDate(despesa.data_pagamento),
+          category: despesa.tipo,
+          type: "Pendente",
+          value: formatCurrency(despesa.valor),
+          originalData: despesa,
+        };
+      });
+  }, [despesas]);
 
   // Função para adicionar nova despesa/conta a pagar
   const handleAddDespesa = () => {
@@ -134,39 +106,42 @@ const Despesas: React.FC = () => {
 
   // Função para editar despesa
   const handleEditExpense = (expense: any) => {
-    // Usar os dados originais se disponíveis
-    const expenseToEdit = expense.originalData || expense;
-    setEditingExpense(expenseToEdit);
+    // Transformar dados da API para o formato esperado pelo modal
+    const expenseForModal = {
+      id: expense.originalData.codigo.toString(),
+      value: expense.originalData.valor,
+      category:
+        expense.originalData.tipo || expense.originalData.descricao || "",
+      date: expense.originalData.data_pagamento,
+      type: "expense" as const,
+    };
+    setEditingExpense(expenseForModal);
     setIsEditMode(true);
     setIsExpenseModalOpen(true);
   };
 
   // Função para excluir despesa
   const handleDeleteExpense = async (expense: any) => {
-    // Usar os dados originais se disponíveis
-    const expenseToDelete = expense.originalData || expense;
-    const confirmDelete = window.confirm(
-      `Tem certeza que deseja excluir a despesa "${
-        expenseToDelete.category
-      }" no valor de ${
-        expenseToDelete.formattedValue || expenseToDelete.value
-      }?`
-    );
+    if (!window.confirm("Tem certeza que deseja excluir esta despesa?")) {
+      return;
+    }
 
-    if (confirmDelete) {
-      try {
-        console.log("🗑️ Deletando despesa ID:", expenseToDelete.id);
-        // Chamar API para deletar
-        await transactionApiService.deleteExpense(expenseToDelete.id);
+    try {
+      await transactionsService.delete(expense.originalData.codigo);
 
-        console.log("✅ Despesa deletada! Recarregando...");
-        initialLoadDone.current = false;
-        await recarregarDados();
-        initialLoadDone.current = true;
-      } catch (error) {
-        console.error("❌ Erro ao deletar despesa:", error);
-        alert("Erro ao deletar despesa. Tente novamente.");
-      }
+      // Recarregar dados após deletar
+      const data = await despesasService.getDespesas(
+        selectedMonth + 1,
+        selectedYear
+      );
+      setDespesaAtual(data.despesaAtual);
+      setContasAPagar(data.contasAPagar);
+      setDespesas(data.despesas);
+
+      console.log("✅ Despesa deletada com sucesso");
+    } catch (error) {
+      console.error("❌ Erro ao deletar despesa:", error);
+      alert("Erro ao deletar despesa. Tente novamente.");
     }
   };
 
@@ -179,271 +154,69 @@ const Despesas: React.FC = () => {
 
   // Função para salvar despesa
   const handleSaveExpense = async (expenseData: any) => {
-    const amount =
-      typeof expenseData.value === "string"
-        ? parseMoneyValue(expenseData.value)
-        : expenseData.value;
-    const formattedValue = formatCurrency(amount);
-
-    // Corrigir problema da data - usar a data local sem conversão de timezone
-    const [year, month, day] = expenseData.date.split("-").map(Number);
-    const expenseDate = new Date(year, month - 1, day);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Zerar horas para comparação correta
-    const isContaAPagar = expenseDate > today;
-
-    if (isEditMode && editingExpense) {
-      // Modo edição - verificar se mudou de tipo (expense <-> payable)
-      // Detectar tipo original pela data do item
-      const originalDate = editingExpense.date || editingExpense.dueDate;
-      const [origYear, origMonth, origDay] = originalDate
-        .split("-")
-        .map(Number);
-      const originalItemDate = new Date(origYear, origMonth - 1, origDay);
-      const todayForComparison = new Date();
-      todayForComparison.setHours(0, 0, 0, 0);
-      const wasPayable = originalItemDate > todayForComparison;
-      const changedType = wasPayable !== isContaAPagar;
-
-      const baseData = {
-        id: editingExpense.id, // Usar o ID existente
-        date: expenseData.date,
-        description: expenseData.category,
-        category: expenseData.category,
-        value: amount,
-        formattedValue,
-        createdAt: editingExpense.createdAt || new Date(),
-        updatedAt: new Date(),
+    try {
+      const payload = {
+        valor: expenseData.value,
+        is_entrada: false,
+        data_pagamento: expenseData.date, // já vem no formato YYYY-MM-DD
+        descricao: expenseData.category || "Despesa",
       };
 
-      if (changedType) {
-        // Mudou de tipo: deletar do antigo e adicionar no novo
-        if (wasPayable) {
-          deletePayable(editingExpense.id);
-          const expense = {
-            ...baseData,
-            type: "expense" as const,
-          };
-          addExpense(expense);
-        } else {
-          deleteExpense(editingExpense.id);
-          const payable = {
-            ...baseData,
-            dueDate: expenseData.date,
-            status: "pending" as const,
-            type: "payable" as const,
-          };
-          addPayable(payable);
-        }
+      if (isEditMode && editingExpense) {
+        // Editar despesa existente - usar editingExpense.id que contém o código
+        await transactionsService.update(Number(editingExpense.id), payload);
+        console.log("✅ Despesa atualizada com sucesso");
       } else {
-        // Mantém o mesmo tipo: chamar API para atualizar
-        try {
-          if (isContaAPagar) {
-            // Para contas a pagar, apenas atualizar localmente
-            const payable = {
-              ...baseData,
-              dueDate: expenseData.date,
-              status: editingExpense.status || ("pending" as const),
-              type: "payable" as const,
-            };
-            updatePayable(payable);
-          } else {
-            // Para despesas, chamar API de atualização
-            await transactionApiService.updateExpense({
-              transactionCode: parseInt(editingExpense.id, 10),
-              date: expenseData.date,
-              category: expenseData.category,
-              value: amount,
-            });
-
-            console.log("✅ Despesa atualizada na API! Recarregando...");
-
-            // Recarregar dados para sincronizar
-            initialLoadDone.current = false;
-            await recarregarDados();
-            initialLoadDone.current = true;
-          }
-        } catch (error) {
-          console.error("❌ Erro ao atualizar despesa na API:", error);
-          // Se falhar na API, atualizar localmente para não bloquear o usuário
-          if (isContaAPagar) {
-            const payable = {
-              ...baseData,
-              dueDate: expenseData.date,
-              status: editingExpense.status || ("pending" as const),
-              type: "payable" as const,
-            };
-            updatePayable(payable);
-          } else {
-            const expense = {
-              ...baseData,
-              type: "expense" as const,
-            };
-            updateExpense(expense);
-          }
-        }
+        // Criar nova despesa
+        await transactionsService.create(payload);
+        console.log("✅ Despesa criada com sucesso");
       }
-    } else {
-      // Modo criação - adicionar nova despesa
-      try {
-        await transactionApiService.createExpense({
-          date: expenseData.date,
-          category: expenseData.category,
-          value: amount,
-        });
 
-        console.log("✅ Despesa criada! Recarregando...");
-        initialLoadDone.current = false; // Permitir recarregar
-        await recarregarDados();
-        initialLoadDone.current = true; // Bloquear novamente
-      } catch (error) {
-        console.error("❌ Erro ao criar despesa na API:", error);
-        // Se falhar, adicionar localmente para não bloquear o usuário
-        const baseData = {
-          date: expenseData.date,
-          description: expenseData.category,
-          category: expenseData.category,
-          value: amount,
-          formattedValue,
-        };
-
-        if (isContaAPagar) {
-          addPayable({
-            ...baseData,
-            dueDate: expenseData.date,
-            status: "pending" as const,
-            type: "payable" as const,
-          });
-        } else {
-          addExpense({
-            ...baseData,
-            type: "expense" as const,
-          });
-        }
-      }
-    }
-
-    // Fechar o modal após salvar
-    handleCloseExpenseModal();
-  };
-
-  // Função para filtrar dados por mês/ano
-  const filterByMonthYear = (
-    data: any[],
-    selectedMonth: number,
-    selectedYear: number
-  ) => {
-    return data.filter((item) => {
-      // Parse correto da data para evitar problema de timezone
-      const dateString = item.date || item.dueDate;
-      const [year, month, day] = dateString.split("-").map(Number);
-      const itemDate = new Date(year, month - 1, day);
-
-      return (
-        itemDate.getMonth() === selectedMonth &&
-        itemDate.getFullYear() === selectedYear
+      // Recarregar dados
+      const data = await despesasService.getDespesas(
+        selectedMonth + 1,
+        selectedYear
       );
-    });
+      setDespesaAtual(data.despesaAtual);
+      setContasAPagar(data.contasAPagar);
+      setDespesas(data.despesas);
+
+      handleCloseExpenseModal();
+    } catch (error) {
+      console.error("❌ Erro ao salvar despesa:", error);
+      alert("Erro ao salvar despesa. Tente novamente.");
+    }
   };
 
-  // Filtrar despesas e contas a pagar pelo mês/ano selecionado
-  const filteredExpenses = useMemo(
-    () => filterByMonthYear(expenses, selectedMonth, selectedYear),
-    [expenses, selectedMonth, selectedYear]
-  );
-
-  const filteredPayables = useMemo(
-    () => filterByMonthYear(payables, selectedMonth, selectedYear),
-    [payables, selectedMonth, selectedYear]
-  );
-
-  // Converter dados do contexto para formato das tabelas
-  const formatExpenseData = (expenses: any[]) => {
-    return expenses.map((expense) => {
-      // Parse correto da data para evitar problema de timezone
-      const [year, month, day] = expense.date.split("-").map(Number);
-      const expenseDate = new Date(year, month - 1, day);
-
-      return {
-        id: expense.id,
-        date: expenseDate.toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-        }),
-        category: expense.category,
-        type: expense.description || "Variável",
-        value: expense.formattedValue,
-        // Manter dados originais para edição
-        originalDate: expense.date,
-        originalValue: expense.value,
-        originalData: expense,
-      };
-    });
-  };
-
-  const formatPayableData = (payables: any[]) => {
-    return payables.map((payable) => {
-      // Parse correto da data para evitar problema de timezone
-      const [year, month, day] = payable.dueDate.split("-").map(Number);
-      const dueDate = new Date(year, month - 1, day);
-
-      return {
-        id: payable.id,
-        date: dueDate.toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-        }),
-        category: payable.category,
-        type: payable.status === "pending" ? "Pendente" : "Pago",
-        value: payable.formattedValue,
-        // Manter dados originais para edição
-        originalDate: payable.dueDate,
-        originalValue: payable.value,
-        originalData: payable,
-      };
-    });
-  };
-
-  // Calcular totais usando dados filtrados
-  const totalExpenses = filteredExpenses.reduce(
-    (sum, expense) => sum + expense.value,
-    0
-  );
-  const totalPayables = filteredPayables.reduce(
-    (sum, payable) => sum + payable.value,
-    0
-  );
-
-  // Dados dinâmicos das tabelas (usando dados filtrados)
-  const despesasData = formatExpenseData(filteredExpenses);
-  const contasAPagarData = formatPayableData(filteredPayables);
-
-  // Dados dinâmicos para o gráfico de pizza
+  // Agrupar despesas por categoria para o gráfico de pizza
   const pieChartData = useMemo(() => {
     // Categorias pré-cadastradas com cores fixas
     const predefinedCategories = [
-      { name: "Alimentação", color: "#FF6B6B" },
-      { name: "Transporte", color: "#4ECDC4" },
-      { name: "Moradia", color: "#45B7D1" },
-      { name: "Lazer", color: "#96CEB4" },
-      { name: "Saúde", color: "#FFEAA7" },
-      { name: "Educação", color: "#DDA0DD" },
-      { name: "Outros", color: "#98D8C8" },
+      { name: "alimentação", color: "#FF6B6B" },
+      { name: "transporte", color: "#4ECDC4" },
+      { name: "moradia", color: "#45B7D1" },
+      { name: "lazer", color: "#96CEB4" },
+      { name: "saúde", color: "#FFEAA7" },
+      { name: "educação", color: "#DDA0DD" },
+      { name: "mercado", color: "#98D8C8" },
+      { name: "outros", color: "#B0BEC5" },
     ];
 
-    if (filteredExpenses.length === 0) {
+    if (despesas.length === 0) {
       return predefinedCategories.map((cat) => ({
         ...cat,
         percentage: 0,
       }));
     }
 
-    // Agrupar despesas por categoria
+    // Agrupar despesas por categoria (apenas despesas já pagas)
     const categoryTotals: { [key: string]: number } = {};
-    expenses.forEach((expense) => {
-      const category = expense.category || "Outros";
-      categoryTotals[category] =
-        (categoryTotals[category] || 0) + expense.value;
+    despesas.forEach((despesa) => {
+      if (isDateTodayOrBefore(despesa.data_pagamento)) {
+        const category = despesa.tipo?.toLowerCase() || "outros";
+        categoryTotals[category] =
+          (categoryTotals[category] || 0) + despesa.valor;
+      }
     });
 
     const totalExpenseValue = Object.values(categoryTotals).reduce(
@@ -456,7 +229,9 @@ const Despesas: React.FC = () => {
       .map((predefCategory) => {
         const value = categoryTotals[predefCategory.name] || 0;
         return {
-          name: predefCategory.name,
+          name:
+            predefCategory.name.charAt(0).toUpperCase() +
+            predefCategory.name.slice(1),
           percentage:
             totalExpenseValue > 0
               ? Math.round((value / totalExpenseValue) * 100)
@@ -464,10 +239,10 @@ const Despesas: React.FC = () => {
           color: predefCategory.color,
         };
       })
-      .filter((cat) => cat.percentage > 0 || filteredExpenses.length === 0);
-  }, [filteredExpenses]);
+      .filter((cat) => cat.percentage > 0 || despesas.length === 0);
+  }, [despesas]);
 
-  // Dados para o gráfico de barras - Calculado com base nas despesas reais
+  // Dados para o gráfico de barras - TODO: será implementado posteriormente
   const monthlyData = useMemo(() => {
     const months = [
       "Jan",
@@ -484,66 +259,17 @@ const Despesas: React.FC = () => {
       "Dez",
     ];
 
-    // Inicializar array com 0 para cada mês
-    const monthlyTotals = Array(12).fill(0);
-
-    // Somar todas as despesas (pagas) do ano selecionado
-    expenses.forEach((expense) => {
-      const [year, month] = expense.date.split("-").map(Number);
-      if (year === selectedYear) {
-        monthlyTotals[month - 1] += expense.value;
-      }
-    });
-
-    // Criar array de objetos para o gráfico
-    return months.map((month, index) => ({
+    // Por enquanto, retornar dados vazios
+    return months.map((month) => ({
       month,
-      value: monthlyTotals[index],
+      value: 0,
     }));
-  }, [expenses, selectedYear]);
+  }, []);
 
-  // Dados dinâmicos para barras de visão por categoria
+  // Dados dinâmicos para barras de visão por categoria - TODO: implementar com budgets
   const categoryBarsData = useMemo(() => {
-    const predefinedCategories = [
-      { name: "Alimentação", color: "#FF6B6B" },
-      { name: "Transporte", color: "#4ECDC4" },
-      { name: "Moradia", color: "#45B7D1" },
-      { name: "Lazer", color: "#96CEB4" },
-      { name: "Saúde", color: "#FFEAA7" },
-      { name: "Educação", color: "#DDA0DD" },
-      { name: "Outros", color: "#98D8C8" },
-    ];
-
-    // Agrupar despesas por categoria
-    const categoryTotals: { [key: string]: number } = {};
-    filteredExpenses.forEach((expense) => {
-      const category = expense.category || "Outros";
-      categoryTotals[category] =
-        (categoryTotals[category] || 0) + expense.value;
-    });
-
-    // Agrupar budgets por categoria para o mês/ano selecionado
-    const categoryBudgets: { [key: string]: number } = {};
-    budgets
-      .filter(
-        (budget) =>
-          budget.month === selectedMonth &&
-          budget.year === selectedYear &&
-          budget.type === "expense"
-      )
-      .forEach((budget) => {
-        categoryBudgets[budget.category] = budget.plannedAmount;
-      });
-
-    return predefinedCategories
-      .map((category) => ({
-        name: category.name,
-        spent: categoryTotals[category.name] || 0,
-        total: categoryBudgets[category.name] || 0,
-        color: category.color,
-      }))
-      .filter((cat) => cat.total > 0 || cat.spent > 0); // Mostrar apenas categorias com dados
-  }, [filteredExpenses, budgets, selectedMonth, selectedYear]);
+    return [];
+  }, []);
 
   // Definir colunas para a tabela de despesas
   const despesasColumns: TableColumn[] = [
@@ -596,17 +322,13 @@ const Despesas: React.FC = () => {
         cards={[
           {
             title: "DESPESA ATUAL",
-            value: formatValue(
-              `R$ ${totalExpenses.toFixed(2).replace(".", ",")}`
-            ),
+            value: formatValue(despesaAtual),
             icon: carteiraCardDespesasdoMês,
             type: "negative",
           },
           {
             title: "Contas a pagar",
-            value: formatValue(
-              `R$ ${totalPayables.toFixed(2).replace(".", ",")}`
-            ),
+            value: formatValue(contasAPagar),
             icon: simboloMenuBolsoContasAPagar,
             type: "neutral",
           },
@@ -655,23 +377,14 @@ const Despesas: React.FC = () => {
           <ExpensesPieChart
             title="Despesas por categoria"
             totalLabel="TOTAL DESPESAS"
-            totalValue={`R$ ${totalExpenses.toFixed(2).replace(".", ",")}`}
+            totalValue={formatValue(despesaAtual)}
             categories={pieChartData}
             className="despesas-card chart-card"
           />
 
           {/* Visão por categoria */}
           <CategoryBudgetCard
-            data={categoryBarsData.map((item) => ({
-              name: item.name,
-              spent: item.spent,
-              planned: item.total,
-              percentage:
-                item.total > 0
-                  ? Math.min((item.spent / item.total) * 100, 100)
-                  : 0,
-              color: item.color,
-            }))}
+            data={categoryBarsData}
             className="despesas-card category-bars-card"
           />
         </div>
@@ -714,18 +427,30 @@ const Despesas: React.FC = () => {
         onSave={handleSaveExpense}
         onUpdate={handleSaveExpense}
         onDelete={
-          isEditMode
-            ? (id: string) => {
-                const expenseDate = new Date(editingExpense?.date);
-                const today = new Date();
-                const isPayable = expenseDate > today;
-
-                if (isPayable) {
-                  deletePayable(id);
-                } else {
-                  deleteExpense(id);
+          isEditMode && editingExpense
+            ? async () => {
+                if (
+                  !window.confirm(
+                    "Tem certeza que deseja excluir esta despesa?"
+                  )
+                ) {
+                  return;
                 }
-                handleCloseExpenseModal();
+                try {
+                  await transactionsService.delete(Number(editingExpense.id));
+                  const data = await despesasService.getDespesas(
+                    selectedMonth + 1,
+                    selectedYear
+                  );
+                  setDespesaAtual(data.despesaAtual);
+                  setContasAPagar(data.contasAPagar);
+                  setDespesas(data.despesas);
+                  handleCloseExpenseModal();
+                  console.log("✅ Despesa deletada com sucesso");
+                } catch (error) {
+                  console.error("❌ Erro ao deletar despesa:", error);
+                  alert("Erro ao deletar despesa. Tente novamente.");
+                }
               }
             : undefined
         }

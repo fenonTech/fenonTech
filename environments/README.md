@@ -2,25 +2,36 @@
 
 Esta pasta contém as configurações de ambiente para desenvolvimento e produção.
 
+## 🌐 URL da API - IMPORTANTE
+
+**URL Base Atual:** `https://backend-pearl-rho-82.vercel.app/api`
+
+### ⚠️ Para Mudar a URL da API:
+
+Edite **apenas UM arquivo** e a mudança será aplicada em toda aplicação:
+
+1. **Desenvolvimento**: edite `environment.development.ts`
+2. **Produção**: edite `environment.production.ts`
+
+Altere o valor em `api.baseUrl`:
+
+```typescript
+api: {
+  baseUrl: "https://sua-nova-url.com/api",  // ← Mude aqui
+  timeout: 30000,
+}
+```
+
 ## 📁 Estrutura
 
 ```
 environments/
-├── .env.development          # Variáveis de ambiente para DEV
-├── .env.production           # Variáveis de ambiente para PROD
 ├── environment.development.ts # Config TypeScript para DEV
 ├── environment.production.ts  # Config TypeScript para PROD
 └── environment.ts             # Seletor automático de ambiente
 ```
 
 ## 🚀 Como Usar
-
-### Variáveis de Ambiente (.env)
-
-O Vite usa automaticamente os arquivos `.env` baseado no comando:
-
-- **Development**: `npm run dev` → usa `.env.development`
-- **Production**: `npm run build` → usa `.env.production`
 
 ### TypeScript (Recomendado)
 
@@ -42,7 +53,7 @@ if (environment.production) {
 
 ### Development (DEV)
 
-- API: `webhook-test/meuBolso` (ambiente de testes)
+- API: `https://backend-pearl-rho-82.vercel.app/api`
 - Landing Page: `localhost:5174`
 - Dashboard: `localhost:5173`
 - Logs habilitados
@@ -50,14 +61,15 @@ if (environment.production) {
 
 ### Production (PROD)
 
-- API: `webhook/meuBolso` (ambiente real)
+- API: `https://backend-pearl-rho-82.vercel.app/api`
 - Landing Page: `www.fenontech.com.br/landingpage`
 - Dashboard: `www.fenontech.com.br/dashboard`
 - Logs desabilitados
 - Debug desabilitado
 
-## 📝 Notas
+## ✅ Vantagens desta Configuração
 
-- Nunca commite arquivos `.env` com dados sensíveis
-- Use `.env.example` como template
-- As configurações TypeScript são type-safe e recomendadas
+- ✅ **Centralizado** - Mude a URL da API em um só lugar
+- ✅ **Automático** - Seleciona o ambiente certo automaticamente
+- ✅ **Type-safe** - TypeScript valida as configurações
+- ✅ **Fácil manutenção** - Um arquivo por ambiente

@@ -1,0 +1,1173 @@
+﻿.despesas-page {
+  padding: 2rem 2rem 10rem 2rem;
+  margin: 1%;
+  border-radius: 16px;
+  background: #0b0b0b;
+  height: calc(100vh - 40px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  color: white;
+  box-sizing: border-box;
+}
+
+/* Header com filtro de mÃªs/ano */
+.despesas-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #333;
+}
+
+.despesas-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  color: #ffd700;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-header p {
+  color: #ccc;
+  font-size: 1.125rem;
+  margin: 0;
+}
+
+.despesas-cards {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.despesa-card-large {
+  min-height: 120px;
+}
+
+/* Desktop - Garantir que o toggle seja visÃ­vel com estilo consistente */
+@media (min-width: 601px) {
+  .despesas-cards .financial-card .balance-toggle-btn {
+    background: transparent !important;
+    border: none !important;
+    padding: 0.375rem !important;
+    cursor: pointer !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    opacity: 0.7 !important;
+  }
+
+  .despesas-cards .financial-card .balance-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    opacity: 1 !important;
+    transform: scale(1.1) !important;
+  }
+
+  .despesas-cards .financial-card .eye-icon {
+    transition: all 0.3s ease !important;
+    color: #999 !important;
+  }
+
+  .despesas-cards .financial-card .balance-toggle-btn:hover .eye-icon {
+    color: #ffd700 !important;
+  }
+}
+
+/* Mobile - Mostrar toggle de visibilidade com estilo consistente */
+@media (max-width: 600px) {
+  .despesas-header {
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .despesas-filters {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+  }
+
+  .despesas-cards .financial-card .balance-toggle-btn {
+    padding: 0.5rem !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 12px !important;
+    opacity: 1 !important;
+    display: flex !important;
+  }
+
+  .despesas-cards .financial-card .balance-toggle-btn:hover {
+    background: rgba(0, 0, 0, 0.1) !important;
+    transform: scale(1.05) !important;
+  }
+
+  .despesas-cards .financial-card .eye-icon {
+    color: #666 !important;
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .despesas-cards .financial-card .balance-toggle-btn:hover .eye-icon {
+    color: #333 !important;
+  }
+}
+
+.despesas-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.despesas-tables-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.despesas-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.despesas-table-card {
+  flex: 1;
+}
+
+.despesas-card {
+  background: #121212;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #333;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.despesas-card * {
+  box-sizing: border-box;
+}
+
+.despesas-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.despesas-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border-color: #ffd700;
+}
+
+.card-header {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #333;
+}
+
+/* Ãšltimas SaÃ­das */
+.saidas-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summary-item {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr 1.2fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.summary-item:first-child {
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.summary-item:not(:first-child):not(:last-child) {
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.summary-label {
+  color: #ccc;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.summary-date {
+  color: white;
+  font-weight: 500;
+}
+
+.summary-category {
+  color: white;
+  font-weight: 500;
+}
+
+.summary-type {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.summary-type.fixa {
+  background: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+  border: 1px solid #dc3545;
+}
+
+.summary-type.variÃ¡vel {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid #ffc107;
+}
+
+.summary-value.expense {
+  color: #dc3545;
+  font-weight: 700;
+  text-align: right;
+}
+
+.summary-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  border-top: 2px solid #333;
+  margin-top: 0.5rem;
+}
+
+.entries-count {
+  color: #ccc;
+  font-size: 0.875rem;
+}
+
+.entries-total {
+  color: #dc3545;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+/* GrÃ¡fico de Pizza */
+.chart-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.pie-chart-container,
+.chart-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.pie-chart {
+  flex-shrink: 0;
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
+
+.pie-chart-circle,
+.chart-placeholder {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: conic-gradient(
+    #ff6b6b 0deg 140deg,
+    #4ecdc4 140deg 250deg,
+    #45b7d1 250deg 320deg,
+    #96ceb4 320deg 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.pie-chart-circle::before,
+.chart-placeholder::before {
+  content: "";
+  width: 120px;
+  height: 120px;
+  background: #121212;
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.pie-center,
+.chart-center {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.total-label {
+  color: #ccc;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.total-value {
+  color: #ffd700;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.pie-legend,
+.chart-legend {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid #333;
+  overflow-x: auto;
+  overflow-y: hidden;
+  box-sizing: border-box;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  background: #252525;
+  border: 1px solid #333;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  min-width: fit-content;
+  justify-content: center;
+}
+
+.legend-item:hover {
+  background: rgba(255, 217, 0, 0.1);
+  border-color: #ffd700;
+}
+
+.legend-color {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.legend-label {
+  color: #e0e0e0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: "Poppins", sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+/* Scrollbar padrÃ£o aplicada globalmente */
+
+/* Barras de Categoria */
+.category-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.category-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-name {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.category-amount {
+  color: #ccc;
+  font-size: 0.75rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #333;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Responsivo */
+/* Tablet grande */
+@media (max-width: 1200px) and (min-width: 1025px) {
+  .despesas-tables-row {
+    grid-template-columns: 55% 1fr;
+    gap: 1.5rem;
+  }
+
+  .despesas-charts-row {
+    grid-template-columns: 50% 50%;
+    gap: 1.5rem;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .despesas-page {
+    padding: 1.5rem;
+    margin: 0.5%;
+  }
+
+  .despesas-tables-row,
+  .despesas-charts-row {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .pie-chart-container,
+  .chart-container {
+    flex-direction: row;
+    gap: 1.25rem;
+    text-align: left;
+  }
+}
+
+/* Tablet pequeno */
+@media (max-width: 768px) and (min-width: 601px) {
+  .despesas-page {
+    padding: 1rem;
+    margin: 0.5%;
+    border-radius: 14px;
+  }
+
+  .page-header h1 {
+    font-size: 2.25rem;
+  }
+
+  .page-header p {
+    font-size: 1rem;
+  }
+
+  .despesas-cards {
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .despesas-content {
+    gap: 1rem;
+  }
+
+  .despesas-tables-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .despesas-charts-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .despesas-card {
+    padding: 1rem;
+  }
+
+  .card-header {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+  }
+
+  .pie-legend,
+  .chart-legend {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .legend-item {
+    padding: 0.375rem 0.5rem;
+    gap: 0.375rem;
+    min-width: fit-content;
+  }
+
+  .summary-item {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    text-align: left;
+  }
+
+  .summary-item span:nth-child(3),
+  .summary-item span:nth-child(4) {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.25rem;
+  }
+
+  .pie-chart {
+    width: 150px;
+    height: 150px;
+  }
+
+  .pie-chart-circle::before {
+    width: 90px;
+    height: 90px;
+  }
+
+  .total-value {
+    font-size: 0.875rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .despesas-page {
+    padding: 1rem;
+    margin: 0;
+    border-radius: 12px;
+    min-height: calc(100vh - 220px); /* Ajustado para bottom navigation */
+    padding-bottom: 1rem; /* EspaÃ§o extra antes da bottom nav */
+  }
+
+  .page-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .page-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .page-header p {
+    font-size: 0.95rem;
+    color: #aaa;
+  }
+
+  .despesas-cards {
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .despesas-content {
+    gap: 1.25rem;
+  }
+
+  .despesas-tables-row,
+  .despesas-charts-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .despesas-card {
+    padding: 1.25rem;
+    border-radius: 12px;
+    background: #121212;
+    border: 1px solid #1a1a1a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .card-header {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #1a1a1a;
+    color: #ffd700;
+    text-align: center;
+  }
+
+  .pie-chart-container,
+  .chart-container {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .pie-chart {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+  }
+
+  .pie-chart-circle::before {
+    width: 100px;
+    height: 100px;
+  }
+
+  .pie-legend,
+  .chart-legend {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #1a1a1a;
+    border-radius: 8px;
+    border: 1px solid #333;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #ffd700 #1a1a1a;
+  }
+
+  /* Scrollbar personalizada */
+  .pie-legend::-webkit-scrollbar,
+  .chart-legend::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .pie-legend::-webkit-scrollbar-track,
+  .chart-legend::-webkit-scrollbar-track {
+    background: #1a1a1a;
+    border-radius: 3px;
+  }
+
+  .pie-legend::-webkit-scrollbar-thumb,
+  .chart-legend::-webkit-scrollbar-thumb {
+    background: #ffd700;
+    border-radius: 3px;
+  }
+
+  .pie-legend::-webkit-scrollbar-thumb:hover,
+  .chart-legend::-webkit-scrollbar-thumb:hover {
+    background: #ffed4e;
+  }
+
+  .legend-item {
+    padding: 0.5rem 0.75rem;
+    gap: 0.5rem;
+    background: #252525;
+    border: 1px solid #333;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    min-width: fit-content;
+    text-align: center;
+    transition: background 0.2s ease;
+  }
+
+  .legend-item:hover {
+    background: rgba(255, 217, 0, 0.1);
+    border-color: #ffd700;
+  }
+
+  .category-bars {
+    gap: 0.75rem;
+    padding: 0 1rem;
+  }
+
+  .category-item {
+    gap: 0.5rem;
+  }
+
+  .category-name {
+    font-size: 0.8rem;
+    min-width: 80px;
+  }
+
+  .category-bar-container {
+    height: 20px;
+  }
+
+  .category-value {
+    font-size: 0.75rem;
+    min-width: 60px;
+  }
+}
+
+/* Mobile muito pequeno */
+@media (max-width: 480px) {
+  .despesas-page {
+    padding: 0.75rem;
+  }
+
+  .page-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .page-header p {
+    font-size: 0.875rem;
+  }
+
+  .despesas-card {
+    padding: 0.75rem;
+  }
+
+  .card-header {
+    font-size: 1rem;
+  }
+
+  .summary-item {
+    padding: 0.5rem 0;
+    gap: 0.25rem;
+  }
+
+  .summary-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+  }
+
+  .pie-chart {
+    width: 120px;
+    height: 120px;
+  }
+
+  .pie-chart-circle::before {
+    width: 80px;
+    height: 80px;
+  }
+
+  .total-label {
+    font-size: 0.625rem;
+  }
+
+  .total-value {
+    font-size: 0.75rem;
+  }
+
+  /* Legenda com scroll - mobile pequeno */
+  .pie-legend,
+  .chart-legend {
+    gap: 0.375rem;
+    padding: 0.5rem;
+  }
+
+  .legend-item {
+    padding: 0.375rem 0.625rem;
+    gap: 0.375rem;
+    min-width: fit-content;
+  }
+
+  .legend-label {
+    font-size: 0.8rem;
+  }
+
+  .legend-color {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Scrollbar menor */
+  .pie-legend::-webkit-scrollbar,
+  .chart-legend::-webkit-scrollbar {
+    height: 4px;
+  }
+}
+
+/* SISTEMA MOBILE INTEGRADO - PADRÃƒO DASHBOARD */
+/* Desktop - garantir que tudo seja visÃ­vel */
+@media (min-width: 769px) {
+  .desktop-content {
+    display: block !important; /* Sempre mostrar no desktop */
+  }
+
+  .mobile-only {
+    display: none !important; /* Esconder conteÃºdo mobile no desktop */
+  }
+
+  .financial-card-container {
+    display: none !important; /* Esconder navegaÃ§Ã£o mobile */
+  }
+
+  .dashboard-tabs {
+    display: none !important; /* Esconder tabs no desktop */
+  }
+
+  /* Garantir que os cards fiquem em linha no desktop */
+  .despesas-cards {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 1.5rem !important;
+    margin-bottom: 2rem !important;
+  }
+}
+
+/* Tablet pequeno */
+@media (max-width: 768px) and (min-width: 601px) {
+  /* ConteÃºdo Desktop - ESCONDIDO NO TABLET */
+  .desktop-content {
+    display: none !important;
+  }
+
+  /* ConteÃºdo Mobile - VISÃVEL NO TABLET */
+  .mobile-only {
+    display: block !important;
+  }
+
+  .financial-card-container {
+    display: flex !important;
+  }
+}
+
+/* Mobile - Sistema Completo */
+@media (max-width: 600px) {
+  .despesas-page {
+    padding: 0.75rem;
+    margin: 0;
+  }
+
+  /* Esconder cards desktop */
+  .despesas-cards {
+    display: none !important;
+  }
+
+  /* ConteÃºdo Desktop - ESCONDIDO NO MOBILE */
+  .desktop-content {
+    display: none !important;
+  }
+
+  /* ConteÃºdo Mobile - VISÃVEL NO MOBILE */
+  .mobile-only {
+    display: block !important;
+  }
+
+  /* Tab content mobile */
+  .mobile-only .tab-content[style*="display: none"] {
+    display: none !important;
+  }
+
+  .mobile-only .tab-content[style*="display: block"] {
+    display: block !important;
+  }
+
+  /* Sistema de NavegaÃ§Ã£o Integrado - APENAS MOBILE - SUPER MINIMALISTA */
+  .financial-card-container {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 1.5rem;
+  }
+
+  .financial-card-navigation {
+    background: #ffd700;
+    border-radius: 16px 16px 0 0;
+    padding: 0.4rem;
+    display: flex;
+    gap: 0.25rem;
+    width: 100%;
+    max-width: 350px;
+    justify-content: center;
+  }
+
+  .nav-button {
+    display: block !important;
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Poppins", sans-serif;
+    text-transform: capitalize;
+    letter-spacing: 0;
+    min-width: auto;
+    text-align: center;
+  }
+
+  .nav-button.active {
+    background: #fff;
+    color: #000;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .nav-button:not(.active):hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .single-financial-card {
+    display: block !important;
+    width: 100%;
+    max-width: 350px;
+    transition: all 0.4s ease;
+    margin-top: -1px; /* Conecta com a navegaÃ§Ã£o */
+    z-index: 1;
+  }
+
+  .single-financial-card .financial-card {
+    border-radius: 0 0 16px 16px !important;
+    border-top: none !important;
+  }
+
+  /* ConteÃºdo mobile simples */
+  .despesas-mobile-content {
+    margin-top: 1rem;
+  }
+
+  /* Dashboard grid mobile */
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* === SISTEMA DE TABS MOBILE === */
+  .dashboard-tabs {
+    display: flex !important;
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 0.375rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #333;
+  }
+
+  .tab-button {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    color: #999;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: "Poppins", sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .tab-button.active {
+    background: #ffd700;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  }
+
+  .tab-button:not(.active):hover {
+    background: rgba(255, 215, 0, 0.1);
+    color: #ffd700;
+  }
+
+  /* === REGRAS PARA TABS MOBILE === */
+  .tab-content.mobile-only {
+    display: none !important;
+  }
+
+  .tab-content.mobile-only.active {
+    display: block !important;
+  }
+
+  .tab-principal:not(.active) {
+    display: none !important;
+  }
+
+  .tab-analise:not(.active) {
+    display: none !important;
+  }
+
+  .tab-principal.active {
+    display: block !important;
+  }
+
+  .tab-analise.active {
+    display: block !important;
+  }
+}
+
+/* BotÃ£o Flutuante de Adicionar */
+.floating-add-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  border: none;
+  border-radius: 50%;
+  color: #121212;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.floating-add-button:hover {
+  background: linear-gradient(135deg, #ffed4e, #ffd700);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6);
+}
+
+.floating-add-button:active {
+  transform: translateY(0);
+}
+
+/* Responsividade do botÃ£o flutuante */
+@media (max-width: 768px) {
+  .floating-add-button {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 52px;
+    height: 52px;
+  }
+}
+
+@media (max-width: 600px) {
+  .floating-add-button {
+    bottom: 6rem; /* EspaÃ§o para bottom navigation */
+    right: 1rem;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ===== TABELA COM BOTÃƒO ADICIONAR ===== */
+.table-with-add-button {
+  background: #1a1a1a;
+  border-radius: 16px;
+  padding: 0;
+  border: 1px solid #333;
+  overflow: hidden;
+}
+
+.table-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid #333;
+  background: #1a1a1a;
+}
+
+.table-header-actions h3 {
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+.btn-add-transaction {
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  color: #000;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+  white-space: nowrap;
+}
+
+.btn-add-transaction:hover {
+  background: linear-gradient(135deg, #ffed4e, #ffd700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.btn-add-transaction:active {
+  transform: translateY(0);
+}
+
+/* Responsividade do cabeÃ§alho da tabela */
+@media (max-width: 768px) {
+  .table-header-actions {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .table-header-actions h3 {
+    text-align: center;
+    font-size: 1.125rem;
+  }
+
+  .btn-add-transaction {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-header-actions {
+    padding: 0.75rem;
+  }
+
+  .btn-add-transaction {
+    font-size: 0.875rem;
+    padding: 0.875rem;
+  }
+}
+

@@ -1,5 +1,4 @@
-import { useCallback } from "react";
-import { useFinancial } from "../contexts/FinancialContext";
+import { useCallback, useState } from "react";
 import { formatCardValue, parseCurrency } from "../utils";
 
 interface UseBalanceVisibilityReturn {
@@ -9,8 +8,11 @@ interface UseBalanceVisibilityReturn {
 }
 
 export const useBalanceVisibility = (): UseBalanceVisibilityReturn => {
-  const { state, toggleBalanceVisibility } = useFinancial();
-  const { isBalanceVisible } = state;
+  const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+
+  const toggleBalanceVisibility = useCallback(() => {
+    setIsBalanceVisible((prev) => !prev);
+  }, []);
 
   const formatValue = useCallback(
     (value: string | number): string => {
