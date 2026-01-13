@@ -6,7 +6,7 @@ Documentação da API de login e autenticação.
 
 ### POST `/api/auth/login`
 
-**URL Completa:** `https://backend-pearl-rho-82.vercel.app/api/auth/login`
+**URL Completa:** `https://zvmw5op52c.execute-api.us-east-1.amazonaws.com/prod/api/auth/login`
 
 ### Request
 
