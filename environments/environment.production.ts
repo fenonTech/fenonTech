@@ -8,7 +8,7 @@ export const environment = {
 
   // APIs
   api: {
-    baseUrl: "https://backend-pearl-rho-82.vercel.app/api",
+    baseUrl: "https://zvmw5op52c.execute-api.us-east-1.amazonaws.com/prod/api",
     timeout: 30000,
   },
 
