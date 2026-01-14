@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import HeaderMobile from "../../../components/HeaderMobile";
 import FinancialCardMobile from "../../../components/FinancialCardMobile";
 import { UltimasTransacoesMobile } from "../../../components/UltimasTransacoesMobile";
@@ -9,7 +9,7 @@ import { CategoryViewMobile } from "../../../components/CategoryViewMobile";
 import type { Income } from "../../../types/transactions";
 import type { MobileScreenType } from "../../../components/LayoutMobile";
 import { useFilter } from "../../../contexts/FilterContext";
-import { receitasService } from "../../../services/api/receitasService";
+import { useReceitasData } from "../../../hooks/queries";
 import { transactionsService } from "../../../services/api/transactionsService";
 import { formatCurrency, formatTableDate } from "../../../utils";
 import "./Receitas.css";
@@ -32,28 +32,17 @@ const Receitas: React.FC<ReceitasProps> = ({
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Estados para dados de receitas
-  const [receitaAtual, setReceitaAtual] = useState(0);
-  const [valoresAReceber, setValoresAReceber] = useState(0);
-  const [entradas, setEntradas] = useState<any[]>([]);
+  // React Query - Busca dados de receitas com cache automático
+  const { data: receitasData, refetch: refetchReceitas } = useReceitasData(
+    selectedMonth + 1,
+    selectedYear
+  );
 
-  // Carregar dados de receitas
-  useEffect(() => {
-    const loadReceitasData = async () => {
-      try {
-        const data = await receitasService.getReceitas(
-          selectedMonth + 1,
-          selectedYear
-        );
-        setReceitaAtual(data.receitaAtual);
-        setValoresAReceber(data.valoresAReceber);
-        setEntradas(data.entradas);
-      } catch (error) {
-        console.error("❌ Erro ao carregar receitas:", error);
-      }
-    };
-    loadReceitasData();
-  }, [selectedMonth, selectedYear]);
+  // Extrair dados (com valores padrão)
+  const receitaAtual = receitasData?.receitaAtual ?? 0;
+  const valoresAReceber = receitasData?.valoresAReceber ?? 0;
+  const entradas = receitasData?.entradas ?? [];
+
   const handleConfigClick = () => {
     if (onNavigate) {
       onNavigate("configuracoes");
@@ -102,13 +91,7 @@ const Receitas: React.FC<ReceitasProps> = ({
       }
 
       // Recarregar dados
-      const data = await receitasService.getReceitas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setReceitaAtual(data.receitaAtual);
-      setValoresAReceber(data.valoresAReceber);
-      setEntradas(data.entradas);
+      await refetchReceitas();
 
       handleCloseIncomeModal();
     } catch (error) {
@@ -130,13 +113,7 @@ const Receitas: React.FC<ReceitasProps> = ({
       await transactionsService.delete(Number(id));
 
       // Recarregar dados
-      const data = await receitasService.getReceitas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setReceitaAtual(data.receitaAtual);
-      setValoresAReceber(data.valoresAReceber);
-      setEntradas(data.entradas);
+      await refetchReceitas();
 
       handleCloseIncomeModal();
     } catch (error) {

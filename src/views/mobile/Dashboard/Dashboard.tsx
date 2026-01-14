@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import HeaderMobile from "../../../components/HeaderMobile";
 import FinancialCardMobile from "../../../components/FinancialCardMobile";
 import { UltimasTransacoesMobile } from "../../../components/UltimasTransacoesMobile";
 import { BottomNavigationMobile } from "../../../components/BottomNavigationMobile";
 import type { MobileScreenType } from "../../../components/LayoutMobile";
 import { useFilter } from "../../../contexts/FilterContext";
-import { dashboardService } from "../../../services/api/dashboardService";
+import { useDashboardData } from "../../../hooks/queries";
 import { formatTableDate } from "../../../utils";
 import "./Dashboard.css";
 
@@ -27,30 +27,17 @@ const Dashboard: React.FC<DashboardProps> = ({
     "inicio" | "receitas" | "despesas"
   >("inicio");
 
-  // Estados para dados do dashboard - MESMOS DADOS DO DESKTOP
-  const [saldo, setSaldo] = useState(0);
-  const [contasAReceber, setContasAReceber] = useState(0);
-  const [contasAPagar, setContasAPagar] = useState(0);
-  const [transacoes, setTransacoes] = useState<any[]>([]);
+  // React Query - Busca dados do dashboard com cache automático
+  const { data: dashboardData } = useDashboardData(
+    selectedMonth + 1,
+    selectedYear
+  );
 
-  // Carregar dados do dashboard - MESMO SERVIÇO DO DESKTOP
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        const data = await dashboardService.getDashboardData(
-          selectedMonth + 1,
-          selectedYear
-        );
-        setSaldo(data.saldo);
-        setContasAReceber(data.contasAReceber);
-        setContasAPagar(data.contasAPagar);
-        setTransacoes(data.transacoes);
-      } catch (error) {
-        console.error("❌ Erro ao carregar dashboard:", error);
-      }
-    };
-    loadDashboardData();
-  }, [selectedMonth, selectedYear]);
+  // Extrair dados (com valores padrão)
+  const saldo = dashboardData?.saldo ?? 0;
+  const contasAReceber = dashboardData?.contasAReceber ?? 0;
+  const contasAPagar = dashboardData?.contasAPagar ?? 0;
+  const transacoes = dashboardData?.transacoes ?? [];
 
   // Formatar transações para o componente UltimasTransacoesMobile
   const ultimasTransacoes = transacoes.slice(0, 9).map((t) => ({

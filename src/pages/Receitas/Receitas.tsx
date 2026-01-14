@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import "./Receitas.css";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
@@ -9,7 +9,7 @@ import { IncomeModal } from "../../components/Modals";
 
 import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
-import { receitasService } from "../../services/api/receitasService";
+import { useReceitasData } from "../../hooks/queries";
 import { transactionsService } from "../../services/api/transactionsService";
 import {
   formatCurrency,
@@ -29,40 +29,16 @@ const Receitas: React.FC = () => {
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
 
-  // Estados locais para os dados de receitas
-  const [receitaAtual, setReceitaAtual] = React.useState(0);
-  const [valoresAReceber, setValoresAReceber] = React.useState(0);
-  const [entradas, setEntradas] = React.useState<any[]>([]);
+  // React Query - Busca dados de receitas com cache automático
+  const { data: receitasApiData, refetch: refetchReceitas } = useReceitasData(
+    selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
+    selectedYear
+  );
 
-  // Carregar dados de receitas sempre que o filtro mudar
-  useEffect(() => {
-    const loadReceitasData = async () => {
-      try {
-        console.log(
-          `🔄 Carregando receitas: mês=${
-            selectedMonth + 1
-          }, ano=${selectedYear}`
-        );
-
-        // Chamar API com filtro de mês e ano
-        const data = await receitasService.getReceitas(
-          selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-          selectedYear
-        );
-
-        // Atualizar estados
-        setReceitaAtual(data.receitaAtual);
-        setValoresAReceber(data.valoresAReceber);
-        setEntradas(data.entradas);
-
-        console.log("✅ Receitas carregadas com sucesso");
-      } catch (error) {
-        console.error("❌ Erro ao carregar receitas:", error);
-      }
-    };
-
-    loadReceitasData();
-  }, [selectedMonth, selectedYear]); // Recarregar quando o filtro mudar
+  // Extrair dados (com valores padrão)
+  const receitaAtual = receitasApiData?.receitaAtual ?? 0;
+  const valoresAReceber = receitasApiData?.valoresAReceber ?? 0;
+  const entradas = receitasApiData?.entradas ?? [];
 
   // Preparar dados para as tabelas
   const receitasData = useMemo(() => {
@@ -127,13 +103,7 @@ const Receitas: React.FC = () => {
       await transactionsService.delete(income.originalData.codigo);
 
       // Recarregar dados após deletar
-      const data = await receitasService.getReceitas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setReceitaAtual(data.receitaAtual);
-      setValoresAReceber(data.valoresAReceber);
-      setEntradas(data.entradas);
+      await refetchReceitas();
 
       console.log("✅ Receita deletada com sucesso");
     } catch (error) {
@@ -170,13 +140,7 @@ const Receitas: React.FC = () => {
       }
 
       // Recarregar dados
-      const data = await receitasService.getReceitas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setReceitaAtual(data.receitaAtual);
-      setValoresAReceber(data.valoresAReceber);
-      setEntradas(data.entradas);
+      await refetchReceitas();
 
       handleCloseIncomeModal();
     } catch (error) {
@@ -359,13 +323,7 @@ const Receitas: React.FC = () => {
                 }
                 try {
                   await transactionsService.delete(Number(editingIncome.id));
-                  const data = await receitasService.getReceitas(
-                    selectedMonth + 1,
-                    selectedYear
-                  );
-                  setReceitaAtual(data.receitaAtual);
-                  setValoresAReceber(data.valoresAReceber);
-                  setEntradas(data.entradas);
+                  await refetchReceitas();
                   handleCloseIncomeModal();
                   console.log("✅ Receita deletada com sucesso");
                 } catch (error) {

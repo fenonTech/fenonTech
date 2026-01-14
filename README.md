@@ -34,17 +34,20 @@
 ## 🛠️ **Stack Tecnológica**
 
 ### **Frontend**
+
 - **React 19.1.1** - Biblioteca JavaScript moderna
 - **TypeScript 5.6** - Tipagem estática para maior segurança
 - **Vite 6.0** - Build tool super rápido
 - **CSS3** - Estilização responsiva e moderna
 
 ### **Automação & APIs**
+
 - **N8N Integration** - Webhooks e workflows automatizados
 - **Fetch API** - Comunicação com APIs REST
 - **Context API** - Gerenciamento de estado global
 
 ### **Ferramentas de Desenvolvimento**
+
 - **ESLint** - Linting e padronização de código
 - **Git** - Controle de versão
 - **VS Code** - Editor recomendado
@@ -54,24 +57,28 @@
 ## 📱 **Páginas e Funcionalidades**
 
 ### 🏠 **Dashboard**
+
 - Visão geral dos saldos e transações
 - Gráficos interativos de receitas e despesas
 - Cards informativos com métricas importantes
 - Lista de transações recentes
 
 ### 💰 **Receitas**
+
 - Cadastro e gestão de receitas
 - Categorização (Fixa/Variável)
 - Gráficos de evolução mensal
 - Filtros e relatórios detalhados
 
 ### 💸 **Despesas**
+
 - Controle completo de gastos
 - Categorização por tipo de despesa
 - Gráficos de distribuição (pizza e barras)
 - Alertas de orçamento
 
 ### ⚙️ **Configurações**
+
 - Perfil do usuário
 - Configurações de notificações
 - Gerenciamento de bancos conectados
@@ -82,17 +89,20 @@
 ## 🚀 **Instalação e Execução**
 
 ### **Pré-requisitos**
-- Node.js 18+ 
+
+- Node.js 18+
 - npm ou yarn
 - Git
 
 ### **1. Clone o Repositório**
+
 ```bash
 git clone https://github.com/fenonTech/fenonTech.git
 cd fenonTech
 ```
 
 ### **2. Instale as Dependências**
+
 ```bash
 npm install
 # ou
@@ -100,6 +110,7 @@ yarn install
 ```
 
 ### **3. Configure as Variáveis de Ambiente**
+
 ```bash
 # Copie o arquivo de exemplo
 cp .env.example .env
@@ -107,10 +118,11 @@ cp .env.example .env
 # Configure suas variáveis
 VITE_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook
 VITE_N8N_API_KEY=your-api-key-here
-VITE_API_BASE_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://https://backend-pearl-rho-82.vercel.app/api
 ```
 
 ### **4. Execute em Desenvolvimento**
+
 ```bash
 npm run dev
 # ou
@@ -118,6 +130,7 @@ yarn dev
 ```
 
 ### **5. Acesse a Aplicação**
+
 Abra [http://localhost:5173](http://localhost:5173) no seu navegador.
 
 ---
@@ -125,25 +138,28 @@ Abra [http://localhost:5173](http://localhost:5173) no seu navegador.
 ## 🔄 **Integração N8N**
 
 ### **Configuração Básica**
+
 O projeto está preparado para integração completa com N8N via webhooks:
 
 ```typescript
 // Exemplo de uso
-import { useWebhooks } from './hooks';
+import { useWebhooks } from "./hooks";
 
 const { sendToN8N, isConnected } = useWebhooks();
 
 // Enviar dados para N8N
-await sendToN8N('transaction.created', transactionData);
+await sendToN8N("transaction.created", transactionData);
 ```
 
 ### **Fluxos de Automação Disponíveis**
+
 - 🏦 **Sincronização Bancária** - Importação automática de transações
 - 📊 **Categorização Inteligente** - IA para categorizar despesas
 - 🔔 **Alertas Smart** - Notificações de gastos e metas
 - 📈 **Relatórios Automáticos** - Geração periódica de relatórios
 
 ### **Documentação Completa**
+
 - 📖 [Guia de Integração N8N](./README_N8N.md)
 - 🔧 [Configuração de Backend](./docs/BACKEND_WEBHOOKS.md)
 
@@ -192,6 +208,7 @@ fenonTech/
 ## 🎨 **Design System**
 
 ### **Paleta de Cores**
+
 - **Primária**: `#FFD700` (Dourado)
 - **Secundária**: `#1a1a1a` (Preto)
 - **Background**: `#0f0f0f` (Preto escuro)
@@ -199,6 +216,7 @@ fenonTech/
 - **Accent**: `#333333` (Cinza escuro)
 
 ### **Tipografia**
+
 - **Fonte Principal**: System fonts (Inter, Roboto, Helvetica)
 - **Títulos**: Bold, variando de 1.25rem a 2rem
 - **Texto**: Regular, 0.875rem a 1rem
@@ -216,6 +234,7 @@ Contribuições são sempre bem-vindas! Para contribuir:
 5. Abra um **Pull Request**
 
 ### **Padrões de Commit**
+
 - ✨ `feat:` Nova funcionalidade
 - 🐛 `fix:` Correção de bug
 - 📚 `docs:` Documentação
@@ -242,6 +261,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 ## 🔮 **Roadmap**
 
 ### **V2.0 - Em Desenvolvimento**
+
 - [ ] Autenticação de usuários
 - [ ] Integração com bancos brasileiros
 - [ ] Relatórios em PDF
@@ -249,6 +269,7 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 - [ ] IA para recomendações financeiras
 
 ### **V1.5 - Próxima Release**
+
 - [ ] Temas personalizáveis
 - [ ] Exportação de dados
 - [ ] Backup automático

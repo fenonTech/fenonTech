@@ -11,8 +11,9 @@ import { ExpenseModal } from "../../components/Modals";
 
 import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
-import { despesasService } from "../../services/api/despesasService";
+import { useDespesasData } from "../../hooks/queries";
 import { transactionsService } from "../../services/api/transactionsService";
+import { despesasService } from "../../services/api/despesasService";
 import {
   formatCurrency,
   formatTableDate,
@@ -31,43 +32,21 @@ const Despesas: React.FC = () => {
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
 
-  // Estados locais para os dados de despesas
-  const [despesaAtual, setDespesaAtual] = React.useState(0);
-  const [contasAPagar, setContasAPagar] = React.useState(0);
-  const [despesas, setDespesas] = React.useState<any[]>([]);
+  // React Query - Busca dados de despesas com cache automático
+  const { data: despesasApiData, refetch: refetchDespesas } = useDespesasData(
+    selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
+    selectedYear
+  );
+
+  // Extrair dados (com valores padrão)
+  const despesaAtual = despesasApiData?.despesaAtual ?? 0;
+  const contasAPagar = despesasApiData?.contasAPagar ?? 0;
+  const despesas = despesasApiData?.despesas ?? [];
+
+  // Estado para despesas mensais (gráfico anual)
   const [despesasMensais, setDespesasMensais] = React.useState<{
     [key: number]: number;
   }>({});
-
-  // Carregar dados de despesas sempre que o filtro mudar
-  useEffect(() => {
-    const loadDespesasData = async () => {
-      try {
-        console.log(
-          `🔄 Carregando despesas: mês=${
-            selectedMonth + 1
-          }, ano=${selectedYear}`
-        );
-
-        // Chamar API com filtro de mês e ano
-        const data = await despesasService.getDespesas(
-          selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-          selectedYear
-        );
-
-        // Atualizar estados
-        setDespesaAtual(data.despesaAtual);
-        setContasAPagar(data.contasAPagar);
-        setDespesas(data.despesas);
-
-        console.log("✅ Despesas carregadas com sucesso");
-      } catch (error) {
-        console.error("❌ Erro ao carregar despesas:", error);
-      }
-    };
-
-    loadDespesasData();
-  }, [selectedMonth, selectedYear]); // Recarregar quando o filtro mudar
 
   // Carregar despesas de todos os meses do ano para o gráfico
   useEffect(() => {
@@ -160,13 +139,7 @@ const Despesas: React.FC = () => {
       await transactionsService.delete(expense.originalData.codigo);
 
       // Recarregar dados após deletar
-      const data = await despesasService.getDespesas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setDespesaAtual(data.despesaAtual);
-      setContasAPagar(data.contasAPagar);
-      setDespesas(data.despesas);
+      await refetchDespesas();
 
       console.log("✅ Despesa deletada com sucesso");
     } catch (error) {
@@ -203,13 +176,7 @@ const Despesas: React.FC = () => {
       }
 
       // Recarregar dados
-      const data = await despesasService.getDespesas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setDespesaAtual(data.despesaAtual);
-      setContasAPagar(data.contasAPagar);
-      setDespesas(data.despesas);
+      await refetchDespesas();
 
       handleCloseExpenseModal();
     } catch (error) {
@@ -512,13 +479,7 @@ const Despesas: React.FC = () => {
                 }
                 try {
                   await transactionsService.delete(Number(editingExpense.id));
-                  const data = await despesasService.getDespesas(
-                    selectedMonth + 1,
-                    selectedYear
-                  );
-                  setDespesaAtual(data.despesaAtual);
-                  setContasAPagar(data.contasAPagar);
-                  setDespesas(data.despesas);
+                  await refetchDespesas();
                   handleCloseExpenseModal();
                   console.log("✅ Despesa deletada com sucesso");
                 } catch (error) {

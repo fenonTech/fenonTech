@@ -25,15 +25,17 @@ src/
 ## 🔧 Configuração
 
 ### 1. Variáveis de Ambiente
+
 Crie um arquivo `.env` baseado no `.env.example`:
 
 ```env
 VITE_N8N_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-webhook-id
 VITE_N8N_API_KEY=your-api-key-here
-VITE_API_BASE_URL=http://localhost:3000/api
+VITE_API_BASE_URL=http://https://backend-pearl-rho-82.vercel.app/api
 ```
 
 ### 2. Instalação de Dependências
+
 ```bash
 npm install
 ```
@@ -41,62 +43,65 @@ npm install
 ## 📡 Como Usar os Webhooks
 
 ### Frontend → N8N
+
 ```typescript
-import { useWebhooks } from './hooks';
+import { useWebhooks } from "./hooks";
 
 const { sendToN8N } = useWebhooks();
 
 // Enviar evento para N8N
-await sendToN8N('transaction.created', {
-  id: '123',
+await sendToN8N("transaction.created", {
+  id: "123",
   amount: 1000,
-  description: 'Nova receita'
+  description: "Nova receita",
 });
 ```
 
 ### N8N → Frontend
+
 ```typescript
-import { useWebhooks } from './hooks';
+import { useWebhooks } from "./hooks";
 
 const { processWebhook } = useWebhooks();
 
 // Processar webhook recebido do N8N
 await processWebhook({
-  event: 'transaction.created',
+  event: "transaction.created",
   data: transactionData,
   timestamp: new Date().toISOString(),
-  source: 'n8n-automation'
+  source: "n8n-automation",
 });
 ```
 
 ### Usar Hook de Transações
+
 ```typescript
-import { useTransactions } from './hooks';
+import { useTransactions } from "./hooks";
 
 const MyComponent = () => {
-  const { 
-    transactions, 
-    loading, 
-    addTransaction, 
-    editTransaction, 
-    removeTransaction 
+  const {
+    transactions,
+    loading,
+    addTransaction,
+    editTransaction,
+    removeTransaction,
   } = useTransactions();
 
   const handleNewTransaction = async () => {
     await addTransaction({
-      type: 'receita',
+      type: "receita",
       amount: 1000,
-      description: 'Salário',
-      category: 'Trabalho',
-      date: '2025-10-08',
-      status: 'completed'
+      description: "Salário",
+      category: "Trabalho",
+      date: "2025-10-08",
+      status: "completed",
     });
   };
 
   return (
     <div>
       {loading && <p>Carregando...</p>}
-      {transactions.map(transaction => (
+      {transactions.map((transaction) => (
         <div key={transaction.id}>{transaction.description}</div>
       ))}
     </div>
@@ -107,18 +112,21 @@ const MyComponent = () => {
 ## 🔄 Fluxos de Automação Sugeridos
 
 ### 1. Sincronização Bancária
+
 - **N8N recebe** dados do banco via API
 - **N8N processa** e categoriza automaticamente
 - **N8N envia** webhook para o frontend
 - **Frontend atualiza** interface em tempo real
 
 ### 2. Alertas Inteligentes
+
 - **Frontend detecta** gastos altos
 - **Envia para N8N** via webhook
 - **N8N analisa** padrões de gastos
 - **N8N dispara** notificações (email, Slack, etc.)
 
 ### 3. Relatórios Automáticos
+
 - **N8N agenda** relatórios mensais
 - **Processa dados** financeiros
 - **Gera relatórios** em PDF
@@ -127,6 +135,7 @@ const MyComponent = () => {
 ## 📊 Eventos de Webhook Disponíveis
 
 ### Eventos Enviados pelo Frontend:
+
 - `transaction.created` - Nova transação criada
 - `transaction.updated` - Transação atualizada
 - `transaction.deleted` - Transação deletada
@@ -134,6 +143,7 @@ const MyComponent = () => {
 - `form.transaction.submitted` - Formulário enviado
 
 ### Eventos Recebidos do N8N:
+
 - `bank.sync.completed` - Sincronização bancária concluída
 - `automation.triggered` - Automação ativada
 - `alert.budget.exceeded` - Orçamento excedido
@@ -142,16 +152,19 @@ const MyComponent = () => {
 ## 🛠️ Exemplos de Workflows N8N
 
 ### 1. Categorização Automática
+
 ```
 Webhook → Function (IA/Regras) → Database → Response
 ```
 
 ### 2. Backup de Dados
+
 ```
 Schedule → Database Query → Google Drive/Dropbox
 ```
 
 ### 3. Notificações Smart
+
 ```
 Webhook → Condition → Slack/Email/WhatsApp
 ```
@@ -167,12 +180,13 @@ Webhook → Condition → Slack/Email/WhatsApp
 ## 🚨 Monitoramento
 
 Use o componente `WebhookStatus` para monitorar:
+
 - Status da conexão com N8N
 - Último webhook recebido/enviado
 - Logs de erro em tempo real
 
 ```typescript
-import WebhookStatus from './components/WebhookStatus/WebhookStatus';
+import WebhookStatus from "./components/WebhookStatus/WebhookStatus";
 
 const Dashboard = () => (
   <div>
