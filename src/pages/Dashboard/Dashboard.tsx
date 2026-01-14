@@ -8,7 +8,7 @@ import FinancialCardGrid from "../../components/FinancialCardGrid";
 import CategoryBudgetCard from "../../components/CategoryBudgetCard";
 import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
-import { dashboardService } from "../../services/api/dashboardService";
+import { useDashboardData } from "../../hooks/queries";
 import { authService } from "../../services/authService";
 import { formatTableDate, isDateTodayOrBefore } from "../../utils";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
@@ -24,11 +24,21 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { selectedMonth, selectedYear, setSelectedMonth, setSelectedYear } =
     useFilter();
 
-  // Estados locais para os dados do dashboard
-  const [saldo, setSaldo] = React.useState(0);
-  const [contasAReceber, setContasAReceber] = React.useState(0);
-  const [contasAPagar, setContasAPagar] = React.useState(0);
-  const [transacoes, setTransacoes] = React.useState<any[]>([]);
+  // React Query - Busca dados do dashboard com cache automático
+  const {
+    data: dashboardData,
+    isLoading,
+    isError,
+  } = useDashboardData(
+    selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
+    selectedYear
+  );
+
+  // Extrair dados do dashboard (com valores padrão)
+  const saldo = dashboardData?.saldo ?? 0;
+  const contasAReceber = dashboardData?.contasAReceber ?? 0;
+  const contasAPagar = dashboardData?.contasAPagar ?? 0;
+  const transacoes = dashboardData?.transacoes ?? [];
 
   // Verificar parâmetros de URL e fazer login automático
   useEffect(() => {
@@ -95,37 +105,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       doLogin();
     }
   }, []);
-
-  // Carregar dados do dashboard sempre que o filtro mudar
-  useEffect(() => {
-    const loadDashboardData = async () => {
-      try {
-        console.log(
-          `🔄 Carregando dashboard: mês=${
-            selectedMonth + 1
-          }, ano=${selectedYear}`
-        );
-
-        // Chamar nova API com filtro de mês e ano
-        const data = await dashboardService.getDashboardData(
-          selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-          selectedYear
-        );
-
-        // Atualizar estados
-        setSaldo(data.saldo);
-        setContasAReceber(data.contasAReceber);
-        setContasAPagar(data.contasAPagar);
-        setTransacoes(data.transacoes);
-
-        console.log("✅ Dashboard carregado com sucesso");
-      } catch (error) {
-        console.error("❌ Erro ao carregar dashboard:", error);
-      }
-    };
-
-    loadDashboardData();
-  }, [selectedMonth, selectedYear]); // Recarregar quando o filtro mudar
 
   // Formatar transações para a tabela
   const allTransactions = useMemo(() => {
@@ -330,85 +309,104 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   return (
     <div className="dashboard">
-      {/* Filtro de Mês e Ano */}
-      <PageHeader
-        selectedMonth={selectedMonth}
-        selectedYear={selectedYear}
-        onMonthChange={setSelectedMonth}
-        onYearChange={setSelectedYear}
-        className="dashboard-header"
-      />
+      {/* Loading state */}
+      {isLoading && (
+        <div className="dashboard-loading">
+          <p>Carregando dados do dashboard...</p>
+        </div>
+      )}
 
-      {/* Cards principais - DESKTOP */}
-      <FinancialCardGrid
-        cards={[
-          {
-            title: "Saldo Atual",
-            value: formatValue(saldo),
-            icon: dinheiroSaldo,
-            type: "neutral",
-          },
-          {
-            title: "Valores a Receber",
-            value: formatValue(contasAReceber),
-            icon: sacoDeDinheiro,
-            type: "positive",
-            onClick: () => onNavigate?.("receitas"),
-          },
-          {
-            title: "Contas a Pagar",
-            value: formatValue(contasAPagar),
-            icon: setaParaBaixo,
-            type: "negative",
-            onClick: () => onNavigate?.("despesas"),
-          },
-        ]}
-        isBalanceVisible={isBalanceVisible}
-        onToggleVisibility={toggleBalanceVisibility}
-      />
+      {/* Error state */}
+      {isError && (
+        <div className="dashboard-error">
+          <p>Erro ao carregar dados. Tente novamente.</p>
+        </div>
+      )}
 
-      {/* Primeira Linha - Transações + Gráfico Pizza */}
-      <div className="dashboard-first-row">
-        {/* Últimas Transações */}
-        <TransactionTable
-          title="Últimas Transações"
-          columns={transactionColumns}
-          data={allTransactions}
-          className="transactions-card"
-          showSummary={true}
-          summaryCountLabel="Transações"
-          valueKey="value"
-        />
+      {/* Conteúdo principal */}
+      {!isLoading && !isError && (
+        <>
+          {/* Filtro de Mês e Ano */}
+          <PageHeader
+            selectedMonth={selectedMonth}
+            selectedYear={selectedYear}
+            onMonthChange={setSelectedMonth}
+            onYearChange={setSelectedYear}
+            className="dashboard-header"
+          />
 
-        {/* Despesas por categoria (gráfico de pizza) */}
-        <ExpensesPieChart
-          title="Despesas por categoria"
-          totalLabel="TOTAL DESPESAS"
-          totalValue={formatValue(totalDespesas)}
-          categories={categoryData}
-          className="expenses-chart-card"
-        />
-      </div>
+          {/* Cards principais - DESKTOP */}
+          <FinancialCardGrid
+            cards={[
+              {
+                title: "Saldo Atual",
+                value: formatValue(saldo),
+                icon: dinheiroSaldo,
+                type: "neutral",
+              },
+              {
+                title: "Valores a Receber",
+                value: formatValue(contasAReceber),
+                icon: sacoDeDinheiro,
+                type: "positive",
+                onClick: () => onNavigate?.("receitas"),
+              },
+              {
+                title: "Contas a Pagar",
+                value: formatValue(contasAPagar),
+                icon: setaParaBaixo,
+                type: "negative",
+                onClick: () => onNavigate?.("despesas"),
+              },
+            ]}
+            isBalanceVisible={isBalanceVisible}
+            onToggleVisibility={toggleBalanceVisibility}
+          />
 
-      {/* Segunda Linha - Contas + Visão Categoria */}
-      <div className="dashboard-second-row">
-        {/* Contas a pagar */}
-        <TransactionTable
-          title="Contas a pagar"
-          columns={billsColumns}
-          data={bills}
-          showIcon={true}
-          icon={simboloMenuBolsoContasAPagar}
-          iconPosition="left"
-          showSummary={true}
-          summaryCountLabel="Contas"
-          valueKey="value"
-          className="bills-table-orange"
-        />
+          {/* Primeira Linha - Transações + Gráfico Pizza */}
+          <div className="dashboard-first-row">
+            {/* Últimas Transações */}
+            <TransactionTable
+              title="Últimas Transações"
+              columns={transactionColumns}
+              data={allTransactions}
+              className="transactions-card"
+              showSummary={true}
+              summaryCountLabel="Transações"
+              valueKey="value"
+            />
 
-        {/* Visão por categoria */}
-        <CategoryBudgetCard data={categoryBarsData} />
-      </div>
+            {/* Despesas por categoria (gráfico de pizza) */}
+            <ExpensesPieChart
+              title="Despesas por categoria"
+              totalLabel="TOTAL DESPESAS"
+              totalValue={formatValue(totalDespesas)}
+              categories={categoryData}
+              className="expenses-chart-card"
+            />
+          </div>
+
+          {/* Segunda Linha - Contas + Visão Categoria */}
+          <div className="dashboard-second-row">
+            {/* Contas a pagar */}
+            <TransactionTable
+              title="Contas a pagar"
+              columns={billsColumns}
+              data={bills}
+              showIcon={true}
+              icon={simboloMenuBolsoContasAPagar}
+              iconPosition="left"
+              showSummary={true}
+              summaryCountLabel="Contas"
+              valueKey="value"
+              className="bills-table-orange"
+            />
+
+            {/* Visão por categoria */}
+            <CategoryBudgetCard data={categoryBarsData} />
+          </div>
+        </>
+      )}
     </div>
   );
 };
