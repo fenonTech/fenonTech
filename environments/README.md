@@ -4,7 +4,7 @@ Esta pasta contém as configurações de ambiente para desenvolvimento e produç
 
 ## 🌐 URL da API - IMPORTANTE
 
-**URL Base Atual:** `https://zvmw5op52c.execute-api.us-east-1.amazonaws.com/prod/api`
+**URL Base Atual:** `https://backend-pearl-rho-82.vercel.app/api`
 
 ### ⚠️ Para Mudar a URL da API:
 
@@ -53,7 +53,7 @@ if (environment.production) {
 
 ### Development (DEV)
 
-- API: `https://zvmw5op52c.execute-api.us-east-1.amazonaws.com/prod/api`
+- API: `https://backend-pearl-rho-82.vercel.app/api`
 - Landing Page: `localhost:5174`
 - Dashboard: `localhost:5173`
 - Logs habilitados
@@ -61,7 +61,7 @@ if (environment.production) {
 
 ### Production (PROD)
 
-- API: `https://zvmw5op52c.execute-api.us-east-1.amazonaws.com/prod/api`
+- API: `https://backend-pearl-rho-82.vercel.app/api`
 - Landing Page: `www.fenontech.com.br/landingpage`
 - Dashboard: `www.fenontech.com.br/dashboard`
 - Logs desabilitados

@@ -7,7 +7,7 @@
  * - Desenvolvimento: environment.development.ts
  * - Produção: environment.production.ts
  *
- * A URL base atual é: https://zvmw5op52c.execute-api.us-east-1.amazonaws.com/prod/api
+ * A URL base atual é: https://backend-pearl-rho-82.vercel.app/api
  */
 
 import { environment as devEnvironment } from "./environment.development";
