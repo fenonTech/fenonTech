@@ -30,10 +30,7 @@ const Receitas: React.FC = () => {
     useBalanceVisibility();
 
   // React Query - Busca dados de receitas com cache automático
-  const {
-    data: receitasApiData,
-    refetch: refetchReceitas,
-  } = useReceitasData(
+  const { data: receitasApiData, refetch: refetchReceitas } = useReceitasData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
     selectedYear
   );

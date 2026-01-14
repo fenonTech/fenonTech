@@ -33,10 +33,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   const [isEditMode, setIsEditMode] = useState(false);
 
   // React Query - Busca dados de receitas com cache automático
-  const {
-    data: receitasData,
-    refetch: refetchReceitas,
-  } = useReceitasData(
+  const { data: receitasData, refetch: refetchReceitas } = useReceitasData(
     selectedMonth + 1,
     selectedYear
   );

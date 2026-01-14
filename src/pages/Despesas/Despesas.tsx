@@ -33,10 +33,7 @@ const Despesas: React.FC = () => {
     useBalanceVisibility();
 
   // React Query - Busca dados de despesas com cache automático
-  const {
-    data: despesasApiData,
-    refetch: refetchDespesas,
-  } = useDespesasData(
+  const { data: despesasApiData, refetch: refetchDespesas } = useDespesasData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
     selectedYear
   );

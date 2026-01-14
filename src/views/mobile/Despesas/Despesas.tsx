@@ -33,10 +33,7 @@ const Despesas: React.FC<DespesasProps> = ({
   const [isEditMode, setIsEditMode] = useState(false);
 
   // React Query - Busca dados de despesas com cache automático
-  const {
-    data: despesasData,
-    refetch: refetchDespesas,
-  } = useDespesasData(
+  const { data: despesasData, refetch: refetchDespesas } = useDespesasData(
     selectedMonth + 1,
     selectedYear
   );

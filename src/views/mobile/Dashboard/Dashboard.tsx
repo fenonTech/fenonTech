@@ -28,9 +28,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   >("inicio");
 
   // React Query - Busca dados do dashboard com cache automático
-  const {
-    data: dashboardData,
-  } = useDashboardData(
+  const { data: dashboardData } = useDashboardData(
     selectedMonth + 1,
     selectedYear
   );
