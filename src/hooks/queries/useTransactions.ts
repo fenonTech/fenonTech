@@ -5,7 +5,10 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { transactionApiService } from "../../services/transactionApiService";
-import type { CreateTransactionDTO, UpdateTransactionDTO } from "../../services/transactionApiService";
+import type {
+  CreateTransactionDTO,
+  UpdateTransactionDTO,
+} from "../../services/transactionApiService";
 
 // ========================================
 // 📊 QUERIES (Leitura)
@@ -44,32 +47,32 @@ export const useCreateTransaction = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateTransactionDTO) => 
+    mutationFn: (data: CreateTransactionDTO) =>
       transactionApiService.createTransaction(data),
-    
+
     // Optimistic Update: atualiza UI antes da resposta da API
     onMutate: async (newTransaction) => {
       // Cancelar queries em andamento para evitar conflitos
       await queryClient.cancelQueries({ queryKey: ["dashboard"] });
-      
+
       // Retornar contexto para rollback se necessário
       return { newTransaction };
     },
-    
+
     // Se der sucesso, invalida cache para refetch
     onSuccess: (_data, variables) => {
       console.log("✅ Transação criada com sucesso!");
-      
+
       // Invalidar queries relacionadas para recarregar dados
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      
+
       if (variables.isIncome) {
         queryClient.invalidateQueries({ queryKey: ["incomes"] });
       } else {
         queryClient.invalidateQueries({ queryKey: ["expenses"] });
       }
     },
-    
+
     // Se der erro, pode fazer rollback aqui
     onError: (error) => {
       console.error("❌ Erro ao criar transação:", error);
@@ -87,7 +90,7 @@ export const useCreateIncome = () => {
   return useMutation({
     mutationFn: (data: Omit<CreateTransactionDTO, "isIncome">) =>
       transactionApiService.createIncome(data),
-    
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["incomes"] });
@@ -104,7 +107,7 @@ export const useCreateExpense = () => {
   return useMutation({
     mutationFn: (data: Omit<CreateTransactionDTO, "isIncome">) =>
       transactionApiService.createExpense(data),
-    
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
@@ -121,24 +124,24 @@ export const useUpdateTransaction = () => {
   return useMutation({
     mutationFn: (data: UpdateTransactionDTO) =>
       transactionApiService.updateTransaction(data),
-    
+
     onMutate: async (updatedTransaction) => {
       await queryClient.cancelQueries({ queryKey: ["dashboard"] });
       return { updatedTransaction };
     },
-    
+
     onSuccess: (_data, variables) => {
       console.log("✅ Transação atualizada com sucesso!");
-      
+
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      
+
       if (variables.isIncome) {
         queryClient.invalidateQueries({ queryKey: ["incomes"] });
       } else {
         queryClient.invalidateQueries({ queryKey: ["expenses"] });
       }
     },
-    
+
     onError: (error) => {
       console.error("❌ Erro ao atualizar transação:", error);
     },
@@ -154,24 +157,24 @@ export const useDeleteTransaction = () => {
   return useMutation({
     mutationFn: ({ codigo, isIncome }: { codigo: number; isIncome: boolean }) =>
       transactionApiService.deleteTransaction(codigo, isIncome),
-    
+
     onMutate: async (variables) => {
       await queryClient.cancelQueries({ queryKey: ["dashboard"] });
       return variables;
     },
-    
+
     onSuccess: (_data, variables) => {
       console.log("✅ Transação deletada com sucesso!");
-      
+
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      
+
       if (variables.isIncome) {
         queryClient.invalidateQueries({ queryKey: ["incomes"] });
       } else {
         queryClient.invalidateQueries({ queryKey: ["expenses"] });
       }
     },
-    
+
     onError: (error) => {
       console.error("❌ Erro ao deletar transação:", error);
     },

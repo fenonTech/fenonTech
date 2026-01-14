@@ -3,6 +3,7 @@
 ## ✅ O que foi feito
 
 ### 1. Instalação e Configuração
+
 - ✅ Instalado `@tanstack/react-query`
 - ✅ Configurado `QueryClientProvider` no [App.tsx](../../App.tsx)
 - ✅ Cache de 30 segundos (staleTime)
@@ -12,9 +13,11 @@
 ### 2. Hooks Criados
 
 #### 📊 Dashboard
+
 - **[useDashboardData](./useDashboardData.ts)** - Busca dados do dashboard com cache
 
 #### 💰 Transações
+
 - **[useIncomes](./useTransactions.ts#L14-L20)** - Busca receitas
 - **[useExpenses](./useTransactions.ts#L25-L31)** - Busca despesas
 - **[useCreateTransaction](./useTransactions.ts#L40-L79)** - Criar transação
@@ -24,6 +27,7 @@
 - **[useDeleteTransaction](./useTransactions.ts#L150-L177)** - Deletar transação
 
 ### 3. Componentes Migrados
+
 - ✅ [Dashboard](../../pages/Dashboard/Dashboard.tsx) - Usando React Query
 - ⏳ Receitas - Próximo passo
 - ⏳ Despesas - Próximo passo
@@ -31,14 +35,16 @@
 ## 🎯 Benefícios Imediatos
 
 ### Performance
-| Ação | Antes | Depois |
-|------|-------|--------|
-| Primeira visita | 1s | 1s (igual) |
-| Volta ao Dashboard | 1s | **0ms** (cache) |
-| Muda mês/ano | 1s (tela branca) | 1s (mostra dados antigos) |
-| Cria transação | 1s + reload manual | **Instantâneo** + auto-refresh |
+
+| Ação               | Antes              | Depois                         |
+| ------------------ | ------------------ | ------------------------------ |
+| Primeira visita    | 1s                 | 1s (igual)                     |
+| Volta ao Dashboard | 1s                 | **0ms** (cache)                |
+| Muda mês/ano       | 1s (tela branca)   | 1s (mostra dados antigos)      |
+| Cria transação     | 1s + reload manual | **Instantâneo** + auto-refresh |
 
 ### Experiência do Usuário
+
 - ✅ **Cache inteligente** - Navegação instantânea
 - ✅ **Stale-while-revalidate** - Mostra dados antigos enquanto carrega novos
 - ✅ **Background refetching** - Atualiza quando volta para aba
@@ -116,11 +122,13 @@ const ReceitasPage = () => {
 ### Para completar a migração:
 
 1. **Migrar página de Receitas**
+
    - Substituir `useEffect` por `useIncomes()`
    - Usar `useCreateIncome()` no modal
    - Usar `useDeleteTransaction()` para deletar
 
 2. **Migrar página de Despesas**
+
    - Substituir `useEffect` por `useExpenses()`
    - Usar `useCreateExpense()` no modal
    - Usar `useDeleteTransaction()` para deletar
@@ -132,15 +140,17 @@ const ReceitasPage = () => {
 ## 🎨 Customizações Disponíveis
 
 ### Ajustar tempo de cache
+
 ```tsx
 // Em qualquer hook
 const { data } = useDashboardData(mes, ano, {
   staleTime: 60000, // 1 minuto ao invés de 30s
-  gcTime: 600000,   // 10 minutos ao invés de 5min
+  gcTime: 600000, // 10 minutos ao invés de 5min
 });
 ```
 
 ### Desabilitar auto-refetch
+
 ```tsx
 const { data } = useDashboardData(mes, ano, {
   refetchOnWindowFocus: false,
@@ -149,6 +159,7 @@ const { data } = useDashboardData(mes, ano, {
 ```
 
 ### Polling (atualização automática)
+
 ```tsx
 const { data } = useDashboardData(mes, ano, {
   refetchInterval: 30000, // Atualiza a cada 30 segundos
@@ -158,29 +169,33 @@ const { data } = useDashboardData(mes, ano, {
 ## 🐛 Debug
 
 ### Ver estado do cache no DevTools
+
 ```bash
 npm install @tanstack/react-query-devtools
 ```
 
 Depois adicione no [App.tsx](../../App.tsx):
+
 ```tsx
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 <QueryClientProvider client={queryClient}>
   {/* ... */}
   <ReactQueryDevtools initialIsOpen={false} />
-</QueryClientProvider>
+</QueryClientProvider>;
 ```
 
 ## 📊 Métricas de Performance
 
 ### Antes do React Query
+
 - Dashboard inicial: ~1000ms
 - Navegação entre páginas: ~1000ms cada
 - Total de chamadas API em 5 navegações: 5 chamadas
 - Tempo total: ~5000ms
 
 ### Depois do React Query
+
 - Dashboard inicial: ~1000ms (igual)
 - Navegação entre páginas: ~0ms (cache)
 - Total de chamadas API em 5 navegações: 1-2 chamadas
@@ -190,6 +205,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 ## ✨ Conclusão
 
 React Query foi implementado com sucesso! Seu app agora:
+
 - Carrega mais rápido
 - Consome menos dados
 - Oferece melhor experiência ao usuário

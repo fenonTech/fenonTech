@@ -25,7 +25,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     useFilter();
 
   // React Query - Busca dados do dashboard com cache automático
-  const { data: dashboardData, isLoading, isError } = useDashboardData(
+  const {
+    data: dashboardData,
+    isLoading,
+    isError,
+  } = useDashboardData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
     selectedYear
   );
@@ -331,76 +335,76 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             className="dashboard-header"
           />
 
-      {/* Cards principais - DESKTOP */}
-      <FinancialCardGrid
-        cards={[
-          {
-            title: "Saldo Atual",
-            value: formatValue(saldo),
-            icon: dinheiroSaldo,
-            type: "neutral",
-          },
-          {
-            title: "Valores a Receber",
-            value: formatValue(contasAReceber),
-            icon: sacoDeDinheiro,
-            type: "positive",
-            onClick: () => onNavigate?.("receitas"),
-          },
-          {
-            title: "Contas a Pagar",
-            value: formatValue(contasAPagar),
-            icon: setaParaBaixo,
-            type: "negative",
-            onClick: () => onNavigate?.("despesas"),
-          },
-        ]}
-        isBalanceVisible={isBalanceVisible}
-        onToggleVisibility={toggleBalanceVisibility}
-      />
+          {/* Cards principais - DESKTOP */}
+          <FinancialCardGrid
+            cards={[
+              {
+                title: "Saldo Atual",
+                value: formatValue(saldo),
+                icon: dinheiroSaldo,
+                type: "neutral",
+              },
+              {
+                title: "Valores a Receber",
+                value: formatValue(contasAReceber),
+                icon: sacoDeDinheiro,
+                type: "positive",
+                onClick: () => onNavigate?.("receitas"),
+              },
+              {
+                title: "Contas a Pagar",
+                value: formatValue(contasAPagar),
+                icon: setaParaBaixo,
+                type: "negative",
+                onClick: () => onNavigate?.("despesas"),
+              },
+            ]}
+            isBalanceVisible={isBalanceVisible}
+            onToggleVisibility={toggleBalanceVisibility}
+          />
 
-      {/* Primeira Linha - Transações + Gráfico Pizza */}
-      <div className="dashboard-first-row">
-        {/* Últimas Transações */}
-        <TransactionTable
-          title="Últimas Transações"
-          columns={transactionColumns}
-          data={allTransactions}
-          className="transactions-card"
-          showSummary={true}
-          summaryCountLabel="Transações"
-          valueKey="value"
-        />
+          {/* Primeira Linha - Transações + Gráfico Pizza */}
+          <div className="dashboard-first-row">
+            {/* Últimas Transações */}
+            <TransactionTable
+              title="Últimas Transações"
+              columns={transactionColumns}
+              data={allTransactions}
+              className="transactions-card"
+              showSummary={true}
+              summaryCountLabel="Transações"
+              valueKey="value"
+            />
 
-        {/* Despesas por categoria (gráfico de pizza) */}
-        <ExpensesPieChart
-          title="Despesas por categoria"
-          totalLabel="TOTAL DESPESAS"
-          totalValue={formatValue(totalDespesas)}
-          categories={categoryData}
-          className="expenses-chart-card"
-        />
-      </div>
+            {/* Despesas por categoria (gráfico de pizza) */}
+            <ExpensesPieChart
+              title="Despesas por categoria"
+              totalLabel="TOTAL DESPESAS"
+              totalValue={formatValue(totalDespesas)}
+              categories={categoryData}
+              className="expenses-chart-card"
+            />
+          </div>
 
-      {/* Segunda Linha - Contas + Visão Categoria */}
-      <div className="dashboard-second-row">
-        {/* Contas a pagar */}
-        <TransactionTable
-          title="Contas a pagar"
-          columns={billsColumns}
-          data={bills}
-          showIcon={true}
-          icon={simboloMenuBolsoContasAPagar}
-          iconPosition="left"
-          showSummary={true}
-          summaryCountLabel="Contas"
-          valueKey="value"
-          className="bills-table-orange"
-        />
+          {/* Segunda Linha - Contas + Visão Categoria */}
+          <div className="dashboard-second-row">
+            {/* Contas a pagar */}
+            <TransactionTable
+              title="Contas a pagar"
+              columns={billsColumns}
+              data={bills}
+              showIcon={true}
+              icon={simboloMenuBolsoContasAPagar}
+              iconPosition="left"
+              showSummary={true}
+              summaryCountLabel="Contas"
+              valueKey="value"
+              className="bills-table-orange"
+            />
 
-        {/* Visão por categoria */}
-        <CategoryBudgetCard data={categoryBarsData} />
-      </div>
+            {/* Visão por categoria */}
+            <CategoryBudgetCard data={categoryBarsData} />
+          </div>
         </>
       )}
     </div>
