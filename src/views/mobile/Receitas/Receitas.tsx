@@ -91,13 +91,7 @@ const Receitas: React.FC<ReceitasProps> = ({
       }
 
       // Recarregar dados
-      const data = await receitasService.getReceitas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setReceitaAtual(data.receitaAtual);
-      setValoresAReceber(data.valoresAReceber);
-      setEntradas(data.entradas);
+      await refetchReceitas();
 
       handleCloseIncomeModal();
     } catch (error) {
