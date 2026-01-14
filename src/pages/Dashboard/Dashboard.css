@@ -13,6 +13,22 @@
   box-sizing: border-box;
 }
 
+/* Loading e Error States */
+.dashboard-loading,
+.dashboard-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 1.2rem;
+  color: #fff;
+  opacity: 0.7;
+}
+
+.dashboard-error {
+  color: #ff6b6b;
+}
+
 /* Primeira Linha - Transações + Gráfico Pizza */
 .dashboard-first-row {
   display: grid;
