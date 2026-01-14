@@ -8,7 +8,7 @@ export const environment = {
 
   // APIs
   api: {
-    baseUrl: "http://localhost:3000/api",
+    baseUrl: "https://backend-pearl-rho-82.vercel.app/api",
     timeout: 30000,
   },
 

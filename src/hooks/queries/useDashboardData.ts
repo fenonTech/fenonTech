@@ -10,8 +10,5 @@ export const useDashboardData = (mes: number, ano: number) => {
   return useQuery({
     queryKey: ["dashboard", mes, ano],
     queryFn: () => dashboardService.getDashboardData(mes, ano),
-    staleTime: 30000, // 30 segundos - dados ficam "frescos"
-    gcTime: 300000, // 5 minutos - mantém em cache
-    refetchOnWindowFocus: true, // Atualiza quando volta para aba
   });
 };

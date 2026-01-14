@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import HeaderMobile from "../../../components/HeaderMobile";
 import FinancialCardMobile from "../../../components/FinancialCardMobile";
 import { UltimasTransacoesMobile } from "../../../components/UltimasTransacoesMobile";
@@ -9,7 +9,7 @@ import { CategoryViewMobile } from "../../../components/CategoryViewMobile";
 import type { Expense } from "../../../types/transactions";
 import type { MobileScreenType } from "../../../components/LayoutMobile";
 import { useFilter } from "../../../contexts/FilterContext";
-import { despesasService } from "../../../services/api/despesasService";
+import { useDespesasData } from "../../../hooks/queries";
 import { transactionsService } from "../../../services/api/transactionsService";
 import { formatCurrency, formatTableDate } from "../../../utils";
 import "./Despesas.css";
@@ -32,28 +32,20 @@ const Despesas: React.FC<DespesasProps> = ({
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Estados para dados de despesas
-  const [despesaAtual, setDespesaAtual] = useState(0);
-  const [contasAPagar, setContasAPagar] = useState(0);
-  const [despesas, setDespesas] = useState<any[]>([]);
+  // React Query - Busca dados de despesas com cache automático
+  const {
+    data: despesasData,
+    refetch: refetchDespesas,
+  } = useDespesasData(
+    selectedMonth + 1,
+    selectedYear
+  );
 
-  // Carregar dados de despesas
-  useEffect(() => {
-    const loadDespesasData = async () => {
-      try {
-        const data = await despesasService.getDespesas(
-          selectedMonth + 1,
-          selectedYear
-        );
-        setDespesaAtual(data.despesaAtual);
-        setContasAPagar(data.contasAPagar);
-        setDespesas(data.despesas);
-      } catch (error) {
-        console.error("❌ Erro ao carregar despesas:", error);
-      }
-    };
-    loadDespesasData();
-  }, [selectedMonth, selectedYear]);
+  // Extrair dados (com valores padrão)
+  const despesaAtual = despesasData?.despesaAtual ?? 0;
+  const contasAPagar = despesasData?.contasAPagar ?? 0;
+  const despesas = despesasData?.despesas ?? [];
+
   const handleConfigClick = () => {
     if (onNavigate) {
       onNavigate("configuracoes");
@@ -102,13 +94,7 @@ const Despesas: React.FC<DespesasProps> = ({
       }
 
       // Recarregar dados
-      const data = await despesasService.getDespesas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setDespesaAtual(data.despesaAtual);
-      setContasAPagar(data.contasAPagar);
-      setDespesas(data.despesas);
+      await refetchDespesas();
 
       handleCloseExpenseModal();
     } catch (error) {
@@ -130,13 +116,7 @@ const Despesas: React.FC<DespesasProps> = ({
       await transactionsService.delete(Number(id));
 
       // Recarregar dados
-      const data = await despesasService.getDespesas(
-        selectedMonth + 1,
-        selectedYear
-      );
-      setDespesaAtual(data.despesaAtual);
-      setContasAPagar(data.contasAPagar);
-      setDespesas(data.despesas);
+      await refetchDespesas();
 
       handleCloseExpenseModal();
     } catch (error) {
