@@ -22,7 +22,7 @@ const LayoutMobile: React.FC = () => {
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [userName, setUserName] = useState(
-    authService.getUserName() || "Usuário"
+    authService.getUserName() || "Usuário",
   );
 
   // Escutar mudanças no nome do usuário

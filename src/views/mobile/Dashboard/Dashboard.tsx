@@ -32,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   // React Query - Busca dados do dashboard com cache automático
   const { data: dashboardData } = useDashboardData(
     selectedMonth + 1,
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -89,7 +89,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           onToggleVisibility={onToggleVisibility}
           mesAno={`${String(selectedMonth + 1).padStart(
             2,
-            "0"
+            "0",
           )}/${selectedYear}`}
           mode="dashboard"
           onNavigate={handleNavTabChange}

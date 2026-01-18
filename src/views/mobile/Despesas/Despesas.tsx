@@ -37,7 +37,7 @@ const Despesas: React.FC<DespesasProps> = ({
   // React Query - Busca dados de despesas com cache automático
   const { data: despesasData, refetch: refetchDespesas } = useDespesasData(
     selectedMonth + 1,
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -77,7 +77,7 @@ const Despesas: React.FC<DespesasProps> = ({
   };
 
   const handleSaveExpense = async (
-    expenseData: Omit<Expense, "id" | "createdAt" | "updatedAt">
+    expenseData: Omit<Expense, "id" | "createdAt" | "updatedAt">,
   ) => {
     try {
       const payload = {
@@ -221,7 +221,7 @@ const Despesas: React.FC<DespesasProps> = ({
           onToggleVisibility={onToggleVisibility}
           mesAno={`${String(selectedMonth + 1).padStart(
             2,
-            "0"
+            "0",
           )}/${selectedYear}`}
           mode="despesas"
           onNavigate={handleNavTabChange}

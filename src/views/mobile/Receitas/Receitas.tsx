@@ -37,7 +37,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   // React Query - Busca dados de receitas com cache automático
   const { data: receitasData, refetch: refetchReceitas } = useReceitasData(
     selectedMonth + 1,
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -77,7 +77,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   };
 
   const handleSaveIncome = async (
-    incomeData: Omit<Income, "id" | "createdAt" | "updatedAt">
+    incomeData: Omit<Income, "id" | "createdAt" | "updatedAt">,
   ) => {
     try {
       const payload = {
@@ -221,7 +221,7 @@ const Receitas: React.FC<ReceitasProps> = ({
           onToggleVisibility={onToggleVisibility}
           mesAno={`${String(selectedMonth + 1).padStart(
             2,
-            "0"
+            "0",
           )}/${selectedYear}`}
           mode="receitas"
           onNavigate={handleNavTabChange}

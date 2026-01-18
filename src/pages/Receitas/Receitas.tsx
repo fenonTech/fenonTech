@@ -32,7 +32,7 @@ const Receitas: React.FC = () => {
   // React Query - Busca dados de receitas com cache automático
   const { data: receitasApiData, refetch: refetchReceitas } = useReceitasData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -317,7 +317,7 @@ const Receitas: React.FC = () => {
             ? async () => {
                 if (
                   !window.confirm(
-                    "Tem certeza que deseja excluir esta receita?"
+                    "Tem certeza que deseja excluir esta receita?",
                   )
                 ) {
                   return;
