@@ -238,17 +238,40 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  max-height: 270px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Scrollbar customizada para payment-history */
+.payment-history::-webkit-scrollbar {
+  width: 6px;
+}
+
+.payment-history::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+.payment-history::-webkit-scrollbar-thumb {
+  background: #ffd900;
+  border-radius: 3px;
+}
+
+.payment-history::-webkit-scrollbar-thumb:hover {
+  background: #ffed4e;
 }
 
 .payment-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1.25rem 1.5rem;
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   border: 1px solid #2a2a2a;
   transition: all 0.2s ease;
+  min-height: 80px;
 }
 
 .payment-item:hover {
@@ -259,7 +282,9 @@
 .payment-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  flex: 1;
+  padding-right: 1rem;
 }
 
 .payment-plan {

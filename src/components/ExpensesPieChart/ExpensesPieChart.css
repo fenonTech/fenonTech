@@ -15,12 +15,6 @@
   box-sizing: border-box;
 }
 
-.expenses-pie-chart:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(135, 131, 131, 0.3);
-  border-color: #ffd900;
-}
-
 .expenses-pie-chart .card-header {
   font-size: 1.25rem;
   font-weight: 600;

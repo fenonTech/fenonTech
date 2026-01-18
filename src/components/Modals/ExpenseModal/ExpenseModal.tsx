@@ -58,7 +58,7 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
   ];
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -239,7 +239,7 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
               Cancelar
             </button>
             <button type="submit" className="btn-save">
-              {isEditMode ? "Salvar Alterações" : "Adicionar"}
+              {isEditMode ? "Salvar" : "Adicionar"}
             </button>
           </div>
         </form>

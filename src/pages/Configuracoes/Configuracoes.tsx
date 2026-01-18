@@ -70,8 +70,14 @@ const Configuracoes: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("pt-BR");
+    if (!dateString) return "Data não disponível";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "Data inválida";
+      return date.toLocaleDateString("pt-BR");
+    } catch (error) {
+      return "Data inválida";
+    }
   };
 
   const calcularDiasRestantes = (dataExpiracao: string) => {

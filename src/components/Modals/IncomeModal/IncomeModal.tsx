@@ -57,7 +57,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
   ];
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -238,7 +238,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
               Cancelar
             </button>
             <button type="submit" className="btn-save income-btn">
-              {isEditMode ? "Salvar Alterações" : "Adicionar"}
+              {isEditMode ? "Salvar" : "Adicionar"}
             </button>
           </div>
         </form>
