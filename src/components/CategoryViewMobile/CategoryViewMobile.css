@@ -42,7 +42,17 @@
 .category-values {
   color: #888888;
   font-size: 0.8rem;
-  font-weight: 400;
+  font-weight: 500;
+}
+
+.category-total-footer {
+  color: #cccccc;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: right;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #333333;
 }
 
 .category-progress-bar {
