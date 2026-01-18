@@ -14,7 +14,6 @@ import { formatTableDate, isDateTodayOrBefore } from "../../utils";
 import dinheiroSaldo from "../../assets/dinheiroSaldo.png";
 import sacoDeDinheiro from "../../assets/sacoDeDinheiro.png";
 import setaParaBaixo from "../../assets/setaParaBaixo.png";
-import simboloMenuBolsoContasAPagar from "../../assets/simboloMenuBolsoContasAPagar.png";
 
 interface DashboardProps {
   onNavigate?: (page: string) => void;
