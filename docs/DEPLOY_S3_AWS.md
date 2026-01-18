@@ -37,7 +37,7 @@ Este guia explica passo a passo como fazer o deploy da aplicação React no Amaz
 6. Configure:
    - **Documento de índice**: `index.html`
    - **Documento de erro**: `index.html` ⚠️ (importante para rotas React)
-7. Clique em **"Salvar alterações"**
+7. Clique em **"Salvar"**
 8. **Anote a URL do endpoint** que aparecerá (ex: `http://meubolso-frontend.s3-website-us-east-1.amazonaws.com`)
 
 ### Passo 3: Configurar Permissões Públicas
@@ -61,7 +61,7 @@ Este guia explica passo a passo como fazer o deploy da aplicação React no Amaz
 }
 ```
 
-4. Clique em **"Salvar alterações"**
+4. Clique em **"Salvar"**
 
 ### Passo 4: Fazer Upload dos Arquivos
 
@@ -104,7 +104,6 @@ aws --version
 ### Configuração das Credenciais
 
 1. Crie um usuário IAM no AWS Console:
-
    - IAM → Usuários → Adicionar usuário
    - Permissões: `AmazonS3FullAccess`
    - Copie: **Access Key ID** e **Secret Access Key**

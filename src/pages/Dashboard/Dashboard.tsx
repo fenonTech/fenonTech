@@ -31,7 +31,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     isError,
   } = useDashboardData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados do dashboard (com valores padrão)
@@ -71,7 +71,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           // Fazer login com os parâmetros da URL
           const response = await authService.login(
             telefoneDecodificado,
-            codigo
+            codigo,
           );
 
           console.log("📥 Resposta da API:", response);
@@ -83,7 +83,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             window.history.replaceState(
               {},
               document.title,
-              window.location.pathname
+              window.location.pathname,
             );
             // Recarregar a página para aplicar autenticação
             window.location.reload();
@@ -142,21 +142,33 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   // Agrupar despesas por categoria para o gráfico de pizza
   const categoryData = useMemo(() => {
-    // Categorias pré-cadastradas com cores fixas
-    const predefinedCategories = [
-      { name: "Alimentação", color: "#FF6B6B" },
-      { name: "Transporte", color: "#4ECDC4" },
-      { name: "Moradia", color: "#45B7D1" },
-      { name: "Lazer", color: "#96CEB4" },
-      { name: "Saúde", color: "#FFEAA7" },
-      { name: "Educação", color: "#DDA0DD" },
-      { name: "Mercado", color: "#98D8C8" },
-      { name: "Outros", color: "#B0BEC5" },
+    // Cores pré-definidas para categorias conhecidas
+    const categoryColors: { [key: string]: string } = {
+      alimentação: "#FF6B6B",
+      transporte: "#4ECDC4",
+      moradia: "#45B7D1",
+      lazer: "#96CEB4",
+      saúde: "#FFEAA7",
+      educação: "#DDA0DD",
+      mercado: "#98D8C8",
+      outros: "#B0BEC5",
+    };
+
+    // Cores extras para categorias dinâmicas
+    const extraColors = [
+      "#E74C3C",
+      "#3498DB",
+      "#2ECC71",
+      "#F39C12",
+      "#9B59B6",
+      "#1ABC9C",
+      "#E67E22",
+      "#34495E",
     ];
 
     // Filtrar apenas despesas (não receitas) já pagas
     const expenses = transacoes.filter(
-      (t) => !t.is_entrada && isDateTodayOrBefore(t.data_pagamento)
+      (t) => !t.is_entrada && isDateTodayOrBefore(t.data_pagamento),
     );
 
     if (expenses.length === 0) {
@@ -166,31 +178,42 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     // Agrupar despesas por categoria
     const categoryTotals: { [key: string]: number } = {};
     expenses.forEach((expense) => {
-      const category = expense.tipo?.toLowerCase() || "outros";
+      // Usar descricao ou tipo como categoria
+      const category = (expense.descricao || expense.tipo || "outros")
+        .toLowerCase()
+        .trim();
       categoryTotals[category] =
         (categoryTotals[category] || 0) + expense.valor;
     });
 
     const totalExpenseValue = Object.values(categoryTotals).reduce(
       (sum, value) => sum + value,
-      0
+      0,
     );
 
-    // Mapear categorias pré-definidas com dados reais
-    return predefinedCategories
-      .map((predefCategory) => {
-        const categoryKey = predefCategory.name.toLowerCase();
-        const value = categoryTotals[categoryKey] || 0;
+    if (totalExpenseValue === 0) {
+      return [];
+    }
+
+    // Criar array com todas as categorias encontradas
+    let colorIndex = 0;
+    return Object.entries(categoryTotals)
+      .map(([category, value]) => {
+        // Usar cor pré-definida ou cor extra
+        let color = categoryColors[category];
+        if (!color) {
+          color = extraColors[colorIndex % extraColors.length];
+          colorIndex++;
+        }
+
         return {
-          name: predefCategory.name,
-          percentage:
-            totalExpenseValue > 0
-              ? Math.round((value / totalExpenseValue) * 100)
-              : 0,
-          color: predefCategory.color,
+          name: category.charAt(0).toUpperCase() + category.slice(1),
+          percentage: Math.round((value / totalExpenseValue) * 100),
+          color: color,
         };
       })
-      .filter((cat) => cat.percentage > 0);
+      .filter((cat) => cat.percentage > 0)
+      .sort((a, b) => b.percentage - a.percentage);
   }, [transacoes]);
 
   // Calcular total de despesas para exibir no gráfico
@@ -393,9 +416,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               title="Contas a pagar"
               columns={billsColumns}
               data={bills}
-              showIcon={true}
-              icon={simboloMenuBolsoContasAPagar}
-              iconPosition="left"
               showSummary={true}
               summaryCountLabel="Contas"
               valueKey="value"

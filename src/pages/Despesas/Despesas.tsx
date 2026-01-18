@@ -35,7 +35,7 @@ const Despesas: React.FC = () => {
   // React Query - Busca dados de despesas com cache automático
   const { data: despesasApiData, refetch: refetchDespesas } = useDespesasData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -187,30 +187,42 @@ const Despesas: React.FC = () => {
 
   // Agrupar despesas por categoria para o gráfico de pizza
   const pieChartData = useMemo(() => {
-    // Categorias pré-cadastradas com cores fixas
-    const predefinedCategories = [
-      { name: "alimentação", color: "#FF6B6B" },
-      { name: "transporte", color: "#4ECDC4" },
-      { name: "moradia", color: "#45B7D1" },
-      { name: "lazer", color: "#96CEB4" },
-      { name: "saúde", color: "#FFEAA7" },
-      { name: "educação", color: "#DDA0DD" },
-      { name: "mercado", color: "#98D8C8" },
-      { name: "outros", color: "#B0BEC5" },
+    // Cores pré-definidas para categorias conhecidas
+    const categoryColors: { [key: string]: string } = {
+      alimentação: "#FF6B6B",
+      transporte: "#4ECDC4",
+      moradia: "#45B7D1",
+      lazer: "#96CEB4",
+      saúde: "#FFEAA7",
+      educação: "#DDA0DD",
+      mercado: "#98D8C8",
+      outros: "#B0BEC5",
+    };
+
+    // Cores extras para categorias dinâmicas
+    const extraColors = [
+      "#E74C3C",
+      "#3498DB",
+      "#2ECC71",
+      "#F39C12",
+      "#9B59B6",
+      "#1ABC9C",
+      "#E67E22",
+      "#34495E",
     ];
 
     if (despesas.length === 0) {
-      return predefinedCategories.map((cat) => ({
-        ...cat,
-        percentage: 0,
-      }));
+      return [];
     }
 
     // Agrupar despesas por categoria (apenas despesas já pagas)
     const categoryTotals: { [key: string]: number } = {};
     despesas.forEach((despesa) => {
       if (isDateTodayOrBefore(despesa.data_pagamento)) {
-        const category = despesa.tipo?.toLowerCase() || "outros";
+        // Usar descricao ou tipo como categoria
+        const category = (despesa.descricao || despesa.tipo || "outros")
+          .toLowerCase()
+          .trim();
         categoryTotals[category] =
           (categoryTotals[category] || 0) + despesa.valor;
       }
@@ -218,25 +230,32 @@ const Despesas: React.FC = () => {
 
     const totalExpenseValue = Object.values(categoryTotals).reduce(
       (sum, value) => sum + value,
-      0
+      0,
     );
 
-    // Mapear categorias pré-definidas com dados reais
-    return predefinedCategories
-      .map((predefCategory) => {
-        const value = categoryTotals[predefCategory.name] || 0;
+    if (totalExpenseValue === 0) {
+      return [];
+    }
+
+    // Criar array com todas as categorias encontradas
+    let colorIndex = 0;
+    return Object.entries(categoryTotals)
+      .map(([category, value]) => {
+        // Usar cor pré-definida ou cor extra
+        let color = categoryColors[category];
+        if (!color) {
+          color = extraColors[colorIndex % extraColors.length];
+          colorIndex++;
+        }
+
         return {
-          name:
-            predefCategory.name.charAt(0).toUpperCase() +
-            predefCategory.name.slice(1),
-          percentage:
-            totalExpenseValue > 0
-              ? Math.round((value / totalExpenseValue) * 100)
-              : 0,
-          color: predefCategory.color,
+          name: category.charAt(0).toUpperCase() + category.slice(1),
+          percentage: Math.round((value / totalExpenseValue) * 100),
+          color: color,
         };
       })
-      .filter((cat) => cat.percentage > 0 || despesas.length === 0);
+      .filter((cat) => cat.percentage > 0)
+      .sort((a, b) => b.percentage - a.percentage);
   }, [despesas]);
 
   // Dados para o gráfico de barras mensais
@@ -472,7 +491,7 @@ const Despesas: React.FC = () => {
             ? async () => {
                 if (
                   !window.confirm(
-                    "Tem certeza que deseja excluir esta despesa?"
+                    "Tem certeza que deseja excluir esta despesa?",
                   )
                 ) {
                   return;

@@ -88,7 +88,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -116,7 +116,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
       newErrors.value = "Valor é obrigatório";
     } else {
       const numValue = parseFloat(
-        formData.value.replace(/\./g, "").replace(",", ".")
+        formData.value.replace(/\./g, "").replace(",", "."),
       );
       if (isNaN(numValue) || numValue <= 0) {
         newErrors.value = "Valor deve ser um número positivo";
@@ -137,7 +137,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
     if (!validateForm()) return;
 
     const numValue = parseFloat(
-      formData.value.replace(/\./g, "").replace(",", ".")
+      formData.value.replace(/\./g, "").replace(",", "."),
     );
 
     const incomeData = {
@@ -273,7 +273,7 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
                 Cancelar
               </button>
               <button type="submit" className="btn-save">
-                {mode === "edit" ? "Salvar Alterações" : "Adicionar"}
+                {mode === "edit" ? "Salvar" : "Adicionar"}
               </button>
             </div>
           </div>

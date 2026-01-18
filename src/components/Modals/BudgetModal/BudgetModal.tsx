@@ -100,7 +100,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
   }, [editingBudget, mode, isOpen]);
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -305,9 +305,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
                 Cancelar
               </button>
               <button type="submit" className="btn-save">
-                {mode === "edit"
-                  ? "Salvar Alterações"
-                  : "Adicionar Planejamento"}
+                {mode === "edit" ? "Salvar" : "Adicionar Planejamento"}
               </button>
             </div>
           </div>
