@@ -35,7 +35,7 @@ const Despesas: React.FC = () => {
   // React Query - Busca dados de despesas com cache automático
   const { data: despesasApiData, refetch: refetchDespesas } = useDespesasData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -230,7 +230,7 @@ const Despesas: React.FC = () => {
 
     const totalExpenseValue = Object.values(categoryTotals).reduce(
       (sum, value) => sum + value,
-      0
+      0,
     );
 
     if (totalExpenseValue === 0) {
@@ -491,7 +491,7 @@ const Despesas: React.FC = () => {
             ? async () => {
                 if (
                   !window.confirm(
-                    "Tem certeza que deseja excluir esta despesa?"
+                    "Tem certeza que deseja excluir esta despesa?",
                   )
                 ) {
                   return;

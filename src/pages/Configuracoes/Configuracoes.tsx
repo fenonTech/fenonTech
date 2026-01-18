@@ -52,7 +52,7 @@ const Configuracoes: React.FC = () => {
       setIsUpdating(true);
       await userService.updateProfile({ nome: editedName });
       setUserData((prev: Usuario | null) =>
-        prev ? { ...prev, nome: editedName } : null
+        prev ? { ...prev, nome: editedName } : null,
       );
       authService.updateUserName(editedName);
       setIsEditingName(false);
@@ -202,7 +202,7 @@ const Configuracoes: React.FC = () => {
                 <span className="label">Dias restantes:</span>
                 <span className="value days-remaining">
                   {calcularDiasRestantes(
-                    assinaturasData.assinatura_atual.prazo
+                    assinaturasData.assinatura_atual.prazo,
                   )}{" "}
                   dias
                 </span>

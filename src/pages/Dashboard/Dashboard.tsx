@@ -31,7 +31,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     isError,
   } = useDashboardData(
     selectedMonth + 1, // API usa 1-12, FilterContext usa 0-11
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados do dashboard (com valores padrão)
@@ -71,7 +71,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           // Fazer login com os parâmetros da URL
           const response = await authService.login(
             telefoneDecodificado,
-            codigo
+            codigo,
           );
 
           console.log("📥 Resposta da API:", response);
@@ -83,7 +83,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             window.history.replaceState(
               {},
               document.title,
-              window.location.pathname
+              window.location.pathname,
             );
             // Recarregar a página para aplicar autenticação
             window.location.reload();
@@ -168,7 +168,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
     // Filtrar apenas despesas (não receitas) já pagas
     const expenses = transacoes.filter(
-      (t) => !t.is_entrada && isDateTodayOrBefore(t.data_pagamento)
+      (t) => !t.is_entrada && isDateTodayOrBefore(t.data_pagamento),
     );
 
     if (expenses.length === 0) {
@@ -188,7 +188,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
     const totalExpenseValue = Object.values(categoryTotals).reduce(
       (sum, value) => sum + value,
-      0
+      0,
     );
 
     if (totalExpenseValue === 0) {
