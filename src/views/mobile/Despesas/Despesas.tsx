@@ -19,6 +19,7 @@ interface DespesasProps {
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
   userName?: string;
+  onLogoutClick?: () => void;
 }
 
 const Despesas: React.FC<DespesasProps> = ({
@@ -26,6 +27,7 @@ const Despesas: React.FC<DespesasProps> = ({
   isBalanceVisible = true,
   onToggleVisibility,
   userName = "Usuário",
+  onLogoutClick,
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -50,8 +52,9 @@ const Despesas: React.FC<DespesasProps> = ({
   };
 
   const handleLogoutClick = () => {
-    console.log("Fazer logout");
-    // TODO: Implementar logout
+    if (onLogoutClick) {
+      onLogoutClick();
+    }
   };
 
   const handleNavTabChange = (tab: "inicio" | "receitas" | "despesas") => {
@@ -82,6 +85,7 @@ const Despesas: React.FC<DespesasProps> = ({
         is_entrada: false,
         data_pagamento: expenseData.date,
         descricao: expenseData.category || "Despesa",
+        tipo: expenseData.category || "Despesa",
       };
 
       if (isEditMode && editingExpense) {

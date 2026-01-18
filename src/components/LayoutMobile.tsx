@@ -5,6 +5,7 @@ import { NotificacoesMobile } from "../views/mobile/Notificacoes";
 import { PagamentosMobile } from "../views/mobile/Pagamentos";
 import { AtualizacaoCadastralMobile } from "../views/mobile/AtualizacaoCadastral";
 import { authService } from "../services/authService";
+import { APP_URLS } from "../config";
 import "./LayoutMobile.css";
 
 export type MobileScreenType =
@@ -19,6 +20,7 @@ export type MobileScreenType =
 const LayoutMobile: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<MobileScreenType>("inicio");
   const [isBalanceVisible, setIsBalanceVisible] = useState(true);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [userName, setUserName] = useState(
     authService.getUserName() || "Usuário"
   );
@@ -44,6 +46,26 @@ const LayoutMobile: React.FC = () => {
     setIsBalanceVisible(!isBalanceVisible);
   };
 
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleConfirmLogout = () => {
+    // Limpar todos os dados do localStorage
+    localStorage.removeItem("fenontech-telefone");
+    localStorage.removeItem("fenontech-codigoTemp");
+    localStorage.removeItem("fenontech-session-expired");
+    localStorage.removeItem("fenontech-subscription-expired");
+    localStorage.removeItem("fenontech-userName");
+
+    // Redirecionar para página de login
+    window.location.href = APP_URLS.LOGIN;
+  };
+
+  const handleCancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
   const renderCurrentScreen = () => {
     switch (activeScreen) {
       case "receitas":
@@ -53,6 +75,7 @@ const LayoutMobile: React.FC = () => {
             isBalanceVisible={isBalanceVisible}
             onToggleVisibility={handleToggleVisibility}
             userName={userName}
+            onLogoutClick={handleLogoutClick}
           />
         );
       case "despesas":
@@ -62,6 +85,7 @@ const LayoutMobile: React.FC = () => {
             isBalanceVisible={isBalanceVisible}
             onToggleVisibility={handleToggleVisibility}
             userName={userName}
+            onLogoutClick={handleLogoutClick}
           />
         );
       case "configuracoes":
@@ -106,12 +130,35 @@ const LayoutMobile: React.FC = () => {
             isBalanceVisible={isBalanceVisible}
             onToggleVisibility={handleToggleVisibility}
             userName={userName}
+            onLogoutClick={handleLogoutClick}
           />
         );
     }
   };
 
-  return <div className="layout-mobile">{renderCurrentScreen()}</div>;
+  return (
+    <div className="layout-mobile">
+      {renderCurrentScreen()}
+
+      {/* Modal de Confirmação de Logout */}
+      {showLogoutModal && (
+        <div className="logout-modal-overlay" onClick={handleCancelLogout}>
+          <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Confirmar Saída</h3>
+            <p>Tem certeza que deseja sair?</p>
+            <div className="logout-modal-buttons">
+              <button className="cancel-button" onClick={handleCancelLogout}>
+                Cancelar
+              </button>
+              <button className="confirm-button" onClick={handleConfirmLogout}>
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default LayoutMobile;

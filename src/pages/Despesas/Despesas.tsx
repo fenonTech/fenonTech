@@ -163,6 +163,7 @@ const Despesas: React.FC = () => {
         is_entrada: false,
         data_pagamento: expenseData.date, // já vem no formato YYYY-MM-DD
         descricao: expenseData.category || "Despesa",
+        tipo: expenseData.category || "Despesa",
       };
 
       if (isEditMode && editingExpense) {

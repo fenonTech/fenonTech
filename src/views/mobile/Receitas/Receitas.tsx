@@ -19,6 +19,7 @@ interface ReceitasProps {
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
   userName?: string;
+  onLogoutClick?: () => void;
 }
 
 const Receitas: React.FC<ReceitasProps> = ({
@@ -26,6 +27,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   isBalanceVisible = true,
   onToggleVisibility,
   userName = "Usuário",
+  onLogoutClick,
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
@@ -50,8 +52,9 @@ const Receitas: React.FC<ReceitasProps> = ({
   };
 
   const handleLogoutClick = () => {
-    console.log("Fazer logout");
-    // TODO: Implementar logout
+    if (onLogoutClick) {
+      onLogoutClick();
+    }
   };
 
   const handleNavTabChange = (tab: "inicio" | "receitas" | "despesas") => {
@@ -82,6 +85,7 @@ const Receitas: React.FC<ReceitasProps> = ({
         is_entrada: true,
         data_pagamento: incomeData.date,
         descricao: incomeData.category || "Receita",
+        tipo: incomeData.category || "Receita",
       };
 
       if (isEditMode && editingIncome) {

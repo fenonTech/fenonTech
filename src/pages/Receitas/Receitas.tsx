@@ -127,6 +127,7 @@ const Receitas: React.FC = () => {
         is_entrada: true,
         data_pagamento: incomeData.date, // já vem no formato YYYY-MM-DD
         descricao: incomeData.category || "Receita",
+        tipo: incomeData.category || "Receita",
       };
 
       if (isEditMode && editingIncome) {
