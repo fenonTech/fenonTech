@@ -17,7 +17,7 @@ const Configuracoes: React.FC = () => {
   // Funções utilitárias
   const formatDate = (dateString: string): string => {
     try {
-      const [year, month, day] = dateString.split('T')[0].split('-');
+      const [year, month, day] = dateString.split("T")[0].split("-");
       const date = new Date(Number(year), Number(month) - 1, Number(day));
       return date.toLocaleDateString("pt-BR");
     } catch {
@@ -28,7 +28,7 @@ const Configuracoes: React.FC = () => {
   const calculateDaysRemaining = (prazo: string): number => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const [year, month, day] = prazo.split('T')[0].split('-');
+    const [year, month, day] = prazo.split("T")[0].split("-");
     const expiryDate = new Date(Number(year), Number(month) - 1, Number(day));
     const diffTime = expiryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -281,14 +281,14 @@ const Configuracoes: React.FC = () => {
                     <span
                       className={`detail-value ${
                         calculateDaysRemaining(
-                          assinaturasData.assinatura_atual.prazo
+                          assinaturasData.assinatura_atual.prazo,
                         ) <= 7
                           ? "warning"
                           : "active"
                       }`}
                     >
                       {calculateDaysRemaining(
-                        assinaturasData.assinatura_atual.prazo
+                        assinaturasData.assinatura_atual.prazo,
                       )}{" "}
                       dias
                     </span>

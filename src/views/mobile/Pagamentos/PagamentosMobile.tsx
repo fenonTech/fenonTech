@@ -38,7 +38,7 @@ const PagamentosMobile: React.FC<PagamentosMobileProps> = ({ onBack }) => {
   const calculateDaysRemaining = (prazo: string): number => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const [year, month, day] = prazo.split('T')[0].split('-');
+    const [year, month, day] = prazo.split("T")[0].split("-");
     const expiryDate = new Date(Number(year), Number(month) - 1, Number(day));
     const diffTime = expiryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -48,7 +48,7 @@ const PagamentosMobile: React.FC<PagamentosMobileProps> = ({ onBack }) => {
   // Função para formatar data
   const formatDate = (dateString: string): string => {
     try {
-      const [year, month, day] = dateString.split('T')[0].split('-');
+      const [year, month, day] = dateString.split("T")[0].split("-");
       const date = new Date(Number(year), Number(month) - 1, Number(day));
       return date.toLocaleDateString("pt-BR");
     } catch {
@@ -113,7 +113,7 @@ const PagamentosMobile: React.FC<PagamentosMobileProps> = ({ onBack }) => {
                   <span className="plan-info-label">Restam:</span>
                   <span className="plan-info-value highlight">
                     {calculateDaysRemaining(
-                      assinaturasData.assinatura_atual.prazo
+                      assinaturasData.assinatura_atual.prazo,
                     )}{" "}
                     Dias
                   </span>

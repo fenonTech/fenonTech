@@ -56,7 +56,7 @@ export const assinaturasService = {
       console.log("📥 Buscando assinaturas do usuário...");
 
       const response = await apiClient.get<MinhasAssinaturasResponse>(
-        API_ENDPOINTS.assinaturas.minhas
+        API_ENDPOINTS.assinaturas.minhas,
       );
 
       const data = response.data;
