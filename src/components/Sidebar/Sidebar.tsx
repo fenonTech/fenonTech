@@ -3,7 +3,6 @@ import "./Sidebar.css";
 import logo from "../../assets/logo.png";
 import simboloReceita from "../../assets/simboloMenuReceita.png";
 import simboloDespesas from "../../assets/simboloMenuDespesas.png";
-import simboloMenuBurguer from "../../assets/simboloMenuBurguer.png";
 
 interface SidebarProps {
   activeItem: string;
