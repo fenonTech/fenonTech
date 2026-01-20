@@ -37,7 +37,9 @@ const PagamentosMobile: React.FC<PagamentosMobileProps> = ({ onBack }) => {
   // Função para calcular dias restantes até o vencimento
   const calculateDaysRemaining = (prazo: string): number => {
     const today = new Date();
-    const expiryDate = new Date(prazo);
+    today.setHours(0, 0, 0, 0);
+    const [year, month, day] = prazo.split('T')[0].split('-');
+    const expiryDate = new Date(Number(year), Number(month) - 1, Number(day));
     const diffTime = expiryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays);
@@ -46,7 +48,8 @@ const PagamentosMobile: React.FC<PagamentosMobileProps> = ({ onBack }) => {
   // Função para formatar data
   const formatDate = (dateString: string): string => {
     try {
-      const date = new Date(dateString);
+      const [year, month, day] = dateString.split('T')[0].split('-');
+      const date = new Date(Number(year), Number(month) - 1, Number(day));
       return date.toLocaleDateString("pt-BR");
     } catch {
       return "Data inválida";
@@ -97,7 +100,7 @@ const PagamentosMobile: React.FC<PagamentosMobileProps> = ({ onBack }) => {
             {/* Card do Plano Atual */}
             <div className="current-plan-card">
               <h2 className="current-plan-name">
-                {assinaturasData.assinatura_atual.plano_name_cakto}
+                {assinaturasData.assinatura_atual.nome_assinatura}
               </h2>
               <div className="current-plan-info">
                 <div className="plan-info-item">

@@ -17,6 +17,7 @@ export interface AssinaturaAtual {
   prazo: string;
   plano_id_cakto: string;
   plano_name_cakto: string;
+  nome_assinatura: string;
   subscription_id_cakto: string;
   is_cancelado: boolean;
   created_at: string;
