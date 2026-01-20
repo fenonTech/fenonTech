@@ -14,6 +14,7 @@ interface DashboardProps {
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
   userName?: string;
+  onLogoutClick?: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -21,6 +22,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   isBalanceVisible = true,
   onToggleVisibility,
   userName = "Usuário",
+  onLogoutClick,
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [activeNavTab, setActiveNavTab] = useState<
@@ -30,7 +32,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   // React Query - Busca dados do dashboard com cache automático
   const { data: dashboardData } = useDashboardData(
     selectedMonth + 1,
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -56,8 +58,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const handleLogoutClick = () => {
-    console.log("Fazer logout");
-    // TODO: Implementar logout
+    if (onLogoutClick) {
+      onLogoutClick();
+    }
   };
 
   const handleNavTabChange = (tab: "inicio" | "receitas" | "despesas") => {
@@ -86,7 +89,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           onToggleVisibility={onToggleVisibility}
           mesAno={`${String(selectedMonth + 1).padStart(
             2,
-            "0"
+            "0",
           )}/${selectedYear}`}
           mode="dashboard"
           onNavigate={handleNavTabChange}

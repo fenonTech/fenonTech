@@ -6,6 +6,7 @@ export interface CategoryBudgetData {
   spent: number;
   planned: number;
   percentage: number;
+  percentageOfTotal?: number; // Percentual em relação ao total de todas as categorias
   color: string;
 }
 
@@ -22,31 +23,43 @@ const CategoryBudgetCard: React.FC<CategoryBudgetCardProps> = ({
   emptyMessage = "Nenhum orçamento planejado para este mês",
   className = "",
 }) => {
+  // Calcular o total geral de todas as categorias
+  const totalGeral = data.reduce((acc, item) => acc + item.spent, 0);
+
   return (
     <div className={`category-budget-card ${className}`}>
       <h3 className="card-header">{title}</h3>
       <div className="category-bars">
         {data.length > 0 ? (
-          data.map((item, index) => (
-            <div key={index} className="category-bar-item">
-              <div className="category-info">
-                <span className="category-name">{item.name}</span>
-                <span className="category-amount">
-                  (R$ {item.spent.toFixed(2).replace(".", ",")} de R${" "}
-                  {item.planned.toFixed(2).replace(".", ",")})
-                </span>
-              </div>
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{
-                    width: `${item.percentage}%`,
-                    backgroundColor: item.color,
-                  }}
-                ></div>
-              </div>
+          <>
+            {data.map((item, index) => {
+              const percentageOfTotal =
+                totalGeral > 0 ? (item.spent / totalGeral) * 100 : 0;
+
+              return (
+                <div key={index} className="category-bar-item">
+                  <div className="category-info">
+                    <span className="category-name">{item.name}</span>
+                    <span className="category-amount">
+                      R$ {item.spent.toFixed(2).replace(".", ",")} (
+                      {percentageOfTotal.toFixed(1)}%)
+                    </span>
+                  </div>
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{
+                        width: `${percentageOfTotal}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              );
+            })}
+            <div className="category-total-footer">
+              Total geral: R$ {totalGeral.toFixed(2).replace(".", ",")}
             </div>
-          ))
+          </>
         ) : (
           <p className="empty-message">{emptyMessage}</p>
         )}

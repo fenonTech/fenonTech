@@ -72,7 +72,8 @@ const Configuracoes: React.FC = () => {
   const formatDate = (dateString: string) => {
     if (!dateString) return "Data não disponível";
     try {
-      const date = new Date(dateString);
+      const [year, month, day] = dateString.split("T")[0].split("-");
+      const date = new Date(Number(year), Number(month) - 1, Number(day));
       if (isNaN(date.getTime())) return "Data inválida";
       return date.toLocaleDateString("pt-BR");
     } catch (error) {
@@ -82,7 +83,9 @@ const Configuracoes: React.FC = () => {
 
   const calcularDiasRestantes = (dataExpiracao: string) => {
     const hoje = new Date();
-    const expiracao = new Date(dataExpiracao);
+    hoje.setHours(0, 0, 0, 0);
+    const [year, month, day] = dataExpiracao.split("T")[0].split("-");
+    const expiracao = new Date(Number(year), Number(month) - 1, Number(day));
     const diffTime = expiracao.getTime() - hoje.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
@@ -168,7 +171,7 @@ const Configuracoes: React.FC = () => {
               <div className="subscription-row">
                 <span className="label">Plano:</span>
                 <span className="value">
-                  {assinaturasData.assinatura_atual.plano_name_cakto}
+                  {assinaturasData.assinatura_atual.nome_assinatura}
                 </span>
               </div>
               <div className="subscription-row">

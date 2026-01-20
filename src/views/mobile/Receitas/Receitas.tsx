@@ -19,6 +19,7 @@ interface ReceitasProps {
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
   userName?: string;
+  onLogoutClick?: () => void;
 }
 
 const Receitas: React.FC<ReceitasProps> = ({
@@ -26,6 +27,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   isBalanceVisible = true,
   onToggleVisibility,
   userName = "Usuário",
+  onLogoutClick,
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [isIncomeModalOpen, setIsIncomeModalOpen] = useState(false);
@@ -35,7 +37,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   // React Query - Busca dados de receitas com cache automático
   const { data: receitasData, refetch: refetchReceitas } = useReceitasData(
     selectedMonth + 1,
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -50,8 +52,9 @@ const Receitas: React.FC<ReceitasProps> = ({
   };
 
   const handleLogoutClick = () => {
-    console.log("Fazer logout");
-    // TODO: Implementar logout
+    if (onLogoutClick) {
+      onLogoutClick();
+    }
   };
 
   const handleNavTabChange = (tab: "inicio" | "receitas" | "despesas") => {
@@ -74,7 +77,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   };
 
   const handleSaveIncome = async (
-    incomeData: Omit<Income, "id" | "createdAt" | "updatedAt">
+    incomeData: Omit<Income, "id" | "createdAt" | "updatedAt">,
   ) => {
     try {
       const payload = {
@@ -82,6 +85,7 @@ const Receitas: React.FC<ReceitasProps> = ({
         is_entrada: true,
         data_pagamento: incomeData.date,
         descricao: incomeData.category || "Receita",
+        tipo: incomeData.category || "Receita",
       };
 
       if (isEditMode && editingIncome) {
@@ -217,7 +221,7 @@ const Receitas: React.FC<ReceitasProps> = ({
           onToggleVisibility={onToggleVisibility}
           mesAno={`${String(selectedMonth + 1).padStart(
             2,
-            "0"
+            "0",
           )}/${selectedYear}`}
           mode="receitas"
           onNavigate={handleNavTabChange}

@@ -17,7 +17,8 @@ const Configuracoes: React.FC = () => {
   // Funções utilitárias
   const formatDate = (dateString: string): string => {
     try {
-      const date = new Date(dateString);
+      const [year, month, day] = dateString.split("T")[0].split("-");
+      const date = new Date(Number(year), Number(month) - 1, Number(day));
       return date.toLocaleDateString("pt-BR");
     } catch {
       return "Data inválida";
@@ -26,7 +27,9 @@ const Configuracoes: React.FC = () => {
 
   const calculateDaysRemaining = (prazo: string): number => {
     const today = new Date();
-    const expiryDate = new Date(prazo);
+    today.setHours(0, 0, 0, 0);
+    const [year, month, day] = prazo.split("T")[0].split("-");
+    const expiryDate = new Date(Number(year), Number(month) - 1, Number(day));
     const diffTime = expiryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return Math.max(0, diffDays);
@@ -264,7 +267,7 @@ const Configuracoes: React.FC = () => {
             <div className="subscription-info">
               <div className="subscription-current">
                 <div className="subscription-name">
-                  {assinaturasData.assinatura_atual.plano_name_cakto}
+                  {assinaturasData.assinatura_atual.nome_assinatura}
                 </div>
                 <div className="subscription-details">
                   <div className="detail-item">
@@ -278,14 +281,14 @@ const Configuracoes: React.FC = () => {
                     <span
                       className={`detail-value ${
                         calculateDaysRemaining(
-                          assinaturasData.assinatura_atual.prazo
+                          assinaturasData.assinatura_atual.prazo,
                         ) <= 7
                           ? "warning"
                           : "active"
                       }`}
                     >
                       {calculateDaysRemaining(
-                        assinaturasData.assinatura_atual.prazo
+                        assinaturasData.assinatura_atual.prazo,
                       )}{" "}
                       dias
                     </span>

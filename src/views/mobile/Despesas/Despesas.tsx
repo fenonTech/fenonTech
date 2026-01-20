@@ -19,6 +19,7 @@ interface DespesasProps {
   isBalanceVisible?: boolean;
   onToggleVisibility: () => void;
   userName?: string;
+  onLogoutClick?: () => void;
 }
 
 const Despesas: React.FC<DespesasProps> = ({
@@ -26,6 +27,7 @@ const Despesas: React.FC<DespesasProps> = ({
   isBalanceVisible = true,
   onToggleVisibility,
   userName = "Usuário",
+  onLogoutClick,
 }) => {
   const { selectedMonth, selectedYear } = useFilter();
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
@@ -35,7 +37,7 @@ const Despesas: React.FC<DespesasProps> = ({
   // React Query - Busca dados de despesas com cache automático
   const { data: despesasData, refetch: refetchDespesas } = useDespesasData(
     selectedMonth + 1,
-    selectedYear
+    selectedYear,
   );
 
   // Extrair dados (com valores padrão)
@@ -50,8 +52,9 @@ const Despesas: React.FC<DespesasProps> = ({
   };
 
   const handleLogoutClick = () => {
-    console.log("Fazer logout");
-    // TODO: Implementar logout
+    if (onLogoutClick) {
+      onLogoutClick();
+    }
   };
 
   const handleNavTabChange = (tab: "inicio" | "receitas" | "despesas") => {
@@ -74,7 +77,7 @@ const Despesas: React.FC<DespesasProps> = ({
   };
 
   const handleSaveExpense = async (
-    expenseData: Omit<Expense, "id" | "createdAt" | "updatedAt">
+    expenseData: Omit<Expense, "id" | "createdAt" | "updatedAt">,
   ) => {
     try {
       const payload = {
@@ -82,6 +85,7 @@ const Despesas: React.FC<DespesasProps> = ({
         is_entrada: false,
         data_pagamento: expenseData.date,
         descricao: expenseData.category || "Despesa",
+        tipo: expenseData.category || "Despesa",
       };
 
       if (isEditMode && editingExpense) {
@@ -217,7 +221,7 @@ const Despesas: React.FC<DespesasProps> = ({
           onToggleVisibility={onToggleVisibility}
           mesAno={`${String(selectedMonth + 1).padStart(
             2,
-            "0"
+            "0",
           )}/${selectedYear}`}
           mode="despesas"
           onNavigate={handleNavTabChange}
