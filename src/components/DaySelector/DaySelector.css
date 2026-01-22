@@ -21,7 +21,7 @@
   color: white;
   padding: 0.5rem 0.75rem;
   font-family: "Poppins", sans-serif;
-  font-size: 0.875rem;
+  font-size: 16px; /* 16px mínimo para evitar zoom no iOS */
   min-width: 120px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -58,14 +58,14 @@
   .day-selector-select {
     width: 100%;
     min-width: auto;
-    font-size: 0.8rem;
+    font-size: 16px !important; /* 16px mínimo para evitar zoom no iOS */
     padding: 0.4rem 0.6rem;
   }
 }
 
 @media (max-width: 480px) {
   .day-selector-select {
-    font-size: 0.75rem;
+    font-size: 16px !important; /* 16px mínimo para evitar zoom no iOS */
     padding: 0.35rem 0.5rem;
   }
 }
