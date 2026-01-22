@@ -14,8 +14,8 @@ export const environment = {
 
   // URLs da Aplicação
   app: {
-    landingPage: "https://www.fenontech.com.br/landingpage",
-    dashboard: "https://www.fenontech.com.br/dashboard",
+    landingPage: "https://www.meubolsoia.com.br/landingpage",
+    dashboard: "https://www.meubolsoia.com.br/dashboard",
   },
 
   // Features
