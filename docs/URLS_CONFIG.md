@@ -9,14 +9,14 @@ O arquivo `src/config/urls.config.ts` contém todas as URLs da aplicação centr
 ## Estrutura
 
 ```typescript
-const LANDING_PAGE_BASE_URL = "https://www.fenontech.com.br/landingpage";
+const LANDING_PAGE_BASE_URL = "https://www.meubolsoia.com.br/landingpage";
 
 export const APP_URLS = {
   LANDING_PAGE_BASE: LANDING_PAGE_BASE_URL,
   LOGIN: `${LANDING_PAGE_BASE_URL}/index.html#/login`,
   PLANOS: `${LANDING_PAGE_BASE_URL}/index.html#/planos`,
   RENOVAR: `${LANDING_PAGE_BASE_URL}/index.html#/renovar`,
-  DASHBOARD_BASE: "https://www.fenontech.com.br/dashboard",
+  DASHBOARD_BASE: "https://www.meubolsoia.com.br/dashboard",
 } as const;
 ```
 
@@ -40,7 +40,7 @@ Para alternar entre diferentes ambientes (produção/teste), basta modificar a v
 ### Produção
 
 ```typescript
-const LANDING_PAGE_BASE_URL = "https://www.fenontech.com.br/landingpage";
+const LANDING_PAGE_BASE_URL = "https://www.meubolsoia.com.br/landingpage";
 ```
 
 ### Teste (localhost)
