@@ -259,10 +259,17 @@
 @media (max-width: 600px) {
   .modal-overlay {
     padding: 0 !important;
-    align-items: center !important;
-    justify-content: center !important;
     background-color: rgba(0, 0, 0, 0.85);
-    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    z-index: 10001 !important;
+    display: block !important;
   }
 
   .modal-container {
@@ -271,13 +278,24 @@
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     max-width: calc(100vw - 40px) !important;
-    width: calc(100% - 40px) !important;
-    max-height: 80vh !important;
+    width: calc(100vw - 40px) !important;
+    max-height: 75vh !important;
     margin: 0 !important;
     border-radius: 16px;
     border: 2px solid #333;
-    animation: modalSlideIn 0.3s ease-out;
+    animation: modalSlideInMobile 0.3s ease-out;
     overflow-y: auto;
+  }
+
+  @keyframes modalSlideInMobile {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
   }
 
   .modal-header {
@@ -332,7 +350,7 @@
   .form-input,
   .form-select {
     padding: 10px 12px;
-    font-size: 15px;
+    font-size: 16px !important; /* 16px mínimo para evitar zoom no iOS */
     border-radius: 8px;
     border-width: 1.5px;
   }
@@ -357,58 +375,6 @@
     border-radius: 8px;
     width: 100%;
     max-width: 240px;
-  }
-}
-
-@media (max-width: 480px) {
-  .modal-container {
-    max-height: 80vh;
-  }
-
-  .modal-header {
-    padding: 16px 16px 8px;
-  }
-
-  .modal-header h2 {
-    font-size: 1rem;
-  }
-
-  .modal-form {
-    padding: 6px 16px 16px;
-  }
-
-  .form-grid {
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-
-  .form-group label {
-    font-size: 0.65rem;
-    margin-bottom: 4px;
-  }
-
-  .form-input,
-  .form-select {
-    padding: 10px 11px;
-    font-size: 15px;
-    border-radius: 8px;
-  }
-
-  .value-input {
-    font-size: 1.125rem;
-    padding: 11px;
-  }
-
-  .modal-actions {
-    gap: 7px;
-    margin-top: 12px;
-  }
-
-  .btn-cancel,
-  .btn-save {
-    padding: 10px 16px;
-    font-size: 0.75rem;
-    max-width: 220px;
   }
 }
 

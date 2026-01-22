@@ -44,7 +44,7 @@
   .year-select {
     width: 100%;
     padding: 0.625rem 0.875rem;
-    font-size: 0.9rem;
+    font-size: 16px !important; /* 16px mínimo para evitar zoom no iOS */
     min-width: auto;
   }
 }
@@ -57,7 +57,7 @@
   .month-select,
   .year-select {
     padding: 0.5rem 0.75rem;
-    font-size: 0.85rem;
+    font-size: 16px !important; /* 16px mínimo para evitar zoom no iOS */
   }
 }
 
@@ -69,7 +69,7 @@
 .month-year-selector.compact .month-select,
 .month-year-selector.compact .year-select {
   padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
+  font-size: 16px !important; /* 16px mínimo para evitar zoom no iOS */
   min-width: 100px;
 }
 
