@@ -84,7 +84,20 @@ const UltimasTransacoesMobile: React.FC<UltimasTransacoesMobileProps> = ({
   };
 
   // Aplicar filtros nas transações
-  const filteredTransactions = filterTransactionsByDate(transacoes);
+  const filteredByDate = filterTransactionsByDate(transacoes);
+  
+  // Aplicar filtro de busca
+  const filteredTransactions = filteredByDate.filter((transacao) => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      transacao.categoria.toLowerCase().includes(searchLower) ||
+      transacao.tipo.toLowerCase().includes(searchLower) ||
+      transacao.valor.toString().includes(searchTerm) ||
+      transacao.data.includes(searchTerm)
+    );
+  });
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

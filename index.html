@@ -1,9 +1,12 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="./src/assets/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -17,33 +20,37 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       // Corrige viewport quando teclado mobile fecha
-      (function() {
+      (function () {
         let lastHeight = window.innerHeight;
-        
+
         function resetViewport() {
           window.scrollTo(0, 0);
           document.documentElement.scrollTop = 0;
           document.body.scrollTop = 0;
-          
+
           // Reset zoom
-          const viewport = document.querySelector('meta[name=viewport]');
+          const viewport = document.querySelector("meta[name=viewport]");
           if (viewport) {
-            viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            viewport.setAttribute(
+              "content",
+              "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+            );
           }
         }
-        
+
         // Detecta quando teclado fecha (altura da janela aumenta)
-        window.visualViewport && window.visualViewport.addEventListener('resize', function() {
-          const currentHeight = window.visualViewport.height;
-          if (currentHeight > lastHeight) {
-            // Teclado fechou
-            setTimeout(resetViewport, 100);
-          }
-          lastHeight = currentHeight;
-        });
-        
+        window.visualViewport &&
+          window.visualViewport.addEventListener("resize", function () {
+            const currentHeight = window.visualViewport.height;
+            if (currentHeight > lastHeight) {
+              // Teclado fechou
+              setTimeout(resetViewport, 100);
+            }
+            lastHeight = currentHeight;
+          });
+
         // Fallback para navegadores sem visualViewport
-        document.addEventListener('focusout', function() {
+        document.addEventListener("focusout", function () {
           setTimeout(resetViewport, 300);
         });
       })();
