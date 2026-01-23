@@ -108,7 +108,7 @@ const Despesas: React.FC = () => {
       });
 
       console.log(
-        `✅ Adicionados: ${despesasCount} despesas pagas, ${payablesCount} contas a pagar`
+        `✅ Adicionados: ${despesasCount} despesas pagas, ${payablesCount} contas a pagar`,
       );
     } catch (error) {
       console.error("❌ Erro ao carregar despesas:", error);
@@ -150,7 +150,7 @@ const Despesas: React.FC = () => {
         expenseToDelete.category
       }" no valor de ${
         expenseToDelete.formattedValue || expenseToDelete.value
-      }?`
+      }?`,
     );
 
     if (confirmDelete) {
@@ -331,7 +331,7 @@ const Despesas: React.FC = () => {
   const filterByMonthYear = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number
+    selectedYear: number,
   ) => {
     return data.filter((item) => {
       // Parse correto da data para evitar problema de timezone
@@ -349,12 +349,12 @@ const Despesas: React.FC = () => {
   // Filtrar despesas e contas a pagar pelo mês/ano selecionado
   const filteredExpenses = useMemo(
     () => filterByMonthYear(expenses, selectedMonth, selectedYear),
-    [expenses, selectedMonth, selectedYear]
+    [expenses, selectedMonth, selectedYear],
   );
 
   const filteredPayables = useMemo(
     () => filterByMonthYear(payables, selectedMonth, selectedYear),
-    [payables, selectedMonth, selectedYear]
+    [payables, selectedMonth, selectedYear],
   );
 
   // Converter dados do contexto para formato das tabelas
@@ -394,7 +394,7 @@ const Despesas: React.FC = () => {
           month: "2-digit",
         }),
         category: payable.category,
-        type: payable.status === "pending" ? "Pendente" : "Pago",
+        type: payable.description || "Variável",
         value: payable.formattedValue,
         // Manter dados originais para edição
         originalDate: payable.dueDate,
@@ -407,11 +407,11 @@ const Despesas: React.FC = () => {
   // Calcular totais usando dados filtrados
   const totalExpenses = filteredExpenses.reduce(
     (sum, expense) => sum + expense.value,
-    0
+    0,
   );
   const totalPayables = filteredPayables.reduce(
     (sum, payable) => sum + payable.value,
-    0
+    0,
   );
 
   // Dados dinâmicos das tabelas (usando dados filtrados)
@@ -448,7 +448,7 @@ const Despesas: React.FC = () => {
 
     const totalExpenseValue = Object.values(categoryTotals).reduce(
       (sum, value) => sum + value,
-      0
+      0,
     );
 
     // Mapear categorias pré-definidas com dados reais
@@ -529,7 +529,7 @@ const Despesas: React.FC = () => {
         (budget) =>
           budget.month === selectedMonth &&
           budget.year === selectedYear &&
-          budget.type === "expense"
+          budget.type === "expense",
       )
       .forEach((budget) => {
         categoryBudgets[budget.category] = budget.plannedAmount;
@@ -596,17 +596,13 @@ const Despesas: React.FC = () => {
         cards={[
           {
             title: "DESPESA ATUAL",
-            value: formatValue(
-              `R$ ${totalExpenses.toFixed(2).replace(".", ",")}`
-            ),
+            value: formatValue(totalExpenses),
             icon: carteiraCardDespesasdoMês,
             type: "negative",
           },
           {
             title: "Contas a pagar",
-            value: formatValue(
-              `R$ ${totalPayables.toFixed(2).replace(".", ",")}`
-            ),
+            value: formatValue(totalPayables),
             icon: simboloMenuBolsoContasAPagar,
             type: "neutral",
           },

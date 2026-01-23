@@ -99,7 +99,7 @@ const Despesas: React.FC = () => {
           id: despesa.codigo.toString(),
           date: formatTableDate(despesa.data_pagamento),
           category: despesa.tipo,
-          type: "Pendente",
+          type: despesa.descricao || "Variável",
           value: formatCurrency(despesa.valor),
           originalData: despesa,
         };

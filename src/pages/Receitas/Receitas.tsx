@@ -64,7 +64,7 @@ const Receitas: React.FC = () => {
           id: entrada.codigo.toString(),
           date: formatTableDate(entrada.data_pagamento),
           category: entrada.tipo,
-          type: "Pendente",
+          type: entrada.descricao || "Variável",
           value: formatCurrency(entrada.valor),
           originalData: entrada,
         };

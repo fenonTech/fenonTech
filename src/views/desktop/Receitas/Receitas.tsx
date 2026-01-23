@@ -133,7 +133,7 @@ const Receitas: React.FC = () => {
     const confirmDelete = window.confirm(
       `Tem certeza que deseja excluir a receita "${
         incomeToDelete.category
-      }" no valor de ${incomeToDelete.formattedValue || incomeToDelete.value}?`
+      }" no valor de ${incomeToDelete.formattedValue || incomeToDelete.value}?`,
     );
 
     if (confirmDelete) {
@@ -315,7 +315,7 @@ const Receitas: React.FC = () => {
   const filterByMonthYear = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number
+    selectedYear: number,
   ) => {
     return data.filter((item) => {
       const dateString = item.date || item.dueDate;
@@ -332,12 +332,12 @@ const Receitas: React.FC = () => {
   // Filtrar receitas e contas a receber pelo mês/ano selecionado
   const filteredIncomes = useMemo(
     () => filterByMonthYear(incomes, selectedMonth, selectedYear),
-    [incomes, selectedMonth, selectedYear]
+    [incomes, selectedMonth, selectedYear],
   );
 
   const filteredReceivables = useMemo(
     () => filterByMonthYear(receivables, selectedMonth, selectedYear),
-    [receivables, selectedMonth, selectedYear]
+    [receivables, selectedMonth, selectedYear],
   );
 
   // Converter dados do contexto para formato das tabelas
@@ -377,7 +377,7 @@ const Receitas: React.FC = () => {
           month: "2-digit",
         }),
         category: receivable.category,
-        type: receivable.status === "pending" ? "Pendente" : "Pago",
+        type: receivable.description || "Variável",
         value: receivable.formattedValue,
         // Manter dados originais para edição
         originalDate: receivable.dueDate,
@@ -390,11 +390,11 @@ const Receitas: React.FC = () => {
   // Calcular totais usando dados filtrados
   const totalIncomes = filteredIncomes.reduce(
     (sum, income) => sum + income.value,
-    0
+    0,
   );
   const totalReceivables = filteredReceivables.reduce(
     (sum, receivable) => sum + receivable.value,
-    0
+    0,
   );
 
   // Dados dinâmicos das tabelas (usando dados filtrados)

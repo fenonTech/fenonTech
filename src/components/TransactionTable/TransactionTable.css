@@ -80,7 +80,7 @@
   padding: 0.75rem 1rem;
   font-weight: 600;
   color: #cccccc;
-  font-size: 0.75rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 1px solid #333333;
@@ -89,7 +89,7 @@
 .data-table td {
   padding: 0.5rem;
   color: #ffffff;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   border-bottom: 1px solid #1a1a1a;
   word-wrap: break-word;
   word-break: break-word;
@@ -109,7 +109,6 @@
 .category {
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
-  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -144,6 +143,7 @@
 .value {
   font-weight: 600;
   text-align: right;
+  font-size: inherit;
 }
 
 .value.income {
@@ -258,11 +258,6 @@
   .data-table th,
   .data-table td {
     padding: 0.625rem 0.75rem;
-  }
-
-  .category {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.6rem;
   }
 }
 
@@ -476,7 +471,6 @@
 
 /* Categorias minimalistas - mobile */
 .data-table tbody td .category {
-  font-size: 0.7rem;
   padding: 0.15rem 0.5rem;
   border-radius: 8px;
   font-weight: 600;
@@ -507,7 +501,6 @@
 
 /* Valores compactos - mobile */
 .data-table tbody td .value {
-  font-size: 0.95rem;
   font-weight: 700;
   text-shadow: none;
 }
@@ -632,13 +625,11 @@
 
   /* Categorias menores */
   .data-table tbody td .category {
-    font-size: 0.65rem;
     padding: 0.15rem 0.5rem;
   }
 
   /* Valores menores */
   .data-table tbody td .value {
-    font-size: 1rem;
     font-weight: 800;
   }
 

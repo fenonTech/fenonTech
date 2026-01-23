@@ -96,28 +96,13 @@
 
 .unified-financial-card .card-value {
   color: white;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   margin: 0;
   font-family: "Poppins", sans-serif;
   line-height: 1.2;
   word-wrap: break-word;
   hyphens: auto;
-}
-
-/* Reduzir fonte automaticamente para valores muito grandes */
-.unified-financial-card .card-value[data-large-value="true"] {
-  font-size: 1.25rem;
-}
-
-/* Para valores extremamente grandes */
-.unified-financial-card .card-value[data-xl-value="true"] {
-  font-size: 1.1rem;
-}
-
-/* Para valores gigantes */
-.unified-financial-card .card-value[data-xxl-value="true"] {
-  font-size: 0.95rem;
 }
 
 .unified-financial-card.positive .card-value {

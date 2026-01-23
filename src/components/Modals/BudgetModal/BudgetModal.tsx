@@ -211,7 +211,7 @@ const BudgetModal: React.FC<BudgetModalProps> = ({
           </div>
 
           <div className="form-group">
-            <label htmlFor="category">Categoria *</label>
+            <label htmlFor="category">Descrição</label>
             <select
               id="category"
               name="category"
