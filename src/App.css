@@ -1,1 +1,21 @@
 /* App.css - Estilos globais da aplicação */
+
+/* Previne problemas de scroll/zoom no mobile */
+html {
+  position: fixed;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+#root {
+  height: 100%;
+  overflow: auto;
+}
