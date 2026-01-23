@@ -14,7 +14,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
   userName,
   userAvatar,
-  pageTitle = "DashBoard Financeiro",
+  pageTitle = "Dashboard Financeiro",
   pageDescription = "Bem-vindo ao seu controle financeiro inteligente",
   onConfigClick,
   onLogoutClick,
