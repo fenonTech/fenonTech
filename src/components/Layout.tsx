@@ -14,7 +14,7 @@ const Layout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [userName, setUserName] = useState(
-    authService.getUserName() || "Usuário"
+    authService.getUserName() || "Usuário",
   );
 
   // Escutar mudanças no nome do usuário
@@ -80,7 +80,7 @@ const Layout: React.FC = () => {
     switch (activeItem) {
       case "dashboard":
         return {
-          title: "DashBoard Financeiro",
+          title: "Dashboard Financeiro",
           description: "Bem-vindo ao seu controle financeiro inteligente",
         };
       case "receitas":
@@ -101,7 +101,7 @@ const Layout: React.FC = () => {
         };
       default:
         return {
-          title: "DashBoard Financeiro",
+          title: "Dashboard Financeiro",
           description: "Bem-vindo ao seu controle financeiro inteligente",
         };
     }
