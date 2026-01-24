@@ -41,11 +41,22 @@ const Dashboard: React.FC<DashboardProps> = ({
   const contasAPagar = dashboardData?.contasAPagar ?? 0;
   const transacoes = dashboardData?.transacoes ?? [];
 
+  console.log("📱 Dashboard Mobile - Total de transações:", transacoes.length);
+  console.log(
+    "📱 Dashboard Mobile - Transações:",
+    transacoes.map((t) => ({
+      id: t.codigo,
+      tipo: t.is_entrada ? "ENTRADA" : "SAIDA",
+      valor: t.valor,
+      descricao: t.descricao || t.tipo,
+    })),
+  );
+
   // Formatar transações para o componente UltimasTransacoesMobile
   const ultimasTransacoes = transacoes.slice(0, 9).map((t) => ({
     id: t.codigo.toString(),
     tipo: t.is_entrada ? ("entrada" as const) : ("saida" as const),
-    categoria: t.tipo || t.descricao || "Sem categoria",
+    categoria: t.descricao || t.tipo || "Sem categoria",
     valor: t.valor,
     data: t.data_pagamento ? formatTableDate(t.data_pagamento) : "--/--",
     dataOriginal: t.data_pagamento, // Data original para filtro

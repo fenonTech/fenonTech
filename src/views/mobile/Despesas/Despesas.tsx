@@ -132,7 +132,7 @@ const Despesas: React.FC<DespesasProps> = ({
       id: transacao.id || transacao.codigo?.toString() || `temp-${Date.now()}`,
       type: "expense" as const,
       category:
-        transacao.categoria || transacao.tipo || transacao.descricao || "",
+        transacao.descricao || transacao.categoria || transacao.tipo || "",
       value:
         typeof transacao.valor === "number"
           ? transacao.valor
@@ -160,7 +160,7 @@ const Despesas: React.FC<DespesasProps> = ({
 
     // Processar despesas
     despesas.forEach((despesa) => {
-      const categoria = despesa.tipo || despesa.descricao || "Despesa";
+      const categoria = despesa.descricao || despesa.tipo || "Despesa";
       const valor = despesa.valor;
 
       if (!categoriasMap.has(categoria)) {
