@@ -184,14 +184,14 @@ const PagamentosMobile: React.FC<PagamentosMobileProps> = ({ onBack }) => {
                       </div>
                       <div className="payment-item-right">
                         <span className="payment-date">
-                          {formatDate(historico.dataAssinatura)}
+                          {formatDate(historico.dataassinatura)}
                         </span>
                         <span className="payment-expiry">
                           Até: {formatDate(historico.prazo)}
                         </span>
-                        {historico.dataCancelamento && (
+                        {historico.datacancelamento && (
                           <span className="payment-canceled">
-                            Cancelado: {formatDate(historico.dataCancelamento)}
+                            Cancelado: {formatDate(historico.datacancelamento)}
                           </span>
                         )}
                       </div>

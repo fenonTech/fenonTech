@@ -199,9 +199,7 @@ const Despesas: React.FC = () => {
     despesas.forEach((despesa) => {
       if (isDateTodayOrBefore(despesa.data_pagamento)) {
         // Usar apenas tipo como categoria
-        const category = (despesa.tipo || "outros")
-          .toLowerCase()
-          .trim();
+        const category = (despesa.tipo || "outros").toLowerCase().trim();
         categoryTotals[category] =
           (categoryTotals[category] || 0) + despesa.valor;
       }

@@ -195,9 +195,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     const categoryTotals: { [key: string]: number } = {};
     expenses.forEach((expense) => {
       // Usar apenas tipo como categoria
-      const category = (expense.tipo || "outros")
-        .toLowerCase()
-        .trim();
+      const category = (expense.tipo || "outros").toLowerCase().trim();
       categoryTotals[category] =
         (categoryTotals[category] || 0) + expense.valor;
     });
@@ -301,7 +299,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         color: categoryColors[name.toLowerCase()] || "#B0BEC5",
       }))
       .sort((a, b) => b.spent - a.spent);
-    
+
     // Retornar todas as categorias (sem limite)
     return allCategories;
   }, [transacoes, selectedMonth, selectedYear]);
