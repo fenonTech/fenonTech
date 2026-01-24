@@ -6,7 +6,6 @@ import ExpensesPieChart from "../../../components/ExpensesPieChart";
 import PageHeader from "../../../components/PageHeader";
 import FinancialCardGrid from "../../../components/FinancialCardGrid";
 import CategoryBudgetCard from "../../../components/CategoryBudgetCard";
-import MonthlyBarChart from "../../../components/MonthlyBarChart";
 import { ExpenseModal } from "../../../components/Modals";
 
 import { useTransaction } from "../../../contexts/TransactionContext";
@@ -478,41 +477,6 @@ const Despesas: React.FC = () => {
       })
       .filter((cat) => cat.percentage > 0 || filteredExpenses.length === 0);
   }, [filteredExpenses]);
-
-  // Dados para o gráfico de barras - Calculado com base nas despesas reais
-  const monthlyData = useMemo(() => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-
-    // Inicializar array com 0 para cada mês
-    const monthlyTotals = Array(12).fill(0);
-
-    // Somar todas as despesas (pagas) do ano selecionado
-    expenses.forEach((expense) => {
-      const [year, month] = expense.date.split("-").map(Number);
-      if (year === selectedYear) {
-        monthlyTotals[month - 1] += expense.value;
-      }
-    });
-
-    // Criar array de objetos para o gráfico
-    return months.map((month, index) => ({
-      month,
-      value: monthlyTotals[index],
-    }));
-  }, [expenses, selectedYear]);
 
   // Dados dinâmicos para barras de visão por categoria
   const categoryBarsData = useMemo(() => {

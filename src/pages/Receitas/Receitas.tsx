@@ -4,7 +4,6 @@ import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
 import PageHeader from "../../components/PageHeader";
 import FinancialCardGrid from "../../components/FinancialCardGrid";
-import MonthlyBarChart from "../../components/MonthlyBarChart";
 import { IncomeModal } from "../../components/Modals";
 
 import { useFilter } from "../../contexts/FilterContext";
@@ -161,30 +160,6 @@ const Receitas: React.FC = () => {
       alert("Erro ao salvar receita. Tente novamente.");
     }
   };
-
-  // Dados para o gráfico de barras - TODO: será implementado posteriormente
-  const monthlyData = useMemo(() => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-
-    // Por enquanto, retornar dados vazios
-    return months.map((month) => ({
-      month,
-      value: 0,
-    }));
-  }, []);
 
   // Definir colunas para a tabela de receitas
   const receitasColumns: TableColumn[] = [

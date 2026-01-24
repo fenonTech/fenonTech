@@ -4,7 +4,6 @@ import TransactionTable from "../../../components/TransactionTable";
 import type { TableColumn } from "../../../components/TransactionTable";
 import PageHeader from "../../../components/PageHeader";
 import FinancialCardGrid from "../../../components/FinancialCardGrid";
-import MonthlyBarChart from "../../../components/MonthlyBarChart";
 import { IncomeModal } from "../../../components/Modals";
 
 import { useTransaction } from "../../../contexts/TransactionContext";
@@ -412,41 +411,6 @@ const Receitas: React.FC = () => {
   // Dados dinâmicos das tabelas (usando dados filtrados)
   const receitasData = formatIncomeData(filteredIncomes);
   const contasAReceberData = formatReceivableData(filteredReceivables);
-
-  // Dados para o gráfico de barras - Calculado com base nas receitas reais
-  const monthlyData = useMemo(() => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-
-    // Inicializar array com 0 para cada mês
-    const monthlyTotals = Array(12).fill(0);
-
-    // Somar todas as receitas (pagas) do ano selecionado
-    incomes.forEach((income) => {
-      const [year, month] = income.date.split("-").map(Number);
-      if (year === selectedYear) {
-        monthlyTotals[month - 1] += income.value;
-      }
-    });
-
-    // Criar array de objetos para o gráfico
-    return months.map((month, index) => ({
-      month,
-      value: monthlyTotals[index],
-    }));
-  }, [incomes, selectedYear]);
 
   // Definir colunas para a tabela de receitas
   const receitasColumns: TableColumn[] = [
