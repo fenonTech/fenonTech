@@ -226,7 +226,7 @@ const Configuracoes: React.FC = () => {
                   <div className="payment-info">
                     <span className="payment-plan">{item.nome_assinatura}</span>
                     <span className="payment-date">
-                      {formatDate(item.dataAssinatura)} -{" "}
+                      {formatDate(item.dataassinatura)} -{" "}
                       {formatDate(item.prazo)}
                     </span>
                   </div>

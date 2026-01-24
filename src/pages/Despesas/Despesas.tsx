@@ -198,10 +198,8 @@ const Despesas: React.FC = () => {
     const categoryTotals: { [key: string]: number } = {};
     despesas.forEach((despesa) => {
       if (isDateTodayOrBefore(despesa.data_pagamento)) {
-        // Usar descricao ou tipo como categoria
-        const category = (despesa.descricao || despesa.tipo || "outros")
-          .toLowerCase()
-          .trim();
+        // Usar apenas tipo como categoria
+        const category = (despesa.tipo || "outros").toLowerCase().trim();
         categoryTotals[category] =
           (categoryTotals[category] || 0) + despesa.valor;
       }
@@ -252,7 +250,7 @@ const Despesas: React.FC = () => {
     const categoryMap = new Map<string, number>();
 
     paidExpenses.forEach((despesa) => {
-      const categoryName = despesa.tipo || despesa.descricao || "Outros";
+      const categoryName = (despesa.tipo || "Outros").toLowerCase().trim();
       const currentValue = categoryMap.get(categoryName) || 0;
       categoryMap.set(categoryName, currentValue + despesa.valor);
     });

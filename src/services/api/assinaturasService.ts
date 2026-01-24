@@ -13,26 +13,28 @@ import { API_ENDPOINTS } from "../../config/api.config";
 
 export interface AssinaturaAtual {
   id: number;
-  usuarioCodigo: number;
+  usuariocodigo: number;
+  checkout_id: string;
+  nome_assinatura: string;
+  dataassinatura: string;
   prazo: string;
   plano_id_cakto: string;
-  plano_name_cakto: string;
-  nome_assinatura: string;
-  subscription_id_cakto: string;
   is_cancelado: boolean;
-  created_at: string;
+  datacancelamento: string | null;
+  plano_id: number;
 }
 
 export interface AssinaturaHistorico {
   id: number;
-  usuarioCodigo: number;
+  usuariocodigo: number;
   checkout_id: string;
   nome_assinatura: string;
-  dataAssinatura: string;
+  dataassinatura: string;
   prazo: string;
   plano_id_cakto: string;
   is_cancelado: boolean;
-  dataCancelamento: string | null;
+  datacancelamento: string | null;
+  plano_id: number;
 }
 
 export interface MinhasAssinaturasResponse {
