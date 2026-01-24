@@ -83,12 +83,18 @@ const Despesas: React.FC = () => {
         return {
           id: despesa.codigo.toString(),
           date: formatTableDate(despesa.data_pagamento),
+          originalDate: despesa.data_pagamento,
           category: despesa.tipo,
           type: despesa.descricao || "Variável",
           value: formatCurrency(despesa.valor),
           originalData: despesa,
         };
-      });
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   }, [despesas]);
 
   const contasAPagarData = useMemo(() => {
@@ -98,12 +104,18 @@ const Despesas: React.FC = () => {
         return {
           id: despesa.codigo.toString(),
           date: formatTableDate(despesa.data_pagamento),
+          originalDate: despesa.data_pagamento,
           category: despesa.tipo,
-          type: "Pendente",
+          type: despesa.descricao || "Variável",
           value: formatCurrency(despesa.valor),
           originalData: despesa,
         };
-      });
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   }, [despesas]);
 
   // Função para adicionar nova despesa/conta a pagar
@@ -282,29 +294,24 @@ const Despesas: React.FC = () => {
     }));
   }, [despesasMensais]);
 
-  // Dados dinâmicos para barras de visão por categoria (apenas despesas)
+  // Dados dinâmicos para barras de visão por categoria (apenas despesas pagas)
   const categoryBarsData = useMemo(() => {
-    if (despesas.length === 0) {
+    // Filtrar apenas despesas que já foram pagas
+    const paidExpenses = despesas.filter((despesa) =>
+      isDateTodayOrBefore(despesa.data_pagamento),
+    );
+
+    if (paidExpenses.length === 0) {
       return [];
     }
 
     // Agrupar por categoria
-    const categoryMap = new Map<string, { spent: number; planned: number }>();
+    const categoryMap = new Map<string, number>();
 
-    despesas.forEach((despesa) => {
+    paidExpenses.forEach((despesa) => {
       const categoryName = despesa.tipo || despesa.descricao || "Outros";
-
-      if (!categoryMap.has(categoryName)) {
-        categoryMap.set(categoryName, { spent: 0, planned: 0 });
-      }
-
-      const categoryData = categoryMap.get(categoryName)!;
-      categoryData.planned += despesa.valor;
-
-      // Se já foi pago (data <= hoje), adiciona ao gasto
-      if (isDateTodayOrBefore(despesa.data_pagamento)) {
-        categoryData.spent += despesa.valor;
-      }
+      const currentValue = categoryMap.get(categoryName) || 0;
+      categoryMap.set(categoryName, currentValue + despesa.valor);
     });
 
     // Cores fixas para cada categoria
@@ -319,26 +326,30 @@ const Despesas: React.FC = () => {
       outros: "#B0BEC5",
     };
 
-    // Converter para array e ordenar por valor planejado
+    // Calcular total gasto
+    const totalSpent = Array.from(categoryMap.values()).reduce(
+      (sum, val) => sum + val,
+      0,
+    );
+
+    // Converter para array e ordenar por valor gasto
     return Array.from(categoryMap.entries())
-      .map(([name, data]) => ({
+      .map(([name, spent]) => ({
         name: name.charAt(0).toUpperCase() + name.slice(1),
-        spent: data.spent,
-        planned: data.planned,
-        percentage:
-          data.planned > 0 ? Math.round((data.spent / data.planned) * 100) : 0,
+        spent: spent,
+        planned: spent, // Usar o valor gasto como planejado
+        percentage: totalSpent > 0 ? Math.round((spent / totalSpent) * 100) : 0,
         color: categoryColors[name.toLowerCase()] || "#B0BEC5",
       }))
-      .sort((a, b) => b.planned - a.planned);
+      .sort((a, b) => b.spent - a.spent);
   }, [despesas]);
 
   // Definir colunas para a tabela de despesas
   const despesasColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
     {
       key: "type",
-      label: "Tipo",
+      label: "Descrição",
       render: (value) => (
         <span className={`category ${value.toLowerCase()}`}>{value}</span>
       ),
@@ -352,11 +363,10 @@ const Despesas: React.FC = () => {
 
   // Definir colunas para a tabela de contas a pagar
   const contasAPagarColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
     {
       key: "type",
-      label: "Tipo",
+      label: "Descrição",
       render: (value) => (
         <span className={`category ${value.toLowerCase()}`}>{value}</span>
       ),
@@ -449,13 +459,6 @@ const Despesas: React.FC = () => {
             className="despesas-card category-bars-card"
           />
         </div>
-
-        {/* Gráfico de Despesas Mensais */}
-        <MonthlyBarChart
-          title="Despesas por Mês"
-          data={monthlyData}
-          className="despesas-card chart-card"
-        />
       </div>
 
       {/* Botão Flutuante de Adicionar */}

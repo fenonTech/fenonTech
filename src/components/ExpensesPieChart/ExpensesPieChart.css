@@ -1,9 +1,9 @@
 /* Componente ExpensesPieChart */
 .expenses-pie-chart {
-  background: #121212;
+  background: #191919;
   border-radius: 16px;
   padding: 1.5rem;
-  border: 1px solid #333;
+  border: 1px solid #2a2a2a;
   transition: all 0.3s ease;
   overflow: hidden;
   box-sizing: border-box;

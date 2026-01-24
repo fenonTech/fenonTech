@@ -107,19 +107,30 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   // Formatar transações para a tabela
   const allTransactions = useMemo(() => {
-    return transacoes.map((transacao) => {
-      return {
-        id: transacao.codigo.toString(),
-        date: formatTableDate(transacao.data_pagamento),
-        description: transacao.descricao || transacao.tipo,
-        category: transacao.tipo,
-        value: new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        }).format(transacao.valor),
-        type: transacao.is_entrada ? ("income" as const) : ("expense" as const),
-      };
-    });
+    return transacoes
+      .map((transacao) => {
+        return {
+          id: transacao.codigo.toString(),
+          date: formatTableDate(transacao.data_pagamento),
+          description: transacao.descricao || transacao.tipo,
+          category: transacao.tipo,
+          value: new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+          }).format(transacao.valor),
+          type: transacao.is_entrada
+            ? ("income" as const)
+            : ("expense" as const),
+          originalDate: transacao.data_pagamento,
+        };
+      })
+      .sort((a, b) => {
+        // Ordenar por data decrescente (mais recente primeiro)
+        return (
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime()
+        );
+      });
   }, [transacoes]);
 
   // Preparar contas a pagar (despesas futuras)
@@ -224,30 +235,28 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
   // Dados para visão por categoria (apenas despesas)
   const categoryBarsData = useMemo(() => {
-    // Filtrar apenas despesas
-    const expenses = transacoes.filter((t) => !t.is_entrada);
+    // Filtrar apenas despesas que já foram pagas do mês/ano selecionado
+    const expenses = transacoes.filter((t) => {
+      if (t.is_entrada || !isDateTodayOrBefore(t.data_pagamento)) {
+        return false;
+      }
+
+      // Filtrar pelo mês e ano selecionado
+      const [year, month] = t.data_pagamento.split("-").map(Number);
+      return month === selectedMonth + 1 && year === selectedYear;
+    });
 
     if (expenses.length === 0) {
       return [];
     }
 
     // Agrupar por categoria
-    const categoryMap = new Map<string, { spent: number; planned: number }>();
+    const categoryMap = new Map<string, number>();
 
     expenses.forEach((expense) => {
       const categoryName = expense.tipo || expense.descricao || "Outros";
-
-      if (!categoryMap.has(categoryName)) {
-        categoryMap.set(categoryName, { spent: 0, planned: 0 });
-      }
-
-      const categoryData = categoryMap.get(categoryName)!;
-      categoryData.planned += expense.valor;
-
-      // Se já foi pago (data <= hoje), adiciona ao gasto
-      if (isDateTodayOrBefore(expense.data_pagamento)) {
-        categoryData.spent += expense.valor;
-      }
+      const currentValue = categoryMap.get(categoryName) || 0;
+      categoryMap.set(categoryName, currentValue + expense.valor);
     });
 
     // Cores fixas para cada categoria
@@ -262,19 +271,24 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       outros: "#B0BEC5",
     };
 
-    // Converter para array e ordenar por valor planejado
+    // Calcular total gasto
+    const totalSpent = Array.from(categoryMap.values()).reduce(
+      (sum, val) => sum + val,
+      0,
+    );
+
+    // Converter para array e ordenar por valor gasto
     return Array.from(categoryMap.entries())
-      .map(([name, data]) => ({
+      .map(([name, spent]) => ({
         name: name.charAt(0).toUpperCase() + name.slice(1),
-        spent: data.spent,
-        planned: data.planned,
-        percentage:
-          data.planned > 0 ? Math.round((data.spent / data.planned) * 100) : 0,
+        spent: spent,
+        planned: spent, // Usar o valor gasto como planejado
+        percentage: totalSpent > 0 ? Math.round((spent / totalSpent) * 100) : 0,
         color: categoryColors[name.toLowerCase()] || "#B0BEC5",
       }))
-      .sort((a, b) => b.planned - a.planned)
+      .sort((a, b) => b.spent - a.spent)
       .slice(0, 6); // Mostrar apenas top 6 categorias
-  }, [transacoes]);
+  }, [transacoes, selectedMonth, selectedYear]);
 
   const { isBalanceVisible, toggleBalanceVisibility, formatValue } =
     useBalanceVisibility();
@@ -282,20 +296,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const transactionColumns: TableColumn[] = [
     {
       key: "date",
-      label: "Data",
+      label: "Pagamento",
       render: (value) => <span>{value}</span>,
     },
     {
       key: "description",
       label: "Descrição",
       render: (value) => <span>{value}</span>,
-    },
-    {
-      key: "category",
-      label: "Categoria",
-      render: (value, row) => (
-        <span className={`category ${row?.type}`}>{value}</span>
-      ),
     },
     {
       key: "value",
@@ -309,18 +316,13 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const billsColumns: TableColumn[] = [
     {
       key: "date",
-      label: "Data",
+      label: "Pagamento",
       render: (value) => <span>{value}</span>,
     },
     {
       key: "description",
       label: "Descrição",
       render: (value) => <span>{value}</span>,
-    },
-    {
-      key: "category",
-      label: "Categoria",
-      render: (value) => <span className="category expense">{value}</span>,
     },
     {
       key: "value",

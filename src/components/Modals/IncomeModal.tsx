@@ -29,17 +29,6 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Categorias predefinidas para receitas
-  const categories = [
-    "Salário",
-    "Freelance",
-    "Vendas",
-    "Investimentos",
-    "Aluguel Recebido",
-    "Prêmios",
-    "Outros",
-  ];
-
   useEffect(() => {
     if (editingIncome && mode === "edit") {
       // Converter a data para formato ISO
@@ -196,21 +185,16 @@ const IncomeModal: React.FC<IncomeModalProps> = ({
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
-            <label htmlFor="category">Categoria *</label>
-            <select
+            <label htmlFor="category">Descrição</label>
+            <input
+              type="text"
               id="category"
               name="category"
               value={formData.category}
               onChange={handleInputChange}
+              placeholder="Digite a categoria"
               className={errors.category ? "error" : ""}
-            >
-              <option value="">Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
+            />
             {errors.category && (
               <span className="error-message">{errors.category}</span>
             )}

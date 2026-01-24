@@ -133,7 +133,7 @@ const Receitas: React.FC = () => {
     const confirmDelete = window.confirm(
       `Tem certeza que deseja excluir a receita "${
         incomeToDelete.category
-      }" no valor de ${incomeToDelete.formattedValue || incomeToDelete.value}?`
+      }" no valor de ${incomeToDelete.formattedValue || incomeToDelete.value}?`,
     );
 
     if (confirmDelete) {
@@ -315,7 +315,7 @@ const Receitas: React.FC = () => {
   const filterByMonthYear = (
     data: any[],
     selectedMonth: number,
-    selectedYear: number
+    selectedYear: number,
   ) => {
     return data.filter((item) => {
       const dateString = item.date || item.dueDate;
@@ -332,69 +332,81 @@ const Receitas: React.FC = () => {
   // Filtrar receitas e contas a receber pelo mês/ano selecionado
   const filteredIncomes = useMemo(
     () => filterByMonthYear(incomes, selectedMonth, selectedYear),
-    [incomes, selectedMonth, selectedYear]
+    [incomes, selectedMonth, selectedYear],
   );
 
   const filteredReceivables = useMemo(
     () => filterByMonthYear(receivables, selectedMonth, selectedYear),
-    [receivables, selectedMonth, selectedYear]
+    [receivables, selectedMonth, selectedYear],
   );
 
   // Converter dados do contexto para formato das tabelas
   const formatIncomeData = (incomes: any[]) => {
-    return incomes.map((income) => {
-      // Parse correto da data para evitar problema de timezone
-      const [year, month, day] = income.date.split("-").map(Number);
-      const incomeDate = new Date(year, month - 1, day);
+    return incomes
+      .map((income) => {
+        // Parse correto da data para evitar problema de timezone
+        const [year, month, day] = income.date.split("-").map(Number);
+        const incomeDate = new Date(year, month - 1, day);
 
-      return {
-        id: income.id,
-        date: incomeDate.toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-        }),
-        category: income.category,
-        type: income.description || "Variável",
-        value: income.formattedValue,
-        // Manter dados originais para edição
-        originalDate: income.date,
-        originalValue: income.value,
-        originalData: income,
-      };
-    });
+        return {
+          id: income.id,
+          date: incomeDate.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+          }),
+          category: income.category,
+          type: income.description || "Variável",
+          value: income.formattedValue,
+          // Manter dados originais para edição
+          originalDate: income.date,
+          originalValue: income.value,
+          originalData: income,
+        };
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   };
 
   const formatReceivableData = (receivables: any[]) => {
-    return receivables.map((receivable) => {
-      // Parse correto da data para evitar problema de timezone
-      const [year, month, day] = receivable.dueDate.split("-").map(Number);
-      const dueDate = new Date(year, month - 1, day);
+    return receivables
+      .map((receivable) => {
+        // Parse correto da data para evitar problema de timezone
+        const [year, month, day] = receivable.dueDate.split("-").map(Number);
+        const dueDate = new Date(year, month - 1, day);
 
-      return {
-        id: receivable.id,
-        date: dueDate.toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-        }),
-        category: receivable.category,
-        type: receivable.status === "pending" ? "Pendente" : "Pago",
-        value: receivable.formattedValue,
-        // Manter dados originais para edição
-        originalDate: receivable.dueDate,
-        originalValue: receivable.value,
-        originalData: receivable,
-      };
-    });
+        return {
+          id: receivable.id,
+          date: dueDate.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+          }),
+          category: receivable.category,
+          type: receivable.description || "Variável",
+          value: receivable.formattedValue,
+          // Manter dados originais para edição
+          originalDate: receivable.dueDate,
+          originalValue: receivable.value,
+          originalData: receivable,
+        };
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   };
 
   // Calcular totais usando dados filtrados
   const totalIncomes = filteredIncomes.reduce(
     (sum, income) => sum + income.value,
-    0
+    0,
   );
   const totalReceivables = filteredReceivables.reduce(
     (sum, receivable) => sum + receivable.value,
-    0
+    0,
   );
 
   // Dados dinâmicos das tabelas (usando dados filtrados)
@@ -438,8 +450,8 @@ const Receitas: React.FC = () => {
 
   // Definir colunas para a tabela de receitas
   const receitasColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
+
     {
       key: "type",
       label: "Tipo",
@@ -456,11 +468,10 @@ const Receitas: React.FC = () => {
 
   // Definir colunas para a tabela de Valores a Receber
   const contasAReceberColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
     {
       key: "type",
-      label: "Tipo",
+      label: "Descrição",
       render: (value) => (
         <span className={`category ${value.toLowerCase()}`}>{value}</span>
       ),
@@ -535,14 +546,6 @@ const Receitas: React.FC = () => {
             onDelete={handleDeleteIncome}
           />
         </div>
-
-        {/* Gráfico de Receitas Mensais */}
-        <MonthlyBarChart
-          title="Receitas por Mês"
-          data={monthlyData}
-          formatValue={formatCurrency}
-          className="receitas-card chart-card"
-        />
       </div>
 
       {/* Botão Flutuante de Adicionar */}

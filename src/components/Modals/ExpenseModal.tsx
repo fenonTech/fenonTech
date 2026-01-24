@@ -29,20 +29,6 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Categorias predefinidas para despesas
-  const categories = [
-    "Alimentação",
-    "Transporte",
-    "Moradia",
-    "Saúde",
-    "Educação",
-    "Lazer",
-    "Roupas",
-    "Tecnologia",
-    "Serviços",
-    "Outros",
-  ];
-
   useEffect(() => {
     if (editingExpense && mode === "edit") {
       // Converter a data para formato ISO
@@ -199,21 +185,16 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
         <form onSubmit={handleSubmit} className="modal-form">
           <div className="form-group">
-            <label htmlFor="category">Categoria *</label>
-            <select
+            <label htmlFor="category">Descrição *</label>
+            <input
+              type="text"
               id="category"
               name="category"
               value={formData.category}
               onChange={handleInputChange}
+              placeholder="Digite a categoria"
               className={errors.category ? "error" : ""}
-            >
-              <option value="">Selecione uma categoria</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
+            />
             {errors.category && (
               <span className="error-message">{errors.category}</span>
             )}

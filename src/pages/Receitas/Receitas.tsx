@@ -48,12 +48,18 @@ const Receitas: React.FC = () => {
         return {
           id: entrada.codigo.toString(),
           date: formatTableDate(entrada.data_pagamento),
+          originalDate: entrada.data_pagamento,
           category: entrada.tipo,
           type: entrada.descricao || "Variável",
           value: formatCurrency(entrada.valor),
           originalData: entrada,
         };
-      });
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   }, [entradas]);
 
   const contasAReceberData = useMemo(() => {
@@ -63,12 +69,18 @@ const Receitas: React.FC = () => {
         return {
           id: entrada.codigo.toString(),
           date: formatTableDate(entrada.data_pagamento),
+          originalDate: entrada.data_pagamento,
           category: entrada.tipo,
-          type: "Pendente",
+          type: entrada.descricao || "Variável",
           value: formatCurrency(entrada.valor),
           originalData: entrada,
         };
-      });
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   }, [entradas]);
 
   // Função para adicionar nova receita/conta a receber
@@ -176,11 +188,10 @@ const Receitas: React.FC = () => {
 
   // Definir colunas para a tabela de receitas
   const receitasColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
     {
       key: "type",
-      label: "Tipo",
+      label: "Descrição",
       render: (value) => (
         <span className={`category ${value.toLowerCase()}`}>{value}</span>
       ),
@@ -194,11 +205,10 @@ const Receitas: React.FC = () => {
 
   // Definir colunas para a tabela de Valores a Receber
   const contasAReceberColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
     {
       key: "type",
-      label: "Tipo",
+      label: "Descrição",
       render: (value) => (
         <span className={`category ${value.toLowerCase()}`}>{value}</span>
       ),
@@ -273,14 +283,6 @@ const Receitas: React.FC = () => {
             onDelete={handleDeleteIncome}
           />
         </div>
-
-        {/* Gráfico de Receitas Mensais */}
-        <MonthlyBarChart
-          title="Receitas por Mês"
-          data={monthlyData}
-          formatValue={formatCurrency}
-          className="receitas-card chart-card"
-        />
       </div>
 
       {/* Botão Flutuante de Adicionar */}
