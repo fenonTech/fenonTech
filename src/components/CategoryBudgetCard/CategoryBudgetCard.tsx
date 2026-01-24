@@ -29,9 +29,9 @@ const CategoryBudgetCard: React.FC<CategoryBudgetCardProps> = ({
   return (
     <div className={`category-budget-card ${className}`}>
       <h3 className="card-header">{title}</h3>
-      <div className="category-bars">
-        {data.length > 0 ? (
-          <>
+      {data.length > 0 ? (
+        <>
+          <div className="category-bars-scrollable">
             {data.map((item, index) => {
               const percentageOfTotal =
                 totalGeral > 0 ? (item.spent / totalGeral) * 100 : 0;
@@ -56,14 +56,14 @@ const CategoryBudgetCard: React.FC<CategoryBudgetCardProps> = ({
                 </div>
               );
             })}
-            <div className="category-total-footer">
-              Total geral: R$ {totalGeral.toFixed(2).replace(".", ",")}
-            </div>
-          </>
-        ) : (
-          <p className="empty-message">{emptyMessage}</p>
-        )}
-      </div>
+          </div>
+          <div className="category-total-footer">
+            Total geral: R$ {totalGeral.toFixed(2).replace(".", ",")}
+          </div>
+        </>
+      ) : (
+        <p className="empty-message">{emptyMessage}</p>
+      )}
     </div>
   );
 };

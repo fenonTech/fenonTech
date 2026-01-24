@@ -359,49 +359,61 @@ const Despesas: React.FC = () => {
 
   // Converter dados do contexto para formato das tabelas
   const formatExpenseData = (expenses: any[]) => {
-    return expenses.map((expense) => {
-      // Parse correto da data para evitar problema de timezone
-      const [year, month, day] = expense.date.split("-").map(Number);
-      const expenseDate = new Date(year, month - 1, day);
+    return expenses
+      .map((expense) => {
+        // Parse correto da data para evitar problema de timezone
+        const [year, month, day] = expense.date.split("-").map(Number);
+        const expenseDate = new Date(year, month - 1, day);
 
-      return {
-        id: expense.id,
-        date: expenseDate.toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-        }),
-        category: expense.category,
-        type: expense.description || "Variável",
-        value: expense.formattedValue,
-        // Manter dados originais para edição
-        originalDate: expense.date,
-        originalValue: expense.value,
-        originalData: expense,
-      };
-    });
+        return {
+          id: expense.id,
+          date: expenseDate.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+          }),
+          category: expense.category,
+          type: expense.description || "Variável",
+          value: expense.formattedValue,
+          // Manter dados originais para edição
+          originalDate: expense.date,
+          originalValue: expense.value,
+          originalData: expense,
+        };
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   };
 
   const formatPayableData = (payables: any[]) => {
-    return payables.map((payable) => {
-      // Parse correto da data para evitar problema de timezone
-      const [year, month, day] = payable.dueDate.split("-").map(Number);
-      const dueDate = new Date(year, month - 1, day);
+    return payables
+      .map((payable) => {
+        // Parse correto da data para evitar problema de timezone
+        const [year, month, day] = payable.dueDate.split("-").map(Number);
+        const dueDate = new Date(year, month - 1, day);
 
-      return {
-        id: payable.id,
-        date: dueDate.toLocaleDateString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-        }),
-        category: payable.category,
-        type: payable.description || "Variável",
-        value: payable.formattedValue,
-        // Manter dados originais para edição
-        originalDate: payable.dueDate,
-        originalValue: payable.value,
-        originalData: payable,
-      };
-    });
+        return {
+          id: payable.id,
+          date: dueDate.toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+          }),
+          category: payable.category,
+          type: payable.description || "Variável",
+          value: payable.formattedValue,
+          // Manter dados originais para edição
+          originalDate: payable.dueDate,
+          originalValue: payable.value,
+          originalData: payable,
+        };
+      })
+      .sort(
+        (a, b) =>
+          new Date(b.originalDate).getTime() -
+          new Date(a.originalDate).getTime(),
+      );
   };
 
   // Calcular totais usando dados filtrados
@@ -547,11 +559,10 @@ const Despesas: React.FC = () => {
 
   // Definir colunas para a tabela de despesas
   const despesasColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
     {
       key: "type",
-      label: "Tipo",
+      label: "Descrição",
       render: (value) => (
         <span className={`category ${value.toLowerCase()}`}>{value}</span>
       ),
@@ -565,11 +576,10 @@ const Despesas: React.FC = () => {
 
   // Definir colunas para a tabela de contas a pagar
   const contasAPagarColumns: TableColumn[] = [
-    { key: "date", label: "Data" },
-    { key: "category", label: "Categoria" },
+    { key: "date", label: "Pagamento" },
     {
       key: "type",
-      label: "Tipo",
+      label: "Descrição",
       render: (value) => (
         <span className={`category ${value.toLowerCase()}`}>{value}</span>
       ),
@@ -671,13 +681,6 @@ const Despesas: React.FC = () => {
             className="despesas-card category-bars-card"
           />
         </div>
-
-        {/* Gráfico de Despesas Mensais */}
-        <MonthlyBarChart
-          title="Despesas por Mês"
-          data={monthlyData}
-          className="despesas-card chart-card"
-        />
       </div>
 
       {/* Botão Flutuante de Adicionar */}

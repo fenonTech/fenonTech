@@ -44,3 +44,11 @@
   gap: 1rem;
   margin-bottom: 1rem;
 }
+
+/* Padronização de cores - seguindo paleta mobile */
+.dashboard .transaction-table-card,
+.dashboard .monthly-bar-chart-card,
+.dashboard .expenses-pie-chart {
+  background: #191919;
+  border: 1px solid #2a2a2a;
+}
