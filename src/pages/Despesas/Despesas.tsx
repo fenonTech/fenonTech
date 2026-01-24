@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import "./Despesas.css";
 import TransactionTable from "../../components/TransactionTable";
 import type { TableColumn } from "../../components/TransactionTable";
@@ -6,14 +6,12 @@ import ExpensesPieChart from "../../components/ExpensesPieChart";
 import PageHeader from "../../components/PageHeader";
 import FinancialCardGrid from "../../components/FinancialCardGrid";
 import CategoryBudgetCard from "../../components/CategoryBudgetCard";
-import MonthlyBarChart from "../../components/MonthlyBarChart";
 import { ExpenseModal } from "../../components/Modals";
 
 import { useFilter } from "../../contexts/FilterContext";
 import { useBalanceVisibility } from "../../hooks/useBalanceVisibility";
 import { useDespesasData } from "../../hooks/queries";
 import { transactionsService } from "../../services/api/transactionsService";
-import { despesasService } from "../../services/api/despesasService";
 import {
   formatCurrency,
   formatTableDate,
@@ -42,38 +40,6 @@ const Despesas: React.FC = () => {
   const despesaAtual = despesasApiData?.despesaAtual ?? 0;
   const contasAPagar = despesasApiData?.contasAPagar ?? 0;
   const despesas = despesasApiData?.despesas ?? [];
-
-  // Estado para despesas mensais (gráfico anual)
-  const [despesasMensais, setDespesasMensais] = React.useState<{
-    [key: number]: number;
-  }>({});
-
-  // Carregar despesas de todos os meses do ano para o gráfico
-  useEffect(() => {
-    const loadYearlyExpenses = async () => {
-      try {
-        const monthlyTotals: { [key: number]: number } = {};
-
-        // Buscar dados de todos os 12 meses do ano selecionado
-        for (let mes = 1; mes <= 12; mes++) {
-          try {
-            const data = await despesasService.getDespesas(mes, selectedYear);
-            monthlyTotals[mes] = data.despesaAtual;
-          } catch (error) {
-            console.warn(`Erro ao carregar despesas do mês ${mes}:`, error);
-            monthlyTotals[mes] = 0;
-          }
-        }
-
-        setDespesasMensais(monthlyTotals);
-        console.log("✅ Despesas anuais carregadas com sucesso");
-      } catch (error) {
-        console.error("❌ Erro ao carregar despesas anuais:", error);
-      }
-    };
-
-    loadYearlyExpenses();
-  }, [selectedYear]); // Recarregar quando o ano mudar
 
   // Preparar dados para as tabelas
   const despesasData = useMemo(() => {
@@ -270,29 +236,6 @@ const Despesas: React.FC = () => {
       .filter((cat) => cat.percentage > 0)
       .sort((a, b) => b.percentage - a.percentage);
   }, [despesas]);
-
-  // Dados para o gráfico de barras mensais
-  const monthlyData = useMemo(() => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-
-    return months.map((month, index) => ({
-      month,
-      value: despesasMensais[index + 1] || 0,
-    }));
-  }, [despesasMensais]);
 
   // Dados dinâmicos para barras de visão por categoria (apenas despesas pagas)
   const categoryBarsData = useMemo(() => {
