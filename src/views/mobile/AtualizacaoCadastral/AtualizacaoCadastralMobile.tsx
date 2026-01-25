@@ -128,17 +128,6 @@ const AtualizacaoCadastralMobile: React.FC<AtualizacaoCadastralMobileProps> = ({
                     {userData.nome.charAt(0).toUpperCase()}
                   </div>
                 </div>
-                <div className="atualizacao-profile-badge">
-                  <img
-                    src={badgeIcon}
-                    alt="Badge"
-                    style={{
-                      width: "20px",
-                      height: "20px",
-                      objectFit: "contain",
-                    }}
-                  />
-                </div>
               </div>
               <div className="atualizacao-profile-info">
                 <h2 className="atualizacao-profile-name">
