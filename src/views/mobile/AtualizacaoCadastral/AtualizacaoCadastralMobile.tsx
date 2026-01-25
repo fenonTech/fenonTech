@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./AtualizacaoCadastralMobile.css";
-import badgeIcon from "../../../assets/editar.png";
 import { userService, type Usuario } from "../../../services";
 import { authService } from "../../../services/authService";
 
