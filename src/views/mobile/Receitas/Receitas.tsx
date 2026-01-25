@@ -160,7 +160,7 @@ const Receitas: React.FC<ReceitasProps> = ({
 
     // Processar receitas (entradas)
     entradas.forEach((entrada) => {
-      const categoria = entrada.tipo || entrada.descricao || "Receita";
+      const categoria = entrada.tipo || "Receita";
       const valor = entrada.valor;
 
       if (!categoriasMap.has(categoria)) {
@@ -195,7 +195,7 @@ const Receitas: React.FC<ReceitasProps> = ({
   const receitasTransacoes = entradas.map((entrada) => ({
     id: entrada.codigo.toString(),
     tipo: "entrada" as const,
-    categoria: entrada.tipo || entrada.descricao || "Receita",
+    categoria: entrada.descricao || "Sem descrição",
     valor: entrada.valor,
     data: entrada.data_pagamento
       ? formatTableDate(entrada.data_pagamento)
