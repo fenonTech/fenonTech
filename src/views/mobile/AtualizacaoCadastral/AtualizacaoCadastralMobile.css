@@ -95,21 +95,6 @@
   font-size: 3rem;
 }
 
-.atualizacao-profile-badge {
-  position: absolute;
-  bottom: -8px;
-  right: -8px;
-  width: 36px;
-  height: 36px;
-  background: #000000;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  border: 2px solid #000000;
-}
-
 .atualizacao-profile-name {
   font-size: 1.1rem;
   font-weight: 700;
@@ -193,12 +178,6 @@
 
   .atualizacao-profile-avatar-placeholder {
     font-size: 2.5rem;
-  }
-
-  .atualizacao-profile-badge {
-    width: 32px;
-    height: 32px;
-    font-size: 1.25rem;
   }
 
   .atualizacao-profile-name {
